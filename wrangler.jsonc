@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "wingrid",
+  "compatibility_date": "2026-09-01",
+  "routes": [{ "pattern": "wingrid.atlesque.dev", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
+  // a static game: everything is in public/, and the account lives at play.atlesque.dev
+  "assets": { "directory": "./public", "html_handling": "drop-trailing-slash" },
+  "observability": { "enabled": true }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "wingrid",
+  "private": true,
+  "license": "MIT",
+  "description": "Wingrid: a free-to-play 6x5 tumbling scatter-pays slot, saved to Atlesque Play.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8790",
+    "deploy": "wrangler deploy",
+    "test": "node --test test/*.test.js",
+    "rtp": "node scripts/rtp.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.147.0"
+  }
+}
