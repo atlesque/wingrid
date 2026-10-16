@@ -11,6 +11,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #000; color:
   font: 600 14px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; }
 #stage { position: fixed; inset: 0; }
 #stage canvas { display: block; width: 100%; height: 100%; }
+/* Keep the portrait artwork at full width, even on shorter phone screens.
+   Let the page scroll to the lower controls instead of shrinking the game. */
+@media (orientation: portrait) {
+  html, body { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
+  #stage { position: relative; inset: auto; width: 100%; aspect-ratio: 750 / 1624; min-height: 100dvh; }
+}
 button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--edge); background: var(--panel); border-radius: 999px; padding: 6px 12px; }
 
 /* the account sits quietly in a corner, over the game */
