@@ -9,7 +9,9 @@
     "db:migrate:remote": "wrangler d1 migrations apply wingrid --remote",
     "dev": "vite",
     "build": "vite build",
+    "build:ci": "npm test && npm run assets:ci && npm run build && wrangler deploy --dry-run",
     "deploy": "vite build && wrangler deploy",
+    "deploy:ci": "npm run db:migrate:remote && wrangler deploy && node scripts/check-production.mjs",
     "test": "node --test test/*.test.js",
     "character:import": "node scripts/import-character.mjs"
   },

@@ -44,19 +44,22 @@ This copy does not read or upload to Starlight's R2 bucket.
 
 ### Automatic deployment
 
-`.github/workflows/deploy.yml` tests, builds, and validates the deployment package
-for pull requests. Pushes and merges to `main` also apply D1 migrations, deploy
-the existing `wingrid` Worker, and check the live home page and `/api/config`.
-The workflow can be run manually from GitHub Actions on `main`. Production runs
-are serialized so an active deployment is allowed to finish.
+Cloudflare Workers Builds is connected to `atlesque/wingrid`, with `main` as
+its production branch. Pushes and merges to `main` build and deploy the existing
+`wingrid` Worker using its existing Cloudflare build token. GitHub Actions runs
+checks for pull requests and `main`; it does not need Cloudflare credentials.
 
-Add `CLOUDFLARE_API_TOKEN` under repository **Settings → Secrets and variables →
-Actions** to activate production deployments. Use a dedicated token scoped to
-account `df08931372f873bc0c8edb7679dc0cf4`, with Workers Scripts Edit, Workers
-Routes Edit, D1 Edit, Account Settings Read, and Zone Read for the `atlesque.dev`
-zone. The account ID is configured in the workflow; no account secret is needed.
-Never store the API token in Git. Local Wrangler OAuth credentials are not used
-by CI. See Cloudflare's [GitHub Actions deployment guide](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/).
+Cloudflare production build settings:
+
+- Build command: `npm run build:ci`
+- Deploy command: `npm run deploy:ci`
+- Root directory: `/`
+
+The build runs tests, restores artwork, builds the app, and validates the deployment
+package. Deployment applies D1 migrations, deploys the Worker, and checks the live
+home page and `/api/config`. To retry a deployment, use **Retry build** in the
+Worker's Cloudflare deployment history. Production-only automatic deployments
+are intended; preview deployments are disabled.
 
 The imported artwork remains outside Git. `npm run assets:ci` downloads the
 existing files served at `https://wingrid.atlesque.dev/starlight/` and verifies
