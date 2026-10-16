@@ -273,16 +273,19 @@ async function build(name, onProgress = () => {}) {
     const obj = await makeItem(it);
     if (!obj) continue;
     if (/^stpr_character_01(?:_SkeletonData)?$/.test(it.skeleton || '') && L.canvas[0] > L.canvas[1]) {
-      // Fit the wider wings in the character column, clear of all six reels.
+      // Fill the character column and float just below the logo.
       const bounds = obj.getBounds();
       const anchor = L.items.find(item => item.path.endsWith('Reels/ClippingAnchors/DownRight'))?.leaves?.[0]?.b;
-      const left = anchor ? anchor[0] + anchor[2]/2 + 28 : L.canvas[0]*.85;
-      const width = L.canvas[0] - 18 - left;
-      const fit = Math.min(1, width/bounds.width);
+      const left = anchor ? anchor[0] + anchor[2]/2 + 8 : L.canvas[0]*.85;
+      const width = L.canvas[0] - 4 - left;
+      const fit = width/bounds.width;
       obj.scale.set(obj.scale.x*fit, obj.scale.y*fit);
       const fitted = obj.getBounds();
       obj.x += left + width/2 - (fitted.x + fitted.width/2);
-      obj.y += bounds.y + bounds.height/2 - (fitted.y + fitted.height/2);
+      const logo = L.items.find(item => /Logo\/Land\/S$/.test(item.path));
+      const logoBounds = logo && drawnBounds(logo);
+      const top = logoBounds ? logoBounds.y + logoBounds.h + 24 : L.canvas[1]*.3;
+      obj.y += top - fitted.y;
     }
     obj.item = it;
     root.addChild(obj);
