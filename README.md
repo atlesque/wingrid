@@ -42,6 +42,35 @@ Run `npm run assets` on a fresh checkout to import the archived game art, then
 sound are uploaded as Cloudflare static assets together with the build.
 This copy does not read or upload to Starlight's R2 bucket.
 
+### Automatic deployment
+
+Cloudflare Workers Builds is connected to `atlesque/wingrid`, with `main` as
+its production branch. Pushes and merges to `main` build and deploy the existing
+`wingrid` Worker using its existing Cloudflare build token. GitHub Actions runs
+checks for pull requests and `main`; it does not need Cloudflare credentials.
+
+Cloudflare production build settings:
+
+- Build command: `npm run build:ci`
+- Deploy command: `npm run deploy:ci`
+- Root directory: `/`
+
+The build runs tests, restores artwork, builds the app, and validates the deployment
+package. Deployment applies D1 migrations, deploys the Worker, and checks the live
+home page and `/api/config`. To retry a deployment, use **Retry build** in the
+Worker's Cloudflare deployment history. Production-only automatic deployments
+are intended; preview deployments are disabled.
+
+The imported artwork remains outside Git. `npm run assets:ci` downloads the
+existing files served at `https://wingrid.atlesque.dev/starlight/` and verifies
+each SHA-256 against `scripts/ci-assets.json`, then overlays the checkout's tracked
+`layout/` files. This also works for a fresh local checkout without the sibling
+archive. CI depends on those production asset URLs remaining available; a missing
+or changed file stops the build before deployment. For intentional imported-art
+updates, use the local archive and manual deployment path and update the manifest
+checksums in the same source change. Princess v2 and Wingrid branding continue
+to come from the tracked `public/` files.
+
 The previous Wingrid checkout is saved in `.backups/before-starlight-rebuild-20261016.tar.gz`.
 The previous production Worker version is recorded in `.backups/previous-deployment.txt`.
 The `starlight-rebuild` source checkout was not modified.
