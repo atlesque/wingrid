@@ -1,53 +1,100 @@
-# Wingrid
+# Wingrid — Starlight rebuild with Princess v2
 
-A free-to-play tumbling slot at **https://wingrid.atlesque.dev**. Credits are play money only: players start with 1,000, they can't be bought or cashed out, and a player who runs out can claim 1,000 more once an hour. Signed in with an [Atlesque Play](https://github.com/atlesque/mbp-games) account, credits and stats follow the player to every device.
+Our own JavaScript version of the archived Starlight Princess slot. It's a 6×5 tumbling grid that pays for 8 or more of a symbol anywhere, with multiplier orbs and free spins, and it runs on a Cloudflare stack:
 
-## How it plays
+- **Front end** (`index.html`, `src/client/`): PixiJS 7 with `pixi-spine`, drawing the archived Spine skeletons and backgrounds. The page never decides a spin. It sends the request and animates the tumbles it gets back.
+- **Worker** (`src/worker/index.js`): owns credits, bets, free spins and stats in **D1**. Every spin runs here with `crypto.getRandomValues`, and a version check on the player row stops two requests from spending the same credits.
+- **Rules** (`src/shared/engine.js`, `round.js`): Wingrid's engine plus the round logic, shared by the Worker and the tests. Credits are play money only.
 
-- A 6×5 grid. **8 or more** of a symbol **anywhere** pays (8-9, 10-11 and 12+ tiers).
-- Winning symbols vanish and the rest **tumble** down; new ones fill in from the top, until nothing more wins.
-- **Multiplier orbs** (2x to 500x) can land on any tumble. When a spin wins, the orbs on the grid add up and multiply the win.
-- **Wish stars** (scatters) pay anywhere. 4 or more start **15 free spins**, where orbs on winning spins add to one total multiplier for the whole feature; 3 or more add 5 spins.
-- **Ante bet** (1.25x the bet) doubles the chance of wish stars. **Buy free spins** for 100x the bet.
-- One spin or one feature never pays more than 5,000x the bet.
+None of Pragmatic's engine code is used. The archive is only a source of art.
 
-Simulated return to player is about 96-98% (`npm run rtp -- 1000000 base|ante|buy`); free spins come about 1 in 390 spins, or 1 in 190 with the ante bet.
+## Guests and accounts
 
-## Code
+A new browser gets a guest session (`POST /api/guest`) and plays straight away. **Sign in** sends the player to Atlesque Play ([mbp-games](https://github.com/atlesque/mbp-games)) and back with a one-time code. The Worker swaps that code for the account token, so the token never sits in the page. After that:
 
-Plain HTML, CSS and JavaScript modules in `public/`, served as static assets by a Cloudflare Worker. No build step.
+- an account the game already knows takes over the session, so the same credits show up on every device;
+- a new account takes the guest's progress, unless Atlesque Play already holds a save for it (for example from Wingrid), in which case that save wins;
+- every change goes up to Atlesque Play as the game's progress, with its revision. If the account's copy moved on without us (another device, an admin reset), the account's copy replaces ours.
 
-- `public/js/engine.js`: the rules, paytable and odds, with no DOM. Change the numbers here and rerun `npm run rtp`.
-- `public/js/feature.js`: a whole round including free spins, for the RTP script and tests.
-- `public/js/game.js`: the page: drawing the grid, the tumble animations, controls and dialogs.
-- `public/js/save.js`: credits, bet settings, stats and unfinished free spins, kept in `localStorage`.
-- `public/js/account.js`: the Atlesque Play client (PKCE sign-in, progress sync with revisions).
-
-## Replacing the art
-
-Every symbol is one SVG in `public/assets/symbols/` (`crown`, `chalice`, `hourglass`, `ring`, `amethyst`, `topaz`, `emerald`, `sapphire`, `ruby`, `scatter`, `mult`). Drop in new files with the same names, square, and they show up everywhere, paytable included. To use PNG or WebP instead, change the extension in `cellEl()` and `paytable()` in `game.js`. Colours and the background live at the top of `public/style.css`.
-
-## Atlesque Play
-
-The game id is `wingrid`, registered in `src/clients.js` of [mbp-games](https://github.com/atlesque/mbp-games). The save is `{ credits, bet, ante, stats, feature, lastTopUp }`; the admin page shows credits, spins and the biggest win from it. Point a local copy at a local accounts service with `?debug&accounts=http://localhost:8787`.
+The save uses Wingrid's format (`{ credits, bet, ante, stats, feature, lastTopUp }`), and `PLAY_GAME_ID` is `wingrid` for now. This Wingrid deployment intentionally uses its existing game id.
 
 ## Running it
 
 ```sh
 npm install
-npm run dev      # http://localhost:8790
-npm test         # rules, tumbles, free spins and RTP bounds
-npm run deploy   # to wingrid.atlesque.dev
+npm run assets       # copies the art from ../starlight-princess-archive/extracted into public/starlight/
+npm run db:migrate   # creates the local D1 tables
+npm run dev          # http://127.0.0.1:8796 (Vite and the Worker on one origin)
+npm test
 ```
 
-## Floating character demo
+Copy `.dev.vars.example` to `.dev.vars` so sign-in goes to a local Atlesque Play rather than the live one. To try sign-in, run mbp-games locally as well (`npm run dev` there, on :8787). Its emails are saved under `.wrangler/tmp/email` rather than sent, and the link inside points at `play.atlesque.dev`, so open it with `http://localhost:8787` in its place.
 
-Open `public/demos/character-float.html` directly in a browser, or visit
-`/demos/character-float.html` on the local server. This self-contained demo
-embeds the archived Starlight Princess idle rig, texture, and PixiJS/Spine
-runtime, with floating movement, pointer guidance, pause, and background
-controls. It refreshes all sprite transforms each frame so facial features
-and clothing stay aligned with the animated rig.
+## Deploying Wingrid
 
-The demo's third-party art and runtime retain their original owners' rights
-and are not covered by Wingrid's MIT license. The demo is for local study.
+This copy deploys the existing **https://wingrid.atlesque.dev** Worker (`wingrid`).
+Its D1 database is `wingrid` (`744548f7-ea4e-4ad8-a97d-e7d261171e51`), separate
+from Starlight's database. Atlesque Play keeps the existing `wingrid` game id,
+so account saves and sign-in continue to use Wingrid's established identity.
+
+Run `npm run assets` on a fresh checkout to import the archived game art, then
+`npm run db:migrate:remote` before `npm run deploy`. All game art, fonts, and
+sound are uploaded as Cloudflare static assets together with the build.
+This copy does not read or upload to Starlight's R2 bucket.
+
+The previous Wingrid checkout is saved in `.backups/before-starlight-rebuild-20261016.tar.gz`.
+The previous production Worker version is recorded in `.backups/previous-deployment.txt`.
+The `starlight-rebuild` source checkout was not modified.
+
+## Princess v2
+
+`src/client/character-v2.js` loads our exact-source 13-part, 21-bone mesh rig
+using Pixi 7 and Spine 3.7. It includes the stronger independent motion and
+original-pixel eyelid blinking from the character demo. Reduced-motion settings
+show the undeformed reference pose. The character replaces the old princess
+in both captured layouts, with the landscape silhouette fitted clear of the reels.
+
+Its source image, rig, atlas metadata, and source checksum live in
+`public/characters/princess-v2/` and are included in the deployment. To import
+updated art/rig files from the archive demo, run `npm run character:import`.
+The runtime adapter is maintained in `src/client/character-v2.js`.
+
+## Looking exactly like the original
+
+The screen is not laid out by hand. `layout/landscape.json` and `layout/portrait.json` are single frames captured from the archived original, listing every sprite, label and Spine skeleton it drew, in draw order, with where and how big each was on screen. `layout/symbols.json` holds each symbol's rig: its idle sprite and its land, win, win-frame and disappear animations, with their offsets. `src/client/scene.js` draws those lists with the original art, and puts our grid of symbols where the original's reels were.
+
+To recapture (for another screen, or after re-mirroring the archive), run the original on 127.0.0.1:8788, start `node scripts/capture-server.mjs`, and in the original's page run the code in `scripts/capture-layout.js`, then `await captureLayout('landscape')` (a 16:9 window) or `'portrait'` (a phone, which loads the original's mobile build). After that, run `npm run assets`.
+
+`npm run assets` rebuilds everything from the archive:
+
+- **Spine**: each skeleton comes from the desktop build. (The decoded archive sometimes kept the mobile or mini copy, which has other animations.) Each skeleton's `.atlas` is rebuilt from the desktop scene data. In the original's sprite lists, a rotated sprite's width and height are its rect on the page, so upright it is height × width. This was checked against every skeleton's own attachment sizes. Padding counts toward the attachment size. The atlases in `extracted/` mixed in the mini build's rects and drew garbled.
+- **NGUI atlases**: `ui/atlases.json` has every sprite list, used for the backgrounds, reel frame, logo, symbols, buttons and panels.
+- **Fonts**: `fonts.css` has the game's fonts under their original family names.
+
+`public/starlight/` is git-ignored. The art is licensed for this private copy, and it will be replaced with our own later. Each symbol is one prefab rig (`PREFAB` in `scene.js`), so replacements can go in one at a time.
+
+## Sound, autoplay and volume
+
+`src/client/sound.js` plays the original's own clips at the moments the original plays them. We worked this out by hooking its sound engine during spins (`layout/sound-refs.json` maps each clip to the part of the original that uses it):
+
+- an ambience loop that never stops;
+- music in layers (idle, spinning, tumbling wins) that run in step and crossfade over 3 seconds;
+- the spin button, the six reel stops, the vanish sound (which climbs with each tumble), tumble fills, the win count-up and the scatter and multiplier voices.
+
+Audio starts on the first tap or key, as browsers require.
+
+The autoplay settings window (turbo, quick spin, skip screens, number of spins) and the volume popover are drawn from frames captured with them open in the original (`layout/autoplay-landscape.json`, `layout/sound-landscape.json`). On a phone they open centred. The original's own mobile versions of these aren't captured yet.
+
+## API
+
+| Call | Does |
+|------|------|
+| `POST /api/guest` | new guest → `{ token, state }` |
+| `GET /api/state` | the player's state (pulls from Atlesque Play when signed in) |
+| `POST /api/spin { buy? }` | the next paid or free spin → `{ spin, state }`, where `spin.steps` holds every tumble |
+| `POST /api/bet { bet?, ante? }` | bet index and ante |
+| `POST /api/topup` | 1,000 free credits when broke, once an hour |
+| `POST /api/signin { code, code_verifier, redirect_uri }` | finishes the Atlesque Play sign-in |
+| `POST /api/signout` | ends the session; the page starts a new guest |
+
+Every call except `guest` and `config` sends `Authorization: Bearer <token>`. POSTs must come from the page's own origin.

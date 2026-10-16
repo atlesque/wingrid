@@ -1,0 +1,2 @@
+# copy to .dev.vars for local dev: sign-in goes to a local mbp-games (`npm run dev` there)
+PLAY_URL=http://localhost:8787

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Wingrid</title>
+  <link rel="stylesheet" href="/starlight/fonts.css">
+  <link rel="stylesheet" href="/src/client/style.css">
+</head>
+<body>
+  <div id="stage"></div>
+
+  <div class="who">
+    <span id="sync" role="status">Playing as guest</span>
+    <button id="account" type="button">Sign in</button>
+  </div>
+
+  <div id="loading" aria-label="Wingrid loading">
+    <div class="loading-card">
+      <div class="loading-stars" aria-hidden="true">✧ <span>✦</span> ✧</div>
+      <img class="loading-logo" src="/branding/wingrid-logo.png" alt="Wingrid" width="280" height="180">
+      <p id="loading-message" role="status">Gathering the starlight…</p>
+      <div id="loading-progress" role="progressbar" aria-label="Game loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="loading-fill"></div>
+      </div>
+      <div class="loading-caption"><span>ASSET LOADING</span><span id="loading-percent" aria-hidden="true">0%</span></div>
+      <button id="loading-retry" type="button" hidden>Try again</button>
+    </div>
+  </div>
+  <div id="toast" hidden></div>
+
+  <dialog id="banner"><h2></h2><p></p><div class="actions"><button type="button">Continue</button><button type="button" hidden>Cancel</button></div></dialog>
+
+  <script type="module" src="/src/client/main.js"></script>
+</body>
+</html>

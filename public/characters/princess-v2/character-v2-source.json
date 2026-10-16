@@ -1,0 +1,12 @@
+{
+  "source": "character-v2-reference.png",
+  "sha256": "c635a1f7572c12222cb98a208483b955ae610915ccf542e475766aa7c1276f83",
+  "width": 1024,
+  "height": 1536,
+  "gridStep": 24,
+  "parts": 13,
+  "bones": 21,
+  "triangles": 8708,
+  "sharedVertices": true,
+  "referencePose": "identity mapping of every source pixel"
+}

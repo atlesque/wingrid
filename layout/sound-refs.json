@@ -1,0 +1,1906 @@
+{
+ "refs": {
+  "fb679d7b77b4ef140ae6e89892ab6bdc": [
+   "IntroScreen/content/ContentII/Content/PageButtons/Page1Button/Collider :SoundPlayer.audioClip",
+   "IntroScreen/content/ContentII/Content/PageButtons/Page2Button/Collider :SoundPlayer.audioClip",
+   "IntroScreen/content/ContentII/Content/PageButtons/Page3Button/Collider :SoundPlayer.audioClip",
+   "IntroScreen/content/ContentII/IntroButtons/PlayButtonIntro :SoundPlayer.audioClip",
+   "IntroScreen/content/ContentII/IntroButtons/ButtonSkipIntro/Button :SoundPlayer.audioClip",
+   "BBB/BonusBuyBlack/Content/Landscape/Buy_BetButtonsCommon/Content/Buy_TotalBetContainer/BetUp_Button :SoundPlayer.audioClip",
+   "BBB/BonusBuyBlack/Content/Landscape/Buy_BetButtonsCommon/Content/Buy_TotalBetContainer/BetDown_Button :SoundPlayer.audioClip",
+   "BBB/BonusBuyBlack/Content/Portrait/Buy_BetButtonsCommon/Content/Buy_TotalBetContainer/BetUp_Button :SoundPlayer.audioClip",
+   "BBB/BonusBuyBlack/Content/Portrait/Buy_BetButtonsCommon/Content/Buy_TotalBetContainer/BetDown_Button :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsLand/SoundOff :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsLand/SoundOn/ButtonOpen :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsLand/SoundOn/ButtonClose :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsPort/SoundOff :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsPort/SoundOn/ButtonOpen :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsPort/SoundOn/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/Buy_BetButtons/Content/BetUp_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/Buy_BetButtons/Content/BetDown_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/MaxBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/BetButtonsArea/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/BetButtonsArea/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/HalfBet/HalfBetButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/DoubleBet/DoubleBetButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/ResetBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/MaxBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/7/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/8/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/9/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/4/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/5/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/6/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/1/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/2/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/3/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/0/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/sep/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/backspace/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/TopBar/Buy_BetButtons/Content/BetUp_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/TopBar/Buy_BetButtons/Content/BetDown_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/MaxBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/BetButtonsArea/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/BetButtonsArea/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/HalfBet/HalfBetButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/DoubleBet/DoubleBetButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/ResetBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/MaxBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/7/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/8/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/9/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/4/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/5/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/6/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/1/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/2/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/3/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/0/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/sep/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/backspace/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/FreeSpinsResultWindows/WinWindow/Buttons/FreeSpinsContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/PlayLater/PlayLater/ButtonTime :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/ButtonTime :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/ButtonTime :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit00/LinkVisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit00/LinkUnvisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit01/LinkVisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit01/LinkUnvisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit02/LinkVisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit02/LinkUnvisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit03/LinkVisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit03/LinkUnvisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/Ear/Land/ScreenAnchor/Holder_Rank/Rank/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/Ear/Land/ScreenAnchor/Holder_Rank/Rank/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/Ear/Port/ScreenAnchor/Holder_Rank/RankArranged/Rank/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/Ear/Port/ScreenAnchor/Holder_Rank/RankArranged/Rank/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/Window/Dynamic/Progress/Close/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/Window/Dynamic/Progress/XButton/XButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/Window/Dynamic/Final/Close/SpinWheelButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Asia/Content/CloseButton/Arrangeable/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentAnnouncements/AnnouncementWindow/Holder/Port/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/CloseBtnHolder/CloseBtn :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_1/CNBtnHolder/CNBtn :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_2/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_2/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_3/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_3/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_3/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_4/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_4/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_4/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_4/CNBtnHolder_3/CNBtn_3 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Texts/ShowMore/ShowMoreButton :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_1/CNBtnHolder/CNBtn :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_2/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_2/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_3/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_3/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_3/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_4/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_4/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_4/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_4/CNBtnHolder_3/CNBtn_3 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Port/Buttons/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Port/Buttons/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Port/Buttons/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Port/Buttons/CNBtnHolder_3/CNBtn_3 :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Single/Button/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Collapsed/Button/ColliderLobbyOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Collapsed/Button/ColliderLobbyClosed :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Button/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_0/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_1/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_2/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_3/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_4/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_5/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Land/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Land/Top/Tabs/LastWins/Inactive/Anchored/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Land/Top/Tabs/TopWins/Inactive/Anchored/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Port/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Port/Top/Tabs/LastWins/Inactive/Anchored/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Port/Top/Tabs/TopWins/Inactive/Anchored/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Land/Top/BackButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Land/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Port/Top/BackButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Port/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Land/Background/S_0 :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Land/Top/BackButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Land/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Port/Background/S_0 :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Port/Top/BackButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Port/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/TournamentPointsNotification/Land/Content/Holder/Button/MinimizeButton :SoundPlayer.audioClip",
+   "GUI_mobile/TournamentPointsNotification/Portrait/Content/Holder/Button/MinimizeButton :SoundPlayer.audioClip",
+   "GUI_mobile/VerifyGameIframe/Frame/Content/Land/Background/S_0 :SoundPlayer.audioClip",
+   "GUI_mobile/VerifyGameIframe/Frame/Content/Land/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/VerifyGameIframe/Frame/Content/Port/Background/S_0 :SoundPlayer.audioClip",
+   "GUI_mobile/VerifyGameIframe/Frame/Content/Port/Top/XButton/CloseButton :SoundPlayer.audioClip"
+  ],
+  "ac8c53df56f9f2141b4ed263cfa094ce": [
+   "IntroScreen/content/ContentII/Content/PageButtons/Page1Button/Collider :SoundPlayer.audioClip",
+   "IntroScreen/content/ContentII/Content/PageButtons/Page2Button/Collider :SoundPlayer.audioClip",
+   "IntroScreen/content/ContentII/Content/PageButtons/Page3Button/Collider :SoundPlayer.audioClip",
+   "IntroScreen/content/ContentII/IntroButtons/PlayButtonIntro :SoundPlayer.audioClip",
+   "IntroScreen/content/ContentII/IntroButtons/ButtonSkipIntro/Button :SoundPlayer.audioClip",
+   "BBB/BonusBuyBlack/Content/Landscape/Buy_BetButtonsCommon/Content/Buy_TotalBetContainer/BetUp_Button :SoundPlayer.audioClip",
+   "BBB/BonusBuyBlack/Content/Landscape/Buy_BetButtonsCommon/Content/Buy_TotalBetContainer/BetDown_Button :SoundPlayer.audioClip",
+   "BBB/BonusBuyBlack/Content/Portrait/Buy_BetButtonsCommon/Content/Buy_TotalBetContainer/BetUp_Button :SoundPlayer.audioClip",
+   "BBB/BonusBuyBlack/Content/Portrait/Buy_BetButtonsCommon/Content/Buy_TotalBetContainer/BetDown_Button :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/ReplaySessionEnd/Holder/Land/Buttons/Watch/Button :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/ReplaySessionEnd/Holder/Land/Buttons/Link/Copy/Button :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/ReplaySessionEnd/Holder/Land/Buttons/Link/Create/Button :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/ReplaySessionEnd/Holder/Port/Buttons/Watch/Button :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/ReplaySessionEnd/Holder/Port/Buttons/Link/Copy/Button :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/ReplaySessionEnd/Holder/Port/Buttons/Link/Create/Button :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsLand/SoundOff :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsLand/SoundOn/ButtonOpen :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsLand/SoundOn/ButtonClose :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsPort/SoundOff :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsPort/SoundOn/ButtonOpen :SoundPlayer.audioClip",
+   "CommonExtra_mobile/ReplayManager/Utils/SoundButton/Holder/Mobile/SoundButtonsPort/SoundOn/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/DynamicContent/AnchoredLeft/Buttons/AutoplayButton/Buttons/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/DynamicContent/AnchoredLeft/Buttons/AutoplayButton/Buttons/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/DynamicContent/AnchoredLeft/Buttons/BetButton/ButtonBetsOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/DynamicContent/AnchoredLeft/Buttons/BetButton/ButtonBetsClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/MenuButton/MenuOpenClose/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/MenuButton/MenuOpenClose/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/MenuButton/ButtonPaytableClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/MenuButton/ButtonAutoplayClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/PaytableButton/PaytableButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/PaytableButton/PaytableButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/AutoPlayButton/APButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/PaytableButton/PaytableButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/PaytableButton/PaytableButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/GameSpeed/Normal :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/GameSpeed/QuickSpin :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/GameSpeed/TurboSpin :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/MenuButton/MenuOpenClose/ButtonOpen/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/MenuButton/MenuOpenClose/ButtonOpen/ButtonOpenExpanded :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/MenuButton/MenuOpenClose/ButtonClose/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/MenuButton/MenuOpenClose/ButtonClose/ButtonCloseExpanded :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/MenuButton/ButtonPaytableClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/MenuButton/ButtonAutoplayClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/Combined/GameSpeed/Normal :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/Combined/GameSpeed/QuickSpin :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/Combined/GameSpeed/TurboSpin :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/Combined/HyperPlay/Normal :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/BetButtons/Buttons/Open :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/BetButtons/Buttons/Close :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/AutoplayButton/Buttons/Open :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredRight/ButtonGroup/AutoplayButton/Buttons/Close :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/Buy_BetButtons/Content/BetUp_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/Buy_BetButtons/Content/BetDown_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/TurboSpin/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/TurboSpin/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/FastPlay/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/FastPlay/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/SkipScreens/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/SkipScreens/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/NumberOfSpins/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/SubmitButton/StartAutoplayButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AutoplaySimpleWindow/Content/HyperplayWindow/OpenHyperPlay/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCash/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCash/TotalBet/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCash/TotalBet/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCash/CloseButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/Bet/Bet/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/Bet/Bet/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/Bet/CoinValue/Buttons/CoinValuePlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/Bet/CoinValue/Buttons/CoinValueMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/SmartBet/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/SmartBet/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/MaxBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCoins/CloseButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetInCashNew/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/BetButtonsArea/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/BetButtonsArea/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/HalfBet/HalfBetButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/DoubleBet/DoubleBetButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/ResetBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/MaxBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/7/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/8/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/9/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/4/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/5/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/6/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/1/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/2/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/3/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/0/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/sep/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/backspace/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/Links/WithoutPromoUrl/Home :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/Links/WithoutPromoUrl/GameHistory :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/Links/WithPromoUrl/Home :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/Links/WithPromoUrl/GameHistory :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/Links/JurisdictionPromoUrl :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/VerifyGameAuthenticityLinkLand :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/MenuBets/BetInCash/ButtonsCash/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/MenuBets/BetInCash/ButtonsCash/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/MenuBets/BetInCoins/SmartBet/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/MenuBets/BetInCoins/SmartBet/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/FastPlay/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/BatterySaver/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/SoundButtons/SoundDownload/Icon/SoundButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/SoundButtons/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/SpinButtonPositionLock/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/ShowNGN/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/HapticFeedback/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/MenuWindow/Content/ShowPromotions/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/NumberOfSpins/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Checkboxes/TurboSpin/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Checkboxes/TurboSpin/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Checkboxes/FastPlay/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Checkboxes/FastPlay/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Checkboxes/SkipScreens/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Checkboxes/SkipScreens/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/StopAutoplay/Sliders/IfWin/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/StopAutoplay/Sliders/IfCashIncreases/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/StopAutoplay/Sliders/IfCashDecreases/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/StopAutoplay/Checkboxes/OnAnyWin/Control/OnAnyWinControl :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/StopAutoplay/Checkboxes/IfFeatureIsWon/Control/IfFeatureIsWonControl :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/SubmitButton/StartAutoplayButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/FreeSpinsResultWindows/WinWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/FreeSpinsResultWindows/WinWindow/Buttons/FreeSpinsContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/NoMoneyAnimator/NoMoneyWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/NoMoneyAnimator/NoMoneyWindow/Button/NoMoneyButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsFinishedWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsFinishedWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsFinishedWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BetsButton/Buttons/Open :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BetsButton/Buttons/Close :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/AutoplayButton/Buttons/Open :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/AutoplayButton/Buttons/Close :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/DynamicContent/ContentScale/Normal/SpinButtons/StartSpin_Button/Buttons/SmartBetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/DynamicContent/ContentScale/Normal/SpinButtons/StartSpin_Button/Buttons/SmartBetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/TopBar/Buy_BetButtons/Content/BetUp_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/TopBar/Buy_BetButtons/Content/BetDown_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredLeft/MenuButton/MenuOpenClose/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredLeft/MenuButton/MenuOpenClose/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredLeft/MenuButton/ButtonPaytableClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredLeft/MenuButton/ButtonAutoplayClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredLeft/PaytableButton/PaytableButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredLeft/PaytableButton/PaytableButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/AutoPlayButton/APButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/MenuButton/MenuOpenClose/ButtonOpen/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/MenuButton/MenuOpenClose/ButtonOpen/ButtonOpenExpanded :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/MenuButton/MenuOpenClose/ButtonClose/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/MenuButton/MenuOpenClose/ButtonClose/ButtonCloseExpanded :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/MenuButton/ButtonPaytableClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/MenuButton/ButtonAutoplayClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/PaytableButton/PaytableButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/PaytableButton/PaytableButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/BetButton/ButtonBetsOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredRight/BetButton/ButtonBetsClose :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/AutoplayButton/Buttons/Open :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/AutoplayButton/Buttons/Close :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/GameSpeed/Normal :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/GameSpeed/QuickSpin :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/GameSpeed/TurboSpin :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/BetButtons/Buttons/Open :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/BetButtons/Buttons/Close :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/Combined/GameSpeed/Normal :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/Combined/GameSpeed/QuickSpin :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/Combined/GameSpeed/TurboSpin :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/ButtonGroup/Combined/HyperPlay/Normal :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/NotClipped/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/NotClipped/SubmitButton/StartAutoplayButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/Checkboxes/TurboSpin/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/Checkboxes/TurboSpin/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/Checkboxes/FastPlay/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/Checkboxes/FastPlay/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/Checkboxes/SkipScreens/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/Checkboxes/SkipScreens/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/NumberOfSpins/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/StopAutoplay/Sliders/IfCashDecreases/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/StopAutoplay/Sliders/IfWin/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/StopAutoplay/Sliders/IfCashIncreases/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/StopAutoplay/Checkboxes/OnAnyWin/Control/OnAnyWinControl :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AdvanceAutoplayAnimator/AdvanceAutoplayWindow/Clipped/Content/StopAutoplay/Checkboxes/IfFeatureIsWon/Control/IfFeatureIsWonControl :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/NumberOfSpins/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/TurboSpin/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/TurboSpin/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/FastPlay/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/FastPlay/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/SkipScreens/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/Checkboxes/SkipScreens/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/SubmitButton/StartAutoplayButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/AutoplaySimpleWindow/Content/HyperplayWindow/OpenHyperPlay/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCash/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCash/Bet/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCash/Bet/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/Bet/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/Bet/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/CoinValue/Buttons/CoinValuePlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/CoinValue/Buttons/CoinValueMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/SmartBet/Buttons/SmartBetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/SmartBet/Buttons/SmartBetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCoins/MaxBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetInCashNew/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/BetButtonsArea/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/BetButtonsArea/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/HalfBet/HalfBetButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/DoubleBet/DoubleBetButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/ResetBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/BetsSide/MaxBet/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/7/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/8/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/9/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/4/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/5/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/6/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/1/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/2/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/3/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/0/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/sep/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BetsWindow/Content/BetManualInput/KeypadSide/backspace/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/XButton/Holder/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/Paytable :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/AutoPlay/ButtonSimple :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/AutoPlay/ButtonAdvanced :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/Links/WithoutPromoUrl/Home :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/Links/WithoutPromoUrl/GameHistory :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/Links/WithPromoUrl/Home :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/Links/WithPromoUrl/GameHistory :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/Links/JurisdictionPromoUrl :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/GeneralSettings/BatterySaver/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/GeneralSettings/FastPlay/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/GeneralSettings/SoundButtons/SoundDownload/Icon/SoundButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/GeneralSettings/SoundButtons/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/GeneralSettings/SpinButtonPositionLock/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/GeneralSettings/ShowNGN/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/GeneralSettings/HapticFeedback/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/GeneralSettings/ShowPromotions/Slider/Thumb :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/BetSettings/BetInCash/Buttons/BetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/BetSettings/BetInCash/Buttons/BetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/BetSettings/BetInCoins/Buttons/SmartBetPlus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/BetSettings/BetInCoins/Buttons/SmartBetMinus :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/MenuWindow/Content/VerifyGameAuthenticityLinkPort :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/NoMoneyAnimator/NoMoneyWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/NoMoneyAnimator/NoMoneyWindow/Button/NoMoneyButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/FreeSpinsResultWindows/WinWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/FreeSpinsResultWindows/WinWindow/Buttons/FreeSpinsContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/PlayLater/PlayLater/ButtonTime :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsFinishedWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/ButtonTime :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsFinishedWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/TimedBonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/PlayLater/PlayLater/ButtonTime :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsStartWindow/Buttons/PlayLater/PlayNow/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsFinishedWindow/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/Windows/BonusRoundsWindows/BoostBonusRoundsFinishedWindow/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/GambleRoot/Content/SelectionWindow/ButtonsHolder/ButtonCollect :SoundPlayer.audioClip",
+   "GUI_mobile/GambleRoot/ResultWindow/ResultLost/Content/Buttons/ButtonOK/OKButton :SoundPlayer.audioClip",
+   "GUI_mobile/GambleRoot/ResultWindow/ResultWin/Content/Buttons/ButtonCollect/CollectButton :SoundPlayer.audioClip",
+   "GUI_mobile/QuickSpinArrangeable/QuickSpinAnimator/QuickSpin/Window/Content/Land/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/QuickSpinArrangeable/QuickSpinAnimator/QuickSpin/Window/Content/Land/FastPlay/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/QuickSpinArrangeable/QuickSpinAnimator/QuickSpin/Window/Content/Land/FastPlay/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/QuickSpinArrangeable/QuickSpinAnimator/QuickSpin/Window/Content/Land/CloseButton/Button :SoundPlayer.audioClip",
+   "GUI_mobile/QuickSpinArrangeable/QuickSpinAnimator/QuickSpin/Window/Content/Port/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/QuickSpinArrangeable/QuickSpinAnimator/QuickSpin/Window/Content/Port/FastPlay/ToOn/Button :SoundPlayer.audioClip",
+   "GUI_mobile/QuickSpinArrangeable/QuickSpinAnimator/QuickSpin/Window/Content/Port/FastPlay/ToOff/Button :SoundPlayer.audioClip",
+   "GUI_mobile/QuickSpinArrangeable/QuickSpinAnimator/QuickSpin/Window/Content/Port/CloseButton/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit00/LinkVisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit00/LinkUnvisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit01/LinkVisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit01/LinkUnvisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit02/LinkVisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit02/LinkUnvisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit03/LinkVisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/RuleUnitsPooler/Units/Unit03/LinkUnvisited/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/Ear/Land/ScreenAnchor/Holder_Rank/Rank/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/Ear/Land/ScreenAnchor/Holder_Rank/Rank/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/Ear/Port/ScreenAnchor/Holder_Rank/RankArranged/Rank/ButtonOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/Ear/Port/ScreenAnchor/Holder_Rank/RankArranged/Rank/ButtonClose :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Landscape/LandscapeCAT :CAT_Container.events.12.actions.1.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Landscape/Content/Holder_Tournaments/NotClipped/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Landscape/Content/Holder_Tournaments/Clipped/Tabs/Rules/RInactive/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Landscape/Content/Holder_Tournaments/Clipped/Tabs/Prizes/PInactive/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Landscape/Content/Holder_Tournaments/Clipped/Tabs/Leaderboard/LInactive/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Landscape/Content/Holder_Tournaments/Clipped/Tabs/Winners/Active/WInactive/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Portrait/PortraitCAT :CAT_Container.events.15.actions.1.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Portrait/Content/Holder_Tournaments/NotClipped/XButton/Holder/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Portrait/Content/Holder_Tournaments/Clipped/Tabs/Rules/RInactive/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Portrait/Content/Holder_Tournaments/Clipped/Tabs/Prizes/PInactive/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Portrait/Content/Holder_Tournaments/Clipped/Tabs/Leaderboard/LInactive/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentArrangeable/Tournament/Portrait/Content/Holder_Tournaments/Clipped/Tabs/Winners/Active/WInactive/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Land/Buttons/OptOutButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Land/Buttons/OptInButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Land/Short/FullRules/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Land/ShortCombined/FullRules/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Land/Full/ShortRules/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Port/Short/FullRules/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Port/Full/ShortRules/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Port/ShortCombined/FullRules/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Port/Buttons/OptIn/OptInButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Content/Port/Buttons/OptOut/OptOutButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Confirm/Land/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Confirm/Land/Buttons/OptOutYesButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Confirm/Land/Buttons/OptOutNoButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Confirm/Port/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Confirm/Port/Buttons/OptIn/OptOutNoButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/Content/ContentAnimator/Confirm/Port/Buttons/OptOut/OptOutYesButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Land/Button/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/Window/Dynamic/Progress/Close/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/Window/Dynamic/Progress/XButton/XButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/Window/Dynamic/Final/Close/SpinWheelButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Land/AG/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Land/AG/Button/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Land/BM/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Land/BM/Button/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Land/FR/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Land/FR/Button/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Port/AG/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Port/AG/Button/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Port/BM/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Port/BM/Button/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Port/FR/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/Port/FR/Button/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Asia/Content/CloseButton/Arrangeable/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentAnnouncements/AnnouncementWindow/Holder/Land/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/TournamentAnnouncements/AnnouncementWindow/Holder/Port/Buttons/ContinueButton :SoundPlayer.audioClip",
+   "GUI_mobile/PaytableScrollbars/Land/Content/Clipped/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/PaytableScrollbars/Port/Content/Clipped/XButton/Holder/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/CloseBtnHolder/CloseBtn :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_1/CNBtnHolder/CNBtn :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_2/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_2/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_3/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_3/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_3/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_4/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_4/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_4/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Buttons/CNButtons_4/CNBtnHolder_3/CNBtn_3 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/NonIntrusive/Content/Texts/ShowMore/ShowMoreButton :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_1/CNBtnHolder/CNBtn :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_2/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_2/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_3/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_3/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_3/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_4/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_4/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_4/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Land/Buttons/CNButtons_4/CNBtnHolder_3/CNBtn_3 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Port/Buttons/CNBtnHolder_0/CNBtn_0 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Port/Buttons/CNBtnHolder_1/CNBtn_1 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Port/Buttons/CNBtnHolder_2/CNBtn_2 :SoundPlayer.audioClip",
+   "GUI_mobile/SystemNotifications/IntrusiveArrangeable/Intrusive/Content/Port/Buttons/CNBtnHolder_3/CNBtn_3 :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Single/Button/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Collapsed/Button/ColliderLobbyOpen :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Collapsed/Button/ColliderLobbyClosed :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Button/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_0/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_1/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_2/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_3/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_4/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Menu/Content/Multiple/Expanded/Content/Arrangeable/Buttons/Button_5/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Land/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Land/Top/Tabs/LastWins/Inactive/Anchored/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Land/Top/Tabs/TopWins/Inactive/Anchored/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Port/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Port/Top/Tabs/LastWins/Inactive/Anchored/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/Winnings/Content/Port/Top/Tabs/TopWins/Inactive/Anchored/Collider :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Land/Top/BackButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Land/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Land/Buttons/Watch/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Land/Buttons/Link/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Port/Top/BackButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Port/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Port/Buttons/Watch/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/SelectedWinning/Content/Port/Buttons/Link/Button :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Land/Background/S_0 :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Land/Top/BackButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Land/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Port/Background/S_0 :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Port/Top/BackButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/Replay/WatchWinning/Content/Port/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/TournamentPointsNotification/Land/Content/Holder/Button/MinimizeButton :SoundPlayer.audioClip",
+   "GUI_mobile/TournamentPointsNotification/Portrait/Content/Holder/Button/MinimizeButton :SoundPlayer.audioClip",
+   "GUI_mobile/VerifyGameIframe/Frame/Content/Land/Background/S_0 :SoundPlayer.audioClip",
+   "GUI_mobile/VerifyGameIframe/Frame/Content/Land/Top/XButton/CloseButton :SoundPlayer.audioClip",
+   "GUI_mobile/VerifyGameIframe/Frame/Content/Port/Background/S_0 :SoundPlayer.audioClip",
+   "GUI_mobile/VerifyGameIframe/Frame/Content/Port/Top/XButton/CloseButton :SoundPlayer.audioClip"
+  ],
+  "955455760e9e1364fa0a453160739117": [
+   "Game/Playground/RA/RSMultiplierVisual/CAT :CAT_Container.events.4.actions.0.audioClip"
+  ],
+  "a10ac7e13d58c7b4f9e56d4b5cdd3289": [
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_0/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_1/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_2/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_3/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_4/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_5/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_6/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_7/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_8/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_9/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_10/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_11/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_12/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_13/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_14/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_15/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_16/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_17/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_18/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_19/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_20/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_21/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_22/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_23/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_24/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_25/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_26/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_27/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_28/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/OnReelsContent/RSM_29/CAT :CAT_Container.events.0.actions.1.audioClip",
+   "Game/Playground/RA/RSMultiplierVisual/FSIndicators/AccumulatedMultiplier/CAT :CAT_Container.events.3.actions.1.audioClip"
+  ],
+  "785fcb57b7c57f94f831aa76b4fd7a28": [
+   "Game/Utils/SoundLogic :VS_SoundLogic.reelsStartingAll.clipNormalSpin.clipFastPlayOff.clipMusicOn"
+  ],
+  "26090d374fe212e4a9324ab5b6b898e3": [
+   "Game/Utils/SoundLogic :VS_SoundLogic.reelsStoppingAll.clipNormalSpin.clipFastPlayOff.clipMusicOn"
+  ],
+  "8f89a6bf762dfd94ca4af48db13aaba6": [
+   "Game/Utils/SoundLogic :VS_SoundLogic.clipSpinWin.clipNormalSpin.clipFastPlayOff.clipMusicOn"
+  ],
+  "03b336f8b4464d3459726fb1d5376756": [
+   "Game/Utils/SoundLogic :VS_SoundLogic.clipShowWinLine.clipNormalSpin.clipFastPlayOff.clipMusicOn"
+  ],
+  "d5805036bab8f57429b5fd1e53422ff8": [
+   "Game/Utils/SoundLogic :VS_SoundLogic.clipFSWonBeforeResult",
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.oneShotsClips.5"
+  ],
+  "ace549f4ad5667147bb1e7fbd386d7ff": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.normalMusic.0.clip",
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.2.musicClipsToDuck.0",
+   "SoundManager :SoundManager.musicClips.4.clip",
+   "SoundManager/MusicSoundSource4 :AudioSource.clip"
+  ],
+  "84727c186a64a8e488b0a1640dac1516": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.normalMusic.1.clip",
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.musicClipsToDuck.2",
+   "Game/Utils/MusicController/TrexM :TRexManager.clips.0.clipDefault",
+   "SoundManager :SoundManager.musicClips.0.clip",
+   "SoundManager/MusicSoundSource0 :AudioSource.clip"
+  ],
+  "d895812ba86aaab44b6fce31b7ee5252": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.normalMusic.2.clip",
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.musicClipsToDuck.3",
+   "Game/Utils/MusicController/TrexM :TRexManager.clips.1.clipDefault",
+   "SoundManager :SoundManager.musicClips.1.clip",
+   "SoundManager/MusicSoundSource1 :AudioSource.clip"
+  ],
+  "0ac5ef7d38cc3a74bb965419442e920a": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.normalMusic.3.clip",
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.musicClipsToDuck.4",
+   "Game/Utils/MusicController/TrexM :TRexManager.clips.2.clipDefault",
+   "SoundManager :SoundManager.musicClips.2.clip",
+   "SoundManager/MusicSoundSource2 :AudioSource.clip"
+  ],
+  "7e85f50bf3f20ff488d9abaef2aeb709": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.fsMusic.0.clip",
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.musicClipsToDuck.1"
+  ],
+  "5ed03e360e521b449956df484c4d2294": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.fsMusic.1.clip",
+   "SoundManager :SoundManager.musicClips.5.clip",
+   "SoundManager/MusicSoundSource5 :AudioSource.clip"
+  ],
+  "d5b067d0685ca9843a7181baad3dcbca": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.bgMusic.0.clip",
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.0.musicClipsToDuck.0"
+  ],
+  "9d9ca9135964b754fbd245dd6bfdfcb3": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.loopingSoundFX.0.clip"
+  ],
+  "51cda7df5f1469b40b92ce0120eccf88": [
+   "Game/Utils/MusicLogic :VS_MusicLogic.loopingSoundFX.1.clip",
+   "SoundManager :SoundManager.loopingClips.0.clip",
+   "SoundManager/LoopingSource0 :AudioSource.clip"
+  ],
+  "9e9cea009e5a5f040a042903bf7c1533": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.0.oneShotsClips.0"
+  ],
+  "4d8bd8cf93aefbd448b3b65767d7ad71": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.oneShotsClips.0",
+   "Game/Utils/CoinCounter :CoinCounter.finalIndividualBigWinClips.2"
+  ],
+  "4b1c955e88b5b554792afce7bbb6fd8c": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.oneShotsClips.1",
+   "Game/Utils/CoinCounter :CoinCounter.finalIndividualBigWinClips.1"
+  ],
+  "be9906e3ebb87f644b77189f8fee5d5f": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.oneShotsClips.2",
+   "Game/Utils/CoinCounter :CoinCounter.finalIndividualBigWinClips.0"
+  ],
+  "f6c86ccfcd170cb4bba1bb7c92a9af05": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.oneShotsClips.3",
+   "Game/Utils/CoinCounter :CoinCounter.finalIndividualBigWinClips.3"
+  ],
+  "89fdd8b39e920164eaaa19d51279f083": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.oneShotsClips.4",
+   "Game/Utils/MusicController :CAT_Container.events.4.actions.2.audioClip"
+  ],
+  "3d2225c5752b9bc44af666496f070b72": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.musicClipsToDuck.0"
+  ],
+  "2a914aec35bb9074886bc8982e875d0e": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.1.musicClipsToDuck.5",
+   "Game/Utils/MusicController/TrexM :TRexManager.clips.3.clipDefault",
+   "SoundManager :SoundManager.musicClips.3.clip",
+   "SoundManager/MusicSoundSource3 :AudioSource.clip"
+  ],
+  "04e38b06dad4cfc4d8084f2c3cbe7f72": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.3.oneShotsClips.0",
+   "Game/Utils/MusicController/SFX :CAT_Container.events.9.actions.0.audioClip"
+  ],
+  "ff8928d45ab6c424daeb50dac2aa6e8c": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.4.oneShotsClips.0",
+   "Game/Utils/MusicController/SFX :CAT_Container.events.10.actions.0.audioClip"
+  ],
+  "9d27134535721684087be4a87518846d": [
+   "Game/Utils/MusicDuck :VS_MusicDuckByOneShot.oneShotDuckers.5.oneShotsClips.0",
+   "Game/Utils/MusicController/SFX :CAT_Container.events.11.actions.0.audioClip"
+  ],
+  "d8bee26a15b63c14c96faa5ef567ca23": [
+   "Game/Utils/MusicController :CAT_Container.events.4.actions.1.audioClip"
+  ],
+  "a7840235f1e68f04abb6dd2fd7b70fca": [
+   "Game/Utils/MusicController :CAT_Container.events.15.actions.5.audioClip"
+  ],
+  "3c8bb7f35392a784ebc69afc99136715": [
+   "Game/Utils/MusicController :CAT_Container.events.17.actions.4.audioClip"
+  ],
+  "e09807cc95d11934f8e2f86732bb6e73": [
+   "Game/Utils/MusicController :CAT_Container.events.19.actions.0.audioClip"
+  ],
+  "6f63f452607297447b548696ab25552c": [
+   "Game/Utils/MusicController/SoundFxController :CAT_Container.events.2.actions.1.audioClip"
+  ],
+  "5868424a003418a40adc6f09bad0fbc9": [
+   "Game/Utils/MusicController/SoundFxController :CAT_Container.events.2.actions.2.audioClip"
+  ],
+  "91cea569172451046b47b5cef9b7c942": [
+   "Game/Utils/MusicController/SoundFxController :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "25625982d60680344bbcf985df22aee1": [
+   "Game/Utils/MusicController/SoundFxController :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "65469e9becbcc77499c036172c627acf": [
+   "Game/Utils/MusicController/SoundFxController :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "f99ce8b259bcfee47843c7cf06ce8246": [
+   "Game/Utils/MusicController/SoundFxController :RandomAudioClipPlayer.audioClips.3"
+  ],
+  "e0141b64972c8bf48a1fdc1c728f21f2": [
+   "Game/Utils/MusicController/SoundFxController :RandomAudioClipPlayer.audioClips.4"
+  ],
+  "84322caf6a24a6548b701f0bed4f6997": [
+   "Game/Utils/MusicController/SoundFxController :RandomAudioClipPlayer.audioClips.5"
+  ],
+  "12766e93e436afe43882c00feaafd812": [
+   "Game/Utils/MusicController/CrowdSoundController :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "13edd1c303e41624597bf2a0ef594fd7": [
+   "Game/Utils/MusicController/CrowdSoundController :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "2fc67288774fe8b449d4df0de7c8bd1e": [
+   "Game/Utils/MusicController/CrowdSoundController :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "ff618643064fcc64c8f32c4db9eb61ee": [
+   "Game/Utils/MusicController/CrowdSoundController :RandomAudioClipPlayer.audioClips.3"
+  ],
+  "fe28e180a48143742928d7c08c26fe0d": [
+   "Game/Utils/MusicController/CrowdSoundController :RandomAudioClipPlayer.audioClips.4"
+  ],
+  "212fd2438e9a0694598e465e1bf44588": [
+   "Game/Utils/MusicController/SymbolTumbleController :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "149dfc6b276037243a37a7926fb9071f": [
+   "Game/Utils/MusicController/SymbolTumbleController :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "0b22bf4c63db08b46ae1410250fc8a4c": [
+   "Game/Utils/MusicController/SymbolTumbleController :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "ab24b7b604c18f4408a24d90b82d1a43": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.0"
+  ],
+  "6f3d5afe2ca00384db3cedbbe0f95276": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.1"
+  ],
+  "018158fc1d6862541b8e2afa934c1b5f": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.2"
+  ],
+  "97898ffc80b92db458ea0fe9a60a417e": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.3"
+  ],
+  "72b1aa6f5e331fb49bf7ba653d4cabaa": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.4"
+  ],
+  "56aaef201aa7bca4aba546a6fca63359": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.5"
+  ],
+  "52e72a0b6666de8448e595b8369542f8": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.6"
+  ],
+  "ed46b55656bd9b645ba3f5f9a162d51c": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.7"
+  ],
+  "5942e5847d714fe4fa14b837d2670d62": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.8"
+  ],
+  "510da1f78b754694abc42d385ae574f3": [
+   "Game/Utils/MusicController/SymbolVanishController :OrderedAudioClipPlayer.audioClips.9"
+  ],
+  "623bda4617571894998e4e89e398128c": [
+   "Game/Utils/MusicController/TumbleVO :OrderedAudioClipPlayer.audioClips.0"
+  ],
+  "b30d92c0e1c7c074aa44a0893bb5e7f3": [
+   "Game/Utils/MusicController/TumbleVO :OrderedAudioClipPlayer.audioClips.2"
+  ],
+  "32955777f363fa948b4b04304cd6f996": [
+   "Game/Utils/MusicController/TumbleVO :OrderedAudioClipPlayer.audioClips.4"
+  ],
+  "61746cc602ac82d4f8e1d478d608ee16": [
+   "Game/Utils/MusicController/TumbleVO :OrderedAudioClipPlayer.audioClips.6"
+  ],
+  "266589194c23b6c40be7f973356a6e27": [
+   "Game/Utils/MusicController/TumbleVO :OrderedAudioClipPlayer.audioClips.8"
+  ],
+  "2b03bbc760924c949b331fa57a8fcb2d": [
+   "Game/Utils/MusicController/TumbleVO :OrderedAudioClipPlayer.audioClips.9"
+  ],
+  "ab12c2e649c957b4fbb47fb106a2775a": [
+   "Game/Utils/MusicController/BetButtons :CAT_Container.events.0.actions.0.audioClip"
+  ],
+  "50e80573a96df1c4cb55fb8d8f855fa8": [
+   "Game/Utils/MusicController/BetButtons :CAT_Container.events.1.actions.0.audioClip"
+  ],
+  "8ebf79c800e0f434db89ef80f035eb30": [
+   "Game/Utils/MusicController/BetButtons :CAT_Container.events.2.actions.0.audioClip"
+  ],
+  "e5db2fa786f3dd74487c802d19878f38": [
+   "Game/Utils/MusicController/BetButtons :CAT_Container.events.3.actions.0.audioClip"
+  ],
+  "3be98af4d624e1643bf9525541f420e9": [
+   "Game/Utils/MusicController/BetButtons :CAT_Container.events.4.actions.0.audioClip"
+  ],
+  "8f484dec51446834fbc8f3112c046bc1": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.0.actions.0.audioClip"
+  ],
+  "98310f56c0782344cb1a96dd72f71ccc": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.1.actions.0.audioClip"
+  ],
+  "a0345e6dac0ac3642820b15593d15b06": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.2.actions.0.audioClip"
+  ],
+  "303e22c62eedd0744986fd093b8f7a4a": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.3.actions.0.audioClip"
+  ],
+  "49be1e6dc9e4464499e65ce57a33f785": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.4.actions.0.audioClip"
+  ],
+  "60c48a92d4ce1d847be714315f5da2b5": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.5.actions.0.audioClip"
+  ],
+  "5de18c8afa3aa7d429c275ef995b1a3a": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.6.actions.0.audioClip"
+  ],
+  "11f5ea90da6cf1348b7f4a165775e525": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.7.actions.0.audioClip"
+  ],
+  "7e33e8f080890e945ace44df948c0931": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.8.actions.0.audioClip"
+  ],
+  "ea3767c4361f74e4cb211cc6c140cf6b": [
+   "Game/Utils/MusicController/SFX :CAT_Container.events.12.actions.0.audioClip"
+  ],
+  "d698db0c12ffcec4eaf6b8a152c0ee2f": [
+   "Game/Utils/MusicController/snd_Scatter :OrderedAudioClipPlayer.audioClips.0"
+  ],
+  "ed7c4c180bc8734439228c310240ab19": [
+   "Game/Utils/MusicController/snd_Scatter :OrderedAudioClipPlayer.audioClips.1"
+  ],
+  "9daf93f7c3fb6d24a89bf5a37c2ca9c9": [
+   "Game/Utils/MusicController/snd_Scatter :OrderedAudioClipPlayer.audioClips.2"
+  ],
+  "f58417f934302e14d975029036ff06a7": [
+   "Game/Utils/MusicController/snd_Scatter :OrderedAudioClipPlayer.audioClips.3"
+  ],
+  "de45bf7f774c3294298235bdeb3b4614": [
+   "Game/Utils/MusicController/snd_Scatter :OrderedAudioClipPlayer.audioClips.4"
+  ],
+  "f9ef93f8e2f49f7468fff2a67ff0630e": [
+   "Game/Utils/MusicController/snd_Scatter :OrderedAudioClipPlayer.audioClips.5"
+  ],
+  "79ed4b89ec59d2f4e97acf8e18bb03ff": [
+   "Game/Utils/VoiceOverSounds/SensationalWinVO :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "9b2b89de733f75e408c3f64898e9d93f": [
+   "Game/Utils/VoiceOverSounds/SensationalWinVO :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "7a2b630099993f742b789219b657251a": [
+   "Game/Utils/VoiceOverSounds/SensationalWinVO :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "338ec627e4dac604cb0070034ebea960": [
+   "Game/Utils/VoiceOverSounds/SensationalWinVO :RandomAudioClipPlayer.audioClips.3"
+  ],
+  "9d410ccf521225748a9a57d4b0e6f60e": [
+   "Game/Utils/VoiceOverSounds/SuperbWinVO :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "ca9c10c9c9f2c1949b3c8f94e987db41": [
+   "Game/Utils/VoiceOverSounds/SuperbWinVO :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "836a9f5e45a3af84fb3ad66c4c75889f": [
+   "Game/Utils/VoiceOverSounds/SuperbWinVO :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "a26e3b39f92fc7d4ca0c9efc0933cc29": [
+   "Game/Utils/VoiceOverSounds/SuperbWinVO :RandomAudioClipPlayer.audioClips.3"
+  ],
+  "a9794ebc58e5b9f42b225a1923bf3e96": [
+   "Game/Utils/VoiceOverSounds/MegaJackPotVO :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "1190c96ffb57ba8479cf5e3f0a0571df": [
+   "Game/Utils/VoiceOverSounds/MegaJackPotVO :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "df4c9c0cede864b4d85535cae5c4af79": [
+   "Game/Utils/VoiceOverSounds/MegaJackPotVO :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "cd1c509805ef26a4f85ec4689d1be7ee": [
+   "Game/Utils/VoiceOverSounds/MegaJackPotVO :RandomAudioClipPlayer.audioClips.3"
+  ],
+  "524f1e11ae9ffb74a822fab249389f99": [
+   "Game/Utils/VoiceOverSounds/Scatter_VoiceOvers :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "26aedd6125641854aa3474364216096b": [
+   "Game/Utils/VoiceOverSounds/Scatter_VoiceOvers :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "9afea7352191f944db4bb63426795264": [
+   "Game/Utils/VoiceOverSounds/Scatter_VoiceOvers :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "03779047f93b10646ab3d3eee1309492": [
+   "Game/Utils/VoiceOverSounds/Scatter_VoiceOvers :RandomAudioClipPlayer.audioClips.3"
+  ],
+  "7930fd488096c614e9101b24705b48c8": [
+   "Game/Utils/VoiceOverSounds/Scatter_VoiceOvers :RandomAudioClipPlayer.audioClips.4"
+  ],
+  "319798e85499b814fb494fb2872e8bde": [
+   "Game/Utils/VoiceOverSounds/Scatter_VoiceOvers :RandomAudioClipPlayer.audioClips.5"
+  ],
+  "4d014ddc82ae4df4e9b6e4c8aeaba401": [
+   "Game/Utils/VoiceOverSounds/Scatter_VoiceOvers :RandomAudioClipPlayer.audioClips.6"
+  ],
+  "1a25a01ef8e7cd547bb75ac540ff52d6": [
+   "Game/Utils/VoiceOverSounds/Scatter_VoiceOvers :RandomAudioClipPlayer.audioClips.7"
+  ],
+  "373fcd708bcd70d4eb782f94907de207": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "0aff080168381d74b8ef04d3d99a8de2": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "b03c7eb4dcb65dd4b9fb3b74e4bfcfbb": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "c7b7fb85afb5c2d4b8dc33f3847651c4": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.3"
+  ],
+  "e8c6aa16eb0a39d4a9b285ecd831a21d": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.4"
+  ],
+  "37186c47dafadb0428399f83899c55f5": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.5"
+  ],
+  "5fba3b88f2cbf4b41902cc9ae770b659": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.6"
+  ],
+  "d83927cef1ccd22409a3f17d9f9ac6f2": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.7"
+  ],
+  "0a3bc36fc50b9244e87c823d966be202": [
+   "Game/Utils/VoiceOverSounds/Multis_VoiceOvers :RandomAudioClipPlayer.audioClips.8"
+  ],
+  "b82de8329d959534c9d96d20dba21d5c": [
+   "Game/Utils/VoiceOverSounds/FS_VoiceOver :CAT_Container.events.0.actions.0.audioClip"
+  ],
+  "cf58037fb05cc064780351f020dd8a5d": [
+   "Game/Utils/VoiceOverSounds/FS_VoiceOver :CAT_Container.events.1.actions.0.audioClip"
+  ],
+  "c0c20e01a33b67b46b1dc6bce26abf45": [
+   "Game/Utils/VoiceOverSounds/FS_VoiceOver :CAT_Container.events.2.actions.0.audioClip"
+  ],
+  "b3da7ec71fa20344dba90e860dbacae6": [
+   "Game/Utils/VoiceOverSounds/snd_CatVO :CAT_Container.events.1.actions.0.audioClip"
+  ],
+  "f23a8ec1b9a596041b60b62a5a5bfeaf": [
+   "Game/Utils/VoiceOverSounds/snd_CatVO :RandomAudioClipPlayer.audioClips.0"
+  ],
+  "06c75783f0047b443b62e64eb6833756": [
+   "Game/Utils/VoiceOverSounds/snd_CatVO :RandomAudioClipPlayer.audioClips.1"
+  ],
+  "96281a958feff70469024629373d01c3": [
+   "Game/Utils/VoiceOverSounds/snd_CatVO :RandomAudioClipPlayer.audioClips.2"
+  ],
+  "4b53738791e426b49a3b44e2ad7e7504": [
+   "Game/Utils/VoiceOverSounds/snd_CatVO :RandomAudioClipPlayer.audioClips.3"
+  ],
+  "30e71d38545553c4c938d7887e2735f9": [
+   "Game/Utils/VoiceOverSounds/snd_CatVO :RandomAudioClipPlayer.audioClips.4"
+  ],
+  "f2d701eb036147f449dafc11cbf81f8c": [
+   "Game/Utils/VoiceOverSounds/snd_CatVO :RandomAudioClipPlayer.audioClips.5"
+  ],
+  "418cf9dfbc1180047a1e51aba2bb41eb": [
+   "Game/Utils/VoiceOverSounds/snd_CatVO :RandomAudioClipPlayer.audioClips.6"
+  ],
+  "80fa6112d22a8fe4b9a13b7398fcafdc": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.0.clips.0"
+  ],
+  "7fab3e225fca6d942985145b24db2144": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.0.clips.1"
+  ],
+  "3c78a7b6ab93f564da3fc320da6d0c1c": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.0.clips.2"
+  ],
+  "3c665defe02da2548846df84324a1b4d": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.0.clips.3"
+  ],
+  "709de0f5d63833746800522d2b7bd3fc": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.1.clips.0"
+  ],
+  "6901fb1e25e0c494eaf514b039bb6c54": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.1.clips.1"
+  ],
+  "1309bb00395cc154a9649244fded8f54": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.1.clips.2"
+  ],
+  "5c8e5fd7531ae324aa079bede44f4851": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.1.clips.3"
+  ],
+  "e04334c1a7990eb40833a0b8f15520d3": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.2.clips.0"
+  ],
+  "b8b1f913352f710459332e238cd2849c": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.2.clips.1"
+  ],
+  "915cf263ebacff7449b8aecdd5ee3c74": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.2.clips.2"
+  ],
+  "bb359ab8bd046794aadb8b897f128d28": [
+   "Game/Utils/CoinCounter :CoinCounter.levels.2.clips.3"
+  ],
+  "525f6943355638f4bbcab361dd60cea6": [
+   "Game/Utils/CoinCounter :CoinCounter.finalSound"
+  ],
+  "c3d156f99863c604080c38863d943c75": [
+   "Game/Utils/CoinCounter :CoinCounter.normalAlternateMusic.clipDefault",
+   "SoundManager :SoundManager.loopingClips.1.clip",
+   "SoundManager/LoopingSource1 :AudioSource.clip"
+  ],
+  "61312232c5508064e956d7be06551b42": [
+   "Game/Utils/CoinCounter :CoinCounter.freeSpinsAlternateMusic.clipDefault"
+  ],
+  "34588ec2cde1a6147915909564947691": [
+   "Game/Utils/CoinCounter :CoinCounter.finalAlternateSound"
+  ],
+  "4cddbcfa34d126e449e20076272fcabc": [
+   "Game/Utils/CoinCounter :CoinCounter.finalAlternateSoundFS"
+  ],
+  "80bc2ea13b7585d4dad6982a861cc9d9": [
+   "Game/Utils/CoinCounter :CoinCounter.individualBigWinClips.0.clipDefault"
+  ],
+  "0c1d92aaace8dc348a4ac14803a41f91": [
+   "Game/Utils/CoinCounter :CoinCounter.individualBigWinClips.1.clipDefault"
+  ],
+  "49af44e894c7549498624a77e5019f29": [
+   "Game/Utils/CoinCounter :CoinCounter.individualBigWinClips.2.clipDefault"
+  ],
+  "e620a07c9d5f14b45a03dfaa9bb488a5": [
+   "Game/Utils/CoinCounter :CoinCounter.individualBigWinClips.3.clipDefault"
+  ],
+  "b6f4fe22d08e694419ee33c1deb3dfb8": [
+   "Game/Utils/CoinCounter :CoinCounter.individualBigWinClips.4.clipDefault"
+  ],
+  "d99998caf0b7e7544af9251f018338ac": [
+   "BigWin_StarlightPrincess_new/Desktop/_CAT :CAT_Container.events.3.actions.3.audioClip",
+   "BigWin_StarlightPrincess_new/Mobile/_CAT :CAT_Container.events.3.actions.3.audioClip"
+  ],
+  "0864ff107a030e5489388b8012f6af94": [
+   "GUI_mobile/Interface_Landscape/ContentInterface/DynamicContent/AnchoredRight/Normal/SpinButtons/StartSpin_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/DynamicContent/ContentScale/Normal/SpinButtons/StartSpin_Button :SoundPlayer.audioClip"
+  ],
+  "c068e2e309132ee42b30f6b7f1f8d550": [
+   "GUI_mobile/Interface_Landscape/ContentInterface/DynamicContent/AnchoredRight/Autoplay/AutoplayStop_Button :SoundPlayer.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/DynamicContent/ContentScale/Autoplay/AutoplayStop_Button :SoundPlayer.audioClip"
+  ],
+  "a5d81709f5d4c954f9e47efe2f9edbc2": [
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/BalanceAndBet/Scaled/MoneyAndCoinsSwitcher :CAT_Container.events.0.actions.0.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/BalanceAndBet/ScaledBonus/MoneyAndCoinsSwitcher :CAT_Container.events.0.actions.0.audioClip",
+   "GUI_mobile/Interface_Landscape/ContentInterface/BottomBar/AnchoredLeft/BalanceBetWin_BonusGame/MoneyAndCoinsSwitcher :CAT_Container.events.0.actions.0.audioClip",
+   "GUI_mobile/Interface_Portrait/ContentInterface/BottomBar/AnchoredMiddle/MoneyAndCoinsSwitcher :CAT_Container.events.0.actions.0.audioClip"
+  ],
+  "99e583f31b4a924459b6f96e52641f1f": [
+   "GUI_mobile/GambleRoot/Content/SelectionWindow/ButtonsHolder/GambleRed_Button :SoundPlayer.audioClip",
+   "GUI_mobile/GambleRoot/Content/SelectionWindow/ButtonsHolder/GambleBlack_Button :SoundPlayer.audioClip"
+  ],
+  "d5dac4e3f146825419fd707cf3037780": [
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/Utils/SoundPlayerEurope :SoundPlayer.audioClip",
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/Utils/SoundPlayerAsia :SoundPlayer.audioClip"
+  ],
+  "d7eec5ffdf6588c478b8a685379ccace": [
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/Window/Dynamic/Progress/SoundPlayerProgress :SoundPlayer.audioClip"
+  ],
+  "b85920490b64abc48a66019b32e8455c": [
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/Window/Dynamic/Final/SoundPlayerFinal :SoundPlayer.audioClip"
+  ],
+  "e263a2caf6af0974fbf9a121ef142a97": [
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/PrizeWheel :CAT_Container.events.0.actions.4.audioClip"
+  ],
+  "f69597709e6608f48bbac661c2c0ca43": [
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/PrizeWheel :CAT_Container.events.1.actions.1.audioClip"
+  ],
+  "3f5bdf4706315664a888da91cb782553": [
+   "GUI_mobile/Tournament/PromotionsAnnouncer/ContentWin/ContentAnimator/Content/Europe/WD/PrizeWheel :CAT_Container.events.1.actions.6.audioClip"
+  ],
+  "d2cd81addd890104891a8bc06145fe28": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.clipValueAnimator.clipSmallWin.clipMusicOn"
+  ],
+  "72ff83dad82376c4e84612cc47333bcb": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.clipValueAnimator.clipNormalWin.clipMusicOn"
+  ],
+  "f7edc1cc9167c8d458d93d7853718b98": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.clipValueAnimator.clipBigWin.clipMusicOn"
+  ],
+  "b0da244c2b11c4f44bc6bf5e43a09393": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.clipValueAnimator.clipMegaWin.clipMusicOn"
+  ],
+  "a739b44c640153643807c3d024ccd3d1": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.clipValueAnimator.clipEpicWin.clipMusicOn"
+  ],
+  "be74c3b31b7df03478f50047521e072a": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.clipValueAnimator.clipFinal.clipMusicOn"
+  ],
+  "9ce52927e4dfdb2469572b993a1ed2a5": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.gambleSounds.shufflingCardLoopable.clipDefault"
+  ],
+  "f73b21ab84b49ee4e8370c2cb53f2855": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.gambleSounds.shufflingCardStop"
+  ],
+  "6ebb85503dcfe6c47a556ede9c260d6e": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.gambleSounds.resultWindowWin"
+  ],
+  "f2a60575ae4cd7144b783c88253ffdbf": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.gambleSounds.resultWindowLose"
+  ],
+  "41ee324b527d2c247b210632f2e88653": [
+   "GUI_mobile/Utils/GUISoundLogic :GUI_SoundLogic.gambleSounds.newProgressItem"
+  ]
+ },
+ "played": [
+  {
+   "t": 2900,
+   "tag": "src",
+   "m": "Play",
+   "go": "MusicSoundSource0",
+   "args": [],
+   "clip": {
+    "name": "s84727c186a64a8e488b0a1640dac1516",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/84727c186a64a8e488b0a1640dac1516",
+    "soundjsObject": null
+   }
+  },
+  {
+   "t": 2900,
+   "tag": "src",
+   "m": "Play",
+   "go": "MusicSoundSource1",
+   "args": [],
+   "clip": {
+    "name": "sd895812ba86aaab44b6fce31b7ee5252",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/d895812ba86aaab44b6fce31b7ee5252",
+    "soundjsObject": null
+   }
+  },
+  {
+   "t": 2900,
+   "tag": "src",
+   "m": "Play",
+   "go": "MusicSoundSource2",
+   "args": [],
+   "clip": {
+    "name": "s0ac5ef7d38cc3a74bb965419442e920a",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/0ac5ef7d38cc3a74bb965419442e920a",
+    "soundjsObject": null
+   }
+  },
+  {
+   "t": 2900,
+   "tag": "src",
+   "m": "Play",
+   "go": "MusicSoundSource3",
+   "args": [],
+   "clip": {
+    "name": "s2a914aec35bb9074886bc8982e875d0e",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/2a914aec35bb9074886bc8982e875d0e",
+    "soundjsObject": null
+   }
+  },
+  {
+   "t": 9246,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s0864ff107a030e5489388b8012f6af94",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/0864ff107a030e5489388b8012f6af94",
+     "soundjsObject": null
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 9246,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s0864ff107a030e5489388b8012f6af94",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/0864ff107a030e5489388b8012f6af94",
+     "soundjsObject": null
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 9279,
+   "tag": "mgr",
+   "m": "PlayLooping",
+   "go": "SoundManager",
+   "args": [
+    null
+   ],
+   "clip": null
+  },
+  {
+   "t": 9282,
+   "tag": "src",
+   "m": "Stop",
+   "go": "MusicSoundSource5",
+   "args": [],
+   "clip": {
+    "name": "s5ed03e360e521b449956df484c4d2294",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/5ed03e360e521b449956df484c4d2294",
+    "soundjsObject": null
+   }
+  },
+  {
+   "t": 10281,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s785fcb57b7c57f94f831aa76b4fd7a28",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/785fcb57b7c57f94f831aa76b4fd7a28",
+     "soundjsObject": null
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 10281,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s785fcb57b7c57f94f831aa76b4fd7a28",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/785fcb57b7c57f94f831aa76b4fd7a28",
+     "soundjsObject": null
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 10288,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    null
+   ],
+   "clip": null
+  },
+  {
+   "t": 10288,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    null,
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 10388,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    null
+   ],
+   "clip": null
+  },
+  {
+   "t": 10388,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    null,
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 10488,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    null
+   ],
+   "clip": null
+  },
+  {
+   "t": 10488,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    null,
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 10498,
+   "tag": "src",
+   "m": "Play",
+   "go": "MusicSoundSource0",
+   "args": [],
+   "clip": {
+    "name": "s84727c186a64a8e488b0a1640dac1516",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/84727c186a64a8e488b0a1640dac1516"
+   }
+  },
+  {
+   "t": 10498,
+   "tag": "src",
+   "m": "Play",
+   "go": "MusicSoundSource1",
+   "args": [],
+   "clip": {
+    "name": "sd895812ba86aaab44b6fce31b7ee5252",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/d895812ba86aaab44b6fce31b7ee5252"
+   }
+  },
+  {
+   "t": 10498,
+   "tag": "src",
+   "m": "Play",
+   "go": "MusicSoundSource2",
+   "args": [],
+   "clip": {
+    "name": "s0ac5ef7d38cc3a74bb965419442e920a",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/0ac5ef7d38cc3a74bb965419442e920a"
+   }
+  },
+  {
+   "t": 10498,
+   "tag": "src",
+   "m": "Play",
+   "go": "LoopingSource0",
+   "args": [],
+   "clip": {
+    "name": "s51cda7df5f1469b40b92ce0120eccf88",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/51cda7df5f1469b40b92ce0120eccf88"
+   }
+  },
+  {
+   "t": 10498,
+   "tag": "src",
+   "m": "Play",
+   "go": "LoopingSource1",
+   "args": [],
+   "clip": {
+    "name": "sc3d156f99863c604080c38863d943c75",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/c3d156f99863c604080c38863d943c75"
+   }
+  },
+  {
+   "t": 10499,
+   "tag": "src",
+   "m": "Play",
+   "go": "MusicSoundSource3",
+   "args": [],
+   "clip": {
+    "name": "s2a914aec35bb9074886bc8982e875d0e",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/2a914aec35bb9074886bc8982e875d0e"
+   }
+  },
+  {
+   "t": 10587,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    null
+   ],
+   "clip": null
+  },
+  {
+   "t": 10587,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    null,
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 10687,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    null
+   ],
+   "clip": null
+  },
+  {
+   "t": 10687,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    null,
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 11196,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s2f133b6334f17ea4ea2c6a1ace20e410",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/2f133b6334f17ea4ea2c6a1ace20e410"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 11196,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s2f133b6334f17ea4ea2c6a1ace20e410",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/2f133b6334f17ea4ea2c6a1ace20e410"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 11349,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s27ff8b791e1fb344ca479b828bd223ef",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/27ff8b791e1fb344ca479b828bd223ef"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 11349,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s27ff8b791e1fb344ca479b828bd223ef",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/27ff8b791e1fb344ca479b828bd223ef"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 11496,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s4754f15c6dc4b7e43ab40d63e092ce62",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/4754f15c6dc4b7e43ab40d63e092ce62"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 11496,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s4754f15c6dc4b7e43ab40d63e092ce62",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/4754f15c6dc4b7e43ab40d63e092ce62"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 11646,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s5484a589f0896d54695348e8451e29bf",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/5484a589f0896d54695348e8451e29bf"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 11646,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s5484a589f0896d54695348e8451e29bf",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/5484a589f0896d54695348e8451e29bf"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 11788,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s7e162b9655a59d841b7164d157b837a0",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/7e162b9655a59d841b7164d157b837a0"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 11788,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s7e162b9655a59d841b7164d157b837a0",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/7e162b9655a59d841b7164d157b837a0"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 11939,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s75c0fe237f4cfba43b88a5b5591249b3",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/75c0fe237f4cfba43b88a5b5591249b3"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 11939,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s75c0fe237f4cfba43b88a5b5591249b3",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/75c0fe237f4cfba43b88a5b5591249b3"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 12277,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s03b336f8b4464d3459726fb1d5376756",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/03b336f8b4464d3459726fb1d5376756"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 12277,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s03b336f8b4464d3459726fb1d5376756",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/03b336f8b4464d3459726fb1d5376756"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 13763,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s34588ec2cde1a6147915909564947691",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/34588ec2cde1a6147915909564947691"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 13763,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s34588ec2cde1a6147915909564947691",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/34588ec2cde1a6147915909564947691"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 14786,
+   "tag": "mgr",
+   "m": "PlayLooping",
+   "go": "SoundManager",
+   "args": [
+    null
+   ],
+   "clip": null
+  },
+  {
+   "t": 14787,
+   "tag": "src",
+   "m": "Stop",
+   "go": "MusicSoundSource5",
+   "args": [],
+   "clip": {
+    "name": "s5ed03e360e521b449956df484c4d2294",
+    "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/5ed03e360e521b449956df484c4d2294"
+   }
+  },
+  {
+   "t": 14878,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "sab24b7b604c18f4408a24d90b82d1a43",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/ab24b7b604c18f4408a24d90b82d1a43"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 14878,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "sab24b7b604c18f4408a24d90b82d1a43",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/ab24b7b604c18f4408a24d90b82d1a43"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 15359,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s6f63f452607297447b548696ab25552c",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/6f63f452607297447b548696ab25552c"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 15359,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s6f63f452607297447b548696ab25552c",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/6f63f452607297447b548696ab25552c"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 15369,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s212fd2438e9a0694598e465e1bf44588",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/212fd2438e9a0694598e465e1bf44588"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 15369,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s212fd2438e9a0694598e465e1bf44588",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/212fd2438e9a0694598e465e1bf44588"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 15454,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s5868424a003418a40adc6f09bad0fbc9",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/5868424a003418a40adc6f09bad0fbc9"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 15454,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s5868424a003418a40adc6f09bad0fbc9",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/5868424a003418a40adc6f09bad0fbc9"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 15495,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s6f63f452607297447b548696ab25552c",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/6f63f452607297447b548696ab25552c"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 15495,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s6f63f452607297447b548696ab25552c",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/6f63f452607297447b548696ab25552c"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 15511,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s0b22bf4c63db08b46ae1410250fc8a4c",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/0b22bf4c63db08b46ae1410250fc8a4c"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 15511,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s0b22bf4c63db08b46ae1410250fc8a4c",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/0b22bf4c63db08b46ae1410250fc8a4c"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 15589,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    {
+     "name": "s5868424a003418a40adc6f09bad0fbc9",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/5868424a003418a40adc6f09bad0fbc9"
+    }
+   ],
+   "clip": null
+  },
+  {
+   "t": 15589,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    {
+     "name": "s5868424a003418a40adc6f09bad0fbc9",
+     "path": "http://127.0.0.1:8788/gs2c/common/v3/games-html5/games/vs/vs20starlight/mobile/game/res/5868424a003418a40adc6f09bad0fbc9"
+    },
+    1
+   ],
+   "clip": null
+  },
+  {
+   "t": 15889,
+   "tag": "mgr",
+   "m": "PlaySimple",
+   "go": "SoundManager",
+   "args": [
+    null
+   ],
+   "clip": null
+  },
+  {
+   "t": 15889,
+   "tag": "src",
+   "m": "PlayOneShot",
+   "go": "PlayOneShotSource",
+   "args": [
+    null,
+    1
+   ],
+   "clip": null
+  }
+ ]
+}

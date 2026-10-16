@@ -1,16 +1,24 @@
 {
   "name": "wingrid",
   "private": true,
-  "license": "MIT",
-  "description": "Wingrid: a free-to-play 6x5 tumbling scatter-pays slot, saved to Atlesque Play.",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --port 8790",
-    "deploy": "wrangler deploy",
+    "assets": "node scripts/import-assets.mjs",
+    "db:migrate": "wrangler d1 migrations apply wingrid --local",
+    "db:migrate:remote": "wrangler d1 migrations apply wingrid --remote",
+    "dev": "vite",
+    "build": "vite build",
+    "deploy": "vite build && wrangler deploy",
     "test": "node --test test/*.test.js",
-    "rtp": "node scripts/rtp.mjs"
+    "character:import": "node scripts/import-character.mjs"
   },
   "devDependencies": {
-    "wrangler": "^4.147.0"
+    "@cloudflare/vite-plugin": "^1.64.0",
+    "vite": "^8.3.4",
+    "wrangler": "^4.151.0"
+  },
+  "dependencies": {
+    "pixi-spine": "^4.0.6",
+    "pixi.js": "^7.4.3"
   }
 }

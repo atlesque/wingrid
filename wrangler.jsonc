@@ -1,11 +1,19 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "wingrid",
+  "main": "src/worker/index.js",
   "compatibility_date": "2026-09-01",
-  "routes": [{ "pattern": "wingrid.atlesque.dev", "custom_domain": true }],
+  // Wingrid copy of starlight-rebuild; serves the existing Wingrid custom domain
   "workers_dev": false,
   "preview_urls": false,
-  // a static game: everything is in public/, and the account lives at play.atlesque.dev
-  "assets": { "directory": "./public", "html_handling": "drop-trailing-slash" },
-  "observability": { "enabled": true }
+  "routes": [{ "pattern": "wingrid.atlesque.dev", "custom_domain": true }],
+  "assets": { "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
+  // locally a D1 under .wrangler/state (npm run db:migrate); deployed, the real one (npm run db:migrate:remote)
+  "d1_databases": [{ "binding": "DB", "database_name": "wingrid", "database_id": "744548f7-ea4e-4ad8-a97d-e7d261171e51", "migrations_dir": "migrations" }],
+  "vars": {
+    // Atlesque Play (github.com/atlesque/mbp-games). Locally, .dev.vars points this at its `npm run dev` on :8787
+    "PLAY_URL": "https://play.atlesque.dev",
+    "PLAY_GAME_ID": "wingrid"
+  },
+  "observability": { "enabled": true, "traces": { "enabled": true } }
 }
