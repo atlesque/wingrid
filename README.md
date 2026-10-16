@@ -42,6 +42,32 @@ Run `npm run assets` on a fresh checkout to import the archived game art, then
 sound are uploaded as Cloudflare static assets together with the build.
 This copy does not read or upload to Starlight's R2 bucket.
 
+### Automatic deployment
+
+`.github/workflows/deploy.yml` tests, builds, and validates the deployment package
+for pull requests. Pushes and merges to `main` also apply D1 migrations, deploy
+the existing `wingrid` Worker, and check the live home page and `/api/config`.
+The workflow can be run manually from GitHub Actions on `main`. Production runs
+are serialized so an active deployment is allowed to finish.
+
+Add `CLOUDFLARE_API_TOKEN` under repository **Settings → Secrets and variables →
+Actions** to activate production deployments. Use a dedicated token scoped to
+account `df08931372f873bc0c8edb7679dc0cf4`, with Workers Scripts Edit, Workers
+Routes Edit, D1 Edit, Account Settings Read, and Zone Read for the `atlesque.dev`
+zone. The account ID is configured in the workflow; no account secret is needed.
+Never store the API token in Git. Local Wrangler OAuth credentials are not used
+by CI. See Cloudflare's [GitHub Actions deployment guide](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/).
+
+The imported artwork remains outside Git. `npm run assets:ci` downloads the
+existing files served at `https://wingrid.atlesque.dev/starlight/` and verifies
+each SHA-256 against `scripts/ci-assets.json`, then overlays the checkout's tracked
+`layout/` files. This also works for a fresh local checkout without the sibling
+archive. CI depends on those production asset URLs remaining available; a missing
+or changed file stops the build before deployment. For intentional imported-art
+updates, use the local archive and manual deployment path and update the manifest
+checksums in the same source change. Princess v2 and Wingrid branding continue
+to come from the tracked `public/` files.
+
 The previous Wingrid checkout is saved in `.backups/before-starlight-rebuild-20261016.tar.gz`.
 The previous production Worker version is recorded in `.backups/previous-deployment.txt`.
 The `starlight-rebuild` source checkout was not modified.

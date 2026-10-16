@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "assets": "node scripts/import-assets.mjs",
+    "assets:ci": "node scripts/restore-ci-assets.mjs",
     "db:migrate": "wrangler d1 migrations apply wingrid --local",
     "db:migrate:remote": "wrangler d1 migrations apply wingrid --remote",
     "dev": "vite",
