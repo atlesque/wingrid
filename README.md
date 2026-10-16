@@ -39,3 +39,15 @@ npm run dev      # http://localhost:8790
 npm test         # rules, tumbles, free spins and RTP bounds
 npm run deploy   # to wingrid.atlesque.dev
 ```
+
+## Floating character demo
+
+Open `public/demos/character-float.html` directly in a browser, or visit
+`/demos/character-float.html` on the local server. This self-contained demo
+embeds the archived Starlight Princess idle rig, texture, and PixiJS/Spine
+runtime, with floating movement, pointer guidance, pause, and background
+controls. It refreshes all sprite transforms each frame so facial features
+and clothing stay aligned with the animated rig.
+
+The demo's third-party art and runtime retain their original owners' rights
+and are not covered by Wingrid's MIT license. The demo is for local study.
