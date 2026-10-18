@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const source = await readFile(new URL('../src/client/sound.js', import.meta.url), 'utf8');
 let serial = 0;
-async function audio({ deferFree = false, deferCount = false } = {}) {
-  const started = [], requests = [], nodes = []; let resolveFree, resolveCount;
+async function audio({ deferFree = false, deferCount = false, deferWin = false } = {}) {
+  const started = [], requests = [], nodes = []; let resolveFree, resolveCount, resolveWin;
   globalThis.localStorage = { getItem: () => null };
   const gain = () => ({ value: 0, setTargetAtTime() {}, cancelScheduledValues() {}, setValueAtTime() {}, linearRampToValueAtTime(value) { this.value = value; } });
   class AudioContext {
@@ -20,11 +20,12 @@ async function audio({ deferFree = false, deferCount = false } = {}) {
     requests.push(url);
     return { json: async () => files, arrayBuffer: async () => {
       if (deferFree && url.includes(module.CLIPS.freeMusic)) return new Promise(r => { resolveFree = () => r(url); });
+      if (deferWin && url.includes(module.CLIPS.bigWinMusic)) return new Promise(r => { resolveWin = () => r(url); });
       if (deferCount && url.includes(module.CLIPS.countLoop)) return new Promise(r => { resolveCount = () => r(url); });
       return url;
     } };
   };
-  return { module, started, requests, nodes, free: () => resolveFree?.(), count: () => resolveCount?.() };
+  return { module, started, requests, nodes, free: () => resolveFree?.(), count: () => resolveCount?.(), win: () => resolveWin?.() };
 }
 const flush = () => new Promise(r => setImmediate(r));
 test('resuming free spins before the first gesture starts the free-spin music on unlock', async () => {
@@ -43,4 +44,16 @@ test('a slow counter sound never starts after counting has finished', async () =
   const a = await audio({ deferCount: true }); a.module.unlock(); await flush();
   const pending = a.module.counting(true); await flush(); await a.module.counting(false); a.count(); await pending;
   assert.equal(a.started.some(url => url.includes(a.module.CLIPS.countLoop)), false);
+});
+test('big-win music that loads after the celebration closed is stopped, not left playing', async () => {
+  const a = await audio({ deferWin: true }); a.module.unlock(); await flush();
+  const pending = a.module.bigWinMusic(true); await flush(); await a.module.bigWinMusic(false); a.win(); await pending;
+  const win = a.nodes.find(n => n.buffer?.includes(a.module.CLIPS.bigWinMusic));
+  assert.equal(win.stopped, true);
+});
+test('big-win music starts once however often a celebration asks for it', async () => {
+  const a = await audio(); a.module.unlock(); await flush();
+  await Promise.all([a.module.bigWinMusic(true), a.module.bigWinMusic(true)]); await flush();
+  const wins = a.nodes.filter(n => n.buffer?.includes(a.module.CLIPS.bigWinMusic));
+  assert.equal(wins.filter(n => !n.stopped).length, 1);
 });

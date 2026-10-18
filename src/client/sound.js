@@ -11,7 +11,8 @@ export const CLIPS = {
   idle: '/music/wingrid-idle-loop.mp3',
   spinning: '/music/wingrid-base-loop.mp3',
   winning: '/music/wingrid-base-loop.mp3',
-  freeMusic: '7e85f50bf3f20ff488d9abaef2aeb709',
+  freeMusic: '/music/wingrid-free-loop.mp3',
+  bigWinMusic: '/music/wingrid-bigwin-loop.mp3',
   countLoop: 'c3d156f99863c604080c38863d943c75',
   // one-shots
   click: 'ac8c53df56f9f2141b4ed263cfa094ce',
@@ -46,7 +47,7 @@ export const CLIPS = {
 const LAYERS = { idle: 0.6, spinning: 0.7, winning: 1 };
 const FADE = 3; // seconds, as the original crossfades its music layers
 
-let ctx = null, master, musicGain, sfxGain, files = null;
+let ctx = null, master, musicGain, layerBus, sfxGain, files = null;
 const buffers = new Map();
 const settings = load();
 let mood = 'idle', layerNodes = {}, countNode = null, freePending = null, countWanted = false;
@@ -91,18 +92,20 @@ export function unlock() {
   ctx = new (window.AudioContext || window.webkitAudioContext)();
   master = ctx.createGain(); master.connect(ctx.destination);
   musicGain = ctx.createGain(); musicGain.connect(master);
+  // the layers and free-spin music go through their own bus, so a big win can duck them under its music
+  layerBus = ctx.createGain(); layerBus.connect(musicGain);
   sfxGain = ctx.createGain(); sfxGain.connect(master);
   applyGains();
   startMusic();
 }
 
-async function loop(id, volume, at) {
+async function loop(id, volume, at, out = layerBus) {
   const b = await buffer(id);
   if (!b) return null;
   const src = ctx.createBufferSource(), g = ctx.createGain();
   src.buffer = b; src.loop = true;
   g.gain.value = volume;
-  src.connect(g); g.connect(musicGain);
+  src.connect(g); g.connect(out);
   src.start(at ?? ctx.currentTime);
   return { src, g };
 }
@@ -142,6 +145,24 @@ function applyMood() {
     });
   }
   if (m !== 'free' && layerNodes.free) { const n = layerNodes.free; delete layerNodes.free; n.g.gain.linearRampToValueAtTime(0, t + FADE); n.src.stop(t + FADE + 0.1); }
+}
+
+// A big win plays its own music over the ducked layers until the celebration closes.
+let winMusic = null, winWanted = false;
+export async function bigWinMusic(on) {
+  winWanted = on;
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  if (on && !winMusic) {
+    layerBus.gain.setTargetAtTime(0.04, t, 0.15);
+    const n = await loop(CLIPS.bigWinMusic, 1, undefined, musicGain);
+    if (!n) return;
+    if (!winWanted || winMusic) { n.src.stop(); return; }
+    winMusic = n;
+  } else if (!on) {
+    layerBus.gain.setTargetAtTime(1, t, 0.6);
+    if (winMusic) { const n = winMusic; winMusic = null; n.g.gain.setTargetAtTime(0, t, 0.3); n.src.stop(t + 2); }
+  }
 }
 
 export async function play(id, { volume = 1 } = {}) {

@@ -71,7 +71,7 @@ export function createPresentation({ react }) {
       if (!stages.length) return;
       open(capped ? 'max-win' : 'big-win', stages[0].title, capped ? '5,000× THE BASE BET · LIMIT REACHED' : 'PLAY CREDITS WON');
       value.hidden = false; value.textContent = money(0); ok.textContent = 'Skip count-up';
-      react('bonus'); sound.play(sound.CLIPS.bigWin);
+      react('bonus'); sound.play(sound.CLIPS.bigWin); sound.bigWinMusic(true);
       let from = 0, fastForward = false;
       const counter = new AbortController();
       const jump = event => { event?.preventDefault(); fastForward = true; counter.abort(); };
@@ -101,6 +101,7 @@ export function createPresentation({ react }) {
       value.textContent = money(amount); sound.counting(false);
       ok.textContent = 'Continue'; await choice(skip ? 700 : 3000);
       ok.disabled = true;
+      sound.bigWinMusic(false);
       await banner.play(`stpr_bigwin_${banner.tier}_out`);
       surface().clear(); dialog.close();
     },

@@ -1,5 +1,18 @@
 # Background music
 
+Our own music, made on the local YuE2 render node from text prompts. The game plays the loops below; each render
+section further down is the full take a loop was cut from (the takes themselves are kept out of the repo and archived
+with the render node's output).
+
+| File | Plays | Cut from |
+| --- | --- | --- |
+| wingrid-base-loop.mp3 | base game, spinning and winning layers | wingrid-base-v1, 11.10 s for 80.25 s (48 bars at 143.5 BPM) |
+| wingrid-idle-loop.mp3 | base game, idle layer | the same loop with its drums removed (harmonic part only), so the layers stay in step |
+| wingrid-bigwin-loop.mp3 | big-win celebration, over the ducked base music | wingrid-bigwin-v1, 88.80 s for 13.25 s (8 bars) |
+
+Each loop's head is crossfaded with the audio that followed its end in the take, so the wrap continues the way the
+take did. Loudness is matched to the original game's music (about -18.5 LUFS).
+
 ## wingrid-base-v1.mp3
 
 - Model: YuE2-3B (local, RTX 5090 render node), instrumental
