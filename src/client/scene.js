@@ -28,6 +28,8 @@ let app, atlases, rigs, layouts, world, cover, symbolLayer, effectsLayer, curren
 const characters = new Set();
 let freeMode = false;
 const modeSprites = [], modeSpines = [];
+const baseOnly = []; // drawn in the base game only: the buy and bet panels, the blue reel back
+let freeHud = null;  // the free-spins column that takes their place
 const textures = new Map();
 const ui = {};            // named widgets the page updates or listens to
 const sprites = new Map(); // cell id → symbol container
@@ -295,8 +297,9 @@ function wandTip(princess) {
   return tip;
 }
 
-// The princess points her wand at a multiplier orb as it lands: a star flies from the wand tip along an arc
-// and bursts on the orb, as the original's princess charges each orb she reveals.
+// A multiplier orb lands and the princess strikes it, as in the original: she flashes and raises her wand
+// (react('spell') plays the white burst round her), a twinkle leaves her wand tip, and lightning comes down
+// from above the board onto the orb, which pops in a burst of stars.
 async function castAt(box) {
   const princess = [...characters].find(p => !p.destroyed);
   if (!princess || !effectsLayer || effectsLayer.destroyed) return;
@@ -304,33 +307,52 @@ async function castAt(box) {
   const tip = wandTip(princess);
   const from = world.toLocal(princess.toGlobal(new PIXI.Point(tip.x, tip.y)));
   const to = { x: box.x, y: box.y };
-  const lift = grid.dy * 1.2;
-  const bolt = new PIXI.Graphics();
-  bolt.blendMode = PIXI.BLEND_MODES.ADD;
-  effectsLayer.addChild(bolt);
-  const at = p => ({ x: from.x + (to.x - from.x) * p, y: from.y + (to.y - from.y) * p - Math.sin(p * Math.PI) * lift });
+  const top = Math.min(...grid.ys) - grid.dy * 1.4;
+  const fx = new PIXI.Graphics();
+  fx.blendMode = PIXI.BLEND_MODES.ADD;
+  effectsLayer.addChild(fx);
   const star = (g, x, y, r, color, alpha) => g.beginFill(color, alpha).drawPolygon([x, y - r, x + r * .3, y - r * .3, x + r, y,
     x + r * .3, y + r * .3, x, y + r, x - r * .3, y + r * .3, x - r, y, x - r * .3, y - r * .3]).endFill();
-  await motion.animate(380, p => {
-    if (bolt.destroyed) return;
-    bolt.clear();
-    for (let i = 8; i >= 0; i--) {
-      const q = Math.max(0, p - i * .035), pt = at(q);
-      star(bolt, pt.x, pt.y, grid.dy * (.05 + (8 - i) * .012), i ? 0xffd8f6 : 0xffffff, (1 - i / 9) * .85);
+  // the wand twinkles as she casts
+  await motion.animate(220, p => {
+    if (fx.destroyed) return;
+    fx.clear();
+    star(fx, from.x, from.y, grid.dy * (.12 + Math.sin(p * Math.PI) * .22), 0xffffff, Math.sin(p * Math.PI));
+  });
+  if (box.destroyed || fx.destroyed) { fx.destroy(); return; }
+  // a jagged bolt, re-forked every few frames so it crackles, fading as the orb takes the charge
+  const jag = grid.dy * .22;
+  const fork = () => {
+    const steps = 9, points = [];
+    for (let i = 0; i <= steps; i++) {
+      const q = i / steps, wobble = i && i < steps ? (Math.random() - .5) * jag * 2 : 0;
+      points.push(to.x + wobble, top + (to.y - top) * q);
     }
-  }, { ease: p => 1 - (1 - p) ** 2 });
-  if (box.destroyed) { bolt.destroy(); return; }
+    return points;
+  };
+  const line = (points, width, color, alpha) => {
+    fx.lineStyle(width, color, alpha).moveTo(points[0], points[1]);
+    for (let i = 2; i < points.length; i += 2) fx.lineTo(points[i], points[i + 1]);
+  };
   const scale = box.scale.x;
-  await motion.animate(300, p => {
-    if (bolt.destroyed) return;
-    bolt.clear();
+  let points = fork(), frame = 0;
+  await motion.animate(520, p => {
+    if (fx.destroyed) return;
+    if (++frame % 3 === 0) points = fork();
+    const strength = p < .15 ? p / .15 : 1 - (p - .15) / .85;
+    fx.clear();
+    line(points, grid.dy * .28, 0xb46cff, .25 * strength);
+    line(points, grid.dy * .12, 0xffc8f4, .55 * strength);
+    line(points, grid.dy * .035, 0xffffff, strength);
+    fx.lineStyle(0);
+    fx.beginFill(0xffffff, .5 * strength).drawCircle(to.x, to.y, grid.dy * (.25 + p * .25)).endFill();
     for (let i = 0; i < 8; i++) {
-      const a = i * Math.PI / 4, r = grid.dy * (.15 + p * .45);
-      star(bolt, to.x + Math.cos(a) * r, to.y + Math.sin(a) * r, grid.dy * .09 * (1 - p), i % 2 ? 0xbfefff : 0xffe7a8, 1 - p);
+      const a = i * Math.PI / 4 + p, r = grid.dy * (.15 + p * .45);
+      star(fx, to.x + Math.cos(a) * r, to.y + Math.sin(a) * r, grid.dy * .09 * (1 - p), i % 2 ? 0xbfefff : 0xffe7a8, 1 - p);
     }
     if (!box.destroyed) box.scale.set(scale * (1 + Math.sin(p * Math.PI) * .14));
   });
-  bolt.destroy();
+  fx.destroy();
   if (!box.destroyed) box.scale.set(scale);
 }
 
@@ -373,7 +395,7 @@ async function build(name, onProgress = () => {}) {
   const L = layouts[name];
   const root = new PIXI.Container();
   for (const k of Object.keys(ui)) delete ui[k];
-  modeSprites.length = 0; modeSpines.length = 0;
+  modeSprites.length = 0; modeSpines.length = 0; baseOnly.length = 0;
   characters.clear();
   let symbolsAt = -1;
   for (const [index, it] of L.items.entries()) {
@@ -410,6 +432,7 @@ async function build(name, onProgress = () => {}) {
       obj.x += left - fitted.x;
       obj.y += top - fitted.y;
     }
+    if (BASE_ONLY.test(it.path)) { baseOnly.push(obj); obj.visible = !freeMode; }
     obj.item = it;
     root.addChild(obj);
     for (const [key, re] of Object.entries(NAMED)) if (!ui[key] && re.test(it.path)) ui[key] = obj;
@@ -424,9 +447,65 @@ async function build(name, onProgress = () => {}) {
     root.addChild(mask);
     symbolLayer.mask = mask;
   }
+  freeHud = await buildFreeHud(L);
+  if (freeHud) { freeHud.visible = freeMode; root.addChild(freeHud); }
   effectsLayer = new PIXI.Container();
   root.addChild(effectsLayer);
   return root;
+}
+
+// In free spins the original swaps its buy and bet panels for a total-multiplier panel and a spins-left
+// panel, with the winged cat perched on top. Built from the captured panels' places and the bet label's lettering.
+const BASE_ONLY = /BuyBetFeatures\/|Reels\/Reels\/Base\/Back\//;
+async function buildFreeHud(L) {
+  const find = re => L.items.find(it => re.test(it.path));
+  const buyIt = find(/BuyButtons\/AT\/Option_0\/Content\/Buy\/(Land|Port)\/Back\/S_0$/);
+  const betIt = find(/BetLevel\/RA\/Levels\/Content\/(Land|Port)\/Back\/S_0$/);
+  const titleIt = find(/BetLevel\/.*\/Texts\/Bet$/), valueIt = find(/BetLevel\/.*\/Texts\/Value$/);
+  const buy = buyIt && drawnBounds(buyIt), bet = betIt && drawnBounds(betIt);
+  if (!buy || !bet || !titleIt || !valueIt || !atlases.FSLeft) return null;
+  const hud = new PIXI.Container();
+  hud.label = 'Free spins column';
+  const k = titleIt.wt[0];
+  async function panel(cx, top, width, title) {
+    const back = new PIXI.Sprite(await spriteTexture('FSLeft', 'free_spin_left'));
+    back.anchor.set(.5, 0); back.scale.set(width / back.texture.width); back.position.set(cx, top);
+    const h = back.height;
+    const heading = makeLabel({ ...titleIt, text: title, size: titleIt.size * .56, w: 300, maxLines: 2, ax: .5, ay: .5 });
+    heading.scale.set(k); heading.position.set(cx, top + h * .36);
+    const value = makeLabel({ ...valueIt, text: '0', w: 200, ax: .5, ay: .5 });
+    value.scale.set(k); value.position.set(cx, top + h * .7);
+    hud.addChild(back, heading, value);
+    return { value, center: { x: cx, y: top + h * .55 } };
+  }
+  const cx = buy.x + buy.w / 2, width = buy.w * .96;
+  const mult = await panel(cx, buy.y + buy.h * .22, width, 'TOTAL\nMULTIPLIER');
+  const left = await panel(bet.x + bet.w / 2, bet.y + bet.h * .12, width, 'FREE SPINS\nLEFT');
+  // the cat perches on the multiplier panel; she cheers when it grows
+  const cat = new Spine(await skeleton('stpr_cat_3'));
+  cat.state.setAnimation(0, 'idle', true); cat.update(0);
+  const cb = cat.getLocalBounds(), ck = width * .8 / cb.width;
+  cat.scale.set(ck);
+  cat.position.set(cx - (cb.x + cb.width / 2) * ck, buy.y + buy.h * .5 - (cb.y + cb.height) * ck);
+  motion.track(cat);
+  hud.addChildAt(cat, 0);
+  hud.multiplier = mult; hud.left = left; hud.cat = cat;
+  return hud;
+}
+
+// what the free-spins column shows; leave a value out to keep it
+export function setFreeHud({ left, mult } = {}) {
+  if (!freeHud || freeHud.destroyed) return;
+  if (left != null) freeHud.left.value.setText(String(left));
+  if (mult != null) {
+    const grew = mult > (freeHud.mult ?? mult);
+    freeHud.mult = mult;
+    freeHud.multiplier.value.setText(`${mult}x`);
+    if (grew && !motion.reduced) {
+      freeHud.cat.state.setAnimation(0, 'happy', false);
+      freeHud.cat.state.addAnimation(0, 'idle', true, 0);
+    }
+  }
 }
 
 // where each cell's symbol root sits, and its scale: worked out from the captured idle symbols
@@ -773,7 +852,9 @@ export async function collectMultipliers(onCollect) {
   react('spell');
   const meter = document.querySelector('.multiplier-meter').getBoundingClientRect();
   const canvas = app.view.getBoundingClientRect();
-  const target = world.toLocal(new PIXI.Point(meter.left + meter.width / 2 - canvas.left, meter.top + meter.height / 2 - canvas.top));
+  // in free spins the orbs fly to the total-multiplier panel, as in the original
+  const target = freeMode && freeHud ? freeHud.multiplier.center
+    : world.toLocal(new PIXI.Point(meter.left + meter.width / 2 - canvas.left, meter.top + meter.height / 2 - canvas.top));
   for (const [i, b] of boxes.entries()) {
     if (b.destroyed) continue;
     const orb = await makeSymbol(b.cell);
@@ -807,6 +888,8 @@ export async function setFree(on) {
   const changed = freeMode !== !!on;
   freeMode = !!on;
   if (!changed) return;
+  for (const obj of baseOnly) obj.visible = !freeMode;
+  if (freeHud) freeHud.visible = freeMode;
   for (const entry of modeSprites) {
     const { width, height } = entry.sprite;
     entry.sprite.texture = await spriteTexture(freeMode ? 'stpr_freegame_portrait' : entry.base.atlas,
