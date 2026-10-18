@@ -55,6 +55,7 @@ function render() {
   $('#sync').textContent = a ? `Saved to Atlesque Play as ${a.email}` : 'Playing as guest';
   $('#account').disabled = busy || !!state.jackpot;
   bonuses.render(state, cfg);
+  if (f) scene.setFreeHud({ left: f.left, mult: f.totalMult });
   $('#bonus-hud').hidden = false;
 }
 
@@ -64,6 +65,8 @@ async function playSpin(buy = false) {
   try { r = await api.spin(buy); } catch (e) { busy = false; render(); toast(e.message, 2200); return false; }
   const s = r.spin, inFeature = s.kind === 'free';
   bonuses.setMultiplier(inFeature ? state.feature?.totalMult || 0 : 0);
+  // the spins-left count ticks down as the spin starts; a retrigger adds its spins when it is announced
+  if (inFeature) scene.setFreeHud({ left: s.feature.left - (s.event?.type === 'feature-retrigger' ? s.event.spins : 0), mult: state.feature?.totalMult || 0 });
   await scene.setFree(inFeature);
   scene.setText('credit', fmt(state.credits - s.cost)); // the cost leaves the balance as the reels go
   let shown = inFeature ? s.feature.won - s.win : 0;
@@ -89,7 +92,7 @@ async function playSpin(buy = false) {
     await scene.highlight('mult');
     let collected = inFeature ? s.totalMult - s.multSum : 0;
     bonuses.setMultiplier(collected);
-    await scene.collectMultipliers(value => { collected += value; bonuses.setMultiplier(collected); sound.play(sound.CLIPS.jackpotReveal, { volume: .5 }); });
+    await scene.collectMultipliers(value => { collected += value; bonuses.setMultiplier(collected); if (inFeature) scene.setFreeHud({ mult: collected }); sound.play(sound.CLIPS.jackpotReveal, { volume: .5 }); });
   }
   if ((inFeature && s.scatters >= 3) || s.scatterWin) { sound.play(sound.CLIPS.scatterVoice); await scene.highlight('scatter'); }
   const won = s.win;

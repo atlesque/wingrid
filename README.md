@@ -129,8 +129,12 @@ show the undeformed reference pose. The character replaces the old princess
 in both captured layouts. In landscape she floats over the board's right edge, as the original's
 princess does: her wing crosses the reel frame (`CHARACTER_OVERLAP` in `scene.js`), her head tucks
 under the logo and her feet stay clear of the bottom bar. In both layouts she drifts and sways with
-stars twinkling round her, and she points her wand at each multiplier orb as it lands, sending a star
-that bursts on the orb.
+stars twinkling round her. When a multiplier orb lands she flashes and raises her wand, and lightning
+strikes the orb from above the board, as in the original.
+
+In free spins the board turns purple and, in landscape, the buy and bet panels give way to a
+total-multiplier panel and a free-spins-left panel with the winged cat perched on top, as in the
+original. Collected orbs fly to that panel (`buildFreeHud` and `setFreeHud` in `scene.js`).
 
 Its source image, rig, atlas metadata, and source checksum live in
 `public/characters/princess-v2/` and are included in the deployment. To import
