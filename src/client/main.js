@@ -1,3 +1,6 @@
+import '@fontsource/lilita-one/400.css';
+import '@fontsource/nunito/700.css';
+import '@fontsource/nunito/800.css';
 import * as api from './api.js';
 import * as scene from './scene.js';
 import * as sound from './sound.js';

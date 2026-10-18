@@ -21,6 +21,8 @@ const PREFAB = {
 // multipliers come in four colours by size, each with its own sprite and animations
 const MULT = [[100, 'Yellow', 'yellow'], [25, 'Pink', 'purple'], [10, 'Blue', 'blue'], [0, 'Green', 'green']];
 const multLook = v => MULT.find(([min]) => v >= min);
+// how far (layout pixels) the landscape princess reaches over the reel frame's right edge
+const CHARACTER_OVERLAP = 72;
 
 let app, atlases, rigs, layouts, world, cover, symbolLayer, effectsLayer, current;
 const characters = new Set();
@@ -238,11 +240,98 @@ async function makeSpine(it) {
     container.label = 'Princess v2';
     container.addChild(princess);
     container.alpha = it.alpha ?? 1;
+    hover(container, princess);
     return container;
   }
   if (baseBackground) modeSpines.push({ spine: s, item: it });
   s.alpha = it.alpha ?? 1;
   return s;
+}
+
+// The princess drifts up and down and sways a little, with stars twinkling round her, so she reads as
+// floating over the board rather than standing beside it. Measured in her own height, so it suits both layouts.
+function hover(container, princess) {
+  const sparkles = new PIXI.Graphics();
+  sparkles.blendMode = PIXI.BLEND_MODES.ADD;
+  container.addChildAt(sparkles, 0);
+  if (motion.reduced) return;
+  const box = princess.getLocalBounds();
+  const height = box.height * princess.scale.y, width = box.width * princess.scale.x;
+  const x0 = princess.x + (box.x + box.width / 2) * princess.scale.x, y0 = princess.y + (box.y + box.height / 2) * princess.scale.y;
+  const baseY = princess.y, baseRotation = princess.rotation;
+  // fixed spots round her silhouette, each twinkling on its own phase
+  const stars = Array.from({ length: 14 }, (_, i) => ({
+    x: x0 + Math.cos(i * 2.4) * width * (.32 + (i % 3) * .07), y: y0 + Math.sin(i * 2.4) * height * (.38 + (i % 4) * .04),
+    phase: i * .73, size: height * (.007 + (i % 3) * .004),
+  }));
+  let t = 0;
+  const tick = () => {
+    if (princess.destroyed) { PIXI.Ticker.shared.remove(tick); return; }
+    t += PIXI.Ticker.shared.deltaMS / 1000 * motion.speed;
+    const drift = Math.sin(t * Math.PI * 2 / 3.4);
+    princess.y = baseY + drift * height * .018;
+    princess.rotation = baseRotation + Math.sin(t * Math.PI * 2 / 5.2) * .012;
+    sparkles.clear();
+    for (const s of stars) {
+      const glow = Math.max(0, Math.sin(t * 1.7 + s.phase));
+      if (glow < .05) continue;
+      const r = s.size * (.6 + glow * .7), y = s.y + drift * height * .012;
+      sparkles.beginFill(s.phase % 1.5 > .75 ? 0xbfefff : 0xffe7a8, glow * .9)
+        .drawPolygon([s.x, y - r * 2, s.x + r * .35, y - r * .35, s.x + r * 2, y, s.x + r * .35, y + r * .35,
+          s.x, y + r * 2, s.x - r * .35, y + r * .35, s.x - r * 2, y, s.x - r * .35, y - r * .35]).endFill();
+    }
+  };
+  PIXI.Ticker.shared.add(tick);
+}
+
+// the star on the end of her wand: the highest point of the wand mesh as it is posed right now
+function wandTip(princess) {
+  const slot = princess.skeleton.findSlot('wand'), mesh = slot?.getAttachment();
+  if (!mesh?.computeWorldVertices) return { x: 0, y: 0 };
+  const points = new Float32Array(mesh.worldVerticesLength);
+  mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, points, 0, 2);
+  let tip = { x: points[0], y: points[1] };
+  for (let i = 2; i < points.length; i += 2) if (points[i + 1] < tip.y) tip = { x: points[i], y: points[i + 1] };
+  return tip;
+}
+
+// The princess points her wand at a multiplier orb as it lands: a star flies from the wand tip along an arc
+// and bursts on the orb, as the original's princess charges each orb she reveals.
+async function castAt(box) {
+  const princess = [...characters].find(p => !p.destroyed);
+  if (!princess || !effectsLayer || effectsLayer.destroyed) return;
+  react('spell');
+  const tip = wandTip(princess);
+  const from = world.toLocal(princess.toGlobal(new PIXI.Point(tip.x, tip.y)));
+  const to = { x: box.x, y: box.y };
+  const lift = grid.dy * 1.2;
+  const bolt = new PIXI.Graphics();
+  bolt.blendMode = PIXI.BLEND_MODES.ADD;
+  effectsLayer.addChild(bolt);
+  const at = p => ({ x: from.x + (to.x - from.x) * p, y: from.y + (to.y - from.y) * p - Math.sin(p * Math.PI) * lift });
+  const star = (g, x, y, r, color, alpha) => g.beginFill(color, alpha).drawPolygon([x, y - r, x + r * .3, y - r * .3, x + r, y,
+    x + r * .3, y + r * .3, x, y + r, x - r * .3, y + r * .3, x - r, y, x - r * .3, y - r * .3]).endFill();
+  await motion.animate(380, p => {
+    if (bolt.destroyed) return;
+    bolt.clear();
+    for (let i = 8; i >= 0; i--) {
+      const q = Math.max(0, p - i * .035), pt = at(q);
+      star(bolt, pt.x, pt.y, grid.dy * (.05 + (8 - i) * .012), i ? 0xffd8f6 : 0xffffff, (1 - i / 9) * .85);
+    }
+  }, { ease: p => 1 - (1 - p) ** 2 });
+  if (box.destroyed) { bolt.destroy(); return; }
+  const scale = box.scale.x;
+  await motion.animate(300, p => {
+    if (bolt.destroyed) return;
+    bolt.clear();
+    for (let i = 0; i < 8; i++) {
+      const a = i * Math.PI / 4, r = grid.dy * (.15 + p * .45);
+      star(bolt, to.x + Math.cos(a) * r, to.y + Math.sin(a) * r, grid.dy * .09 * (1 - p), i % 2 ? 0xbfefff : 0xffe7a8, 1 - p);
+    }
+    if (!box.destroyed) box.scale.set(scale * (1 + Math.sin(p * Math.PI) * .14));
+  });
+  bolt.destroy();
+  if (!box.destroyed) box.scale.set(scale);
 }
 
 // ---- the captured layout ----
@@ -303,18 +392,22 @@ async function build(name, onProgress = () => {}) {
       }
     }
     if (/^stpr_character_01(?:_SkeletonData)?$/.test(it.skeleton || '') && L.canvas[0] > L.canvas[1]) {
-      // Fill the character column and float just below the logo.
-      const bounds = obj.getBounds();
+      // As in the original, she hovers over the board's right edge: her wing crosses the reel frame,
+      // her head tucks under the logo and her feet stay clear of the bottom bar.
+      const silhouette = obj.children.at(-1); // the princess, without the stars round her
+      const bounds = silhouette.getBounds();
       const anchor = L.items.find(item => item.path.endsWith('Reels/ClippingAnchors/DownRight'))?.leaves?.[0]?.b;
-      const left = anchor ? anchor[0] + anchor[2]/2 + 8 : L.canvas[0]*.85;
-      const width = L.canvas[0] - 4 - left;
-      const fit = width/bounds.width;
-      obj.scale.set(obj.scale.x*fit, obj.scale.y*fit);
-      const fitted = obj.getBounds();
-      obj.x += left + width/2 - (fitted.x + fitted.width/2);
+      const reelsRight = anchor ? anchor[0] + anchor[2]/2 : L.canvas[0]*.85;
+      const left = reelsRight - CHARACTER_OVERLAP;
       const logo = L.items.find(item => /Logo\/Land\/S$/.test(item.path));
       const logoBounds = logo && drawnBounds(logo);
-      const top = logoBounds ? logoBounds.y + logoBounds.h + 24 : L.canvas[1]*.3;
+      const top = logoBounds ? logoBounds.y + logoBounds.h - 14 : L.canvas[1]*.26;
+      const bar = L.items.find(item => item.path.endsWith('TopBar/Background/Sprite'));
+      const bottom = (bar ? drawnBounds(bar).y : L.canvas[1]*.87) - 36;
+      const fit = Math.min((L.canvas[0] + 30 - left)/bounds.width, (bottom - top)/bounds.height);
+      obj.scale.set(obj.scale.x*fit, obj.scale.y*fit);
+      const fitted = silhouette.getBounds();
+      obj.x += left - fitted.x;
       obj.y += top - fitted.y;
     }
     obj.item = it;
@@ -563,7 +656,7 @@ export async function show(g, { instant = false, first = false, scatterTarget = 
               }
             }
             if (b.cell.s === 'scatter') listeners.scatterLanded?.();
-            return land(b);
+            return Promise.all([land(b), b.cell.s === 'mult' && castAt(b)]);
           }));
         }
       } else if (b.y !== p.y) {
@@ -609,6 +702,7 @@ export async function pop(g, wins) {
 // Wish stars or orbs that count play their win animation.
 export async function highlight(kind) {
   const boxes = [...sprites.values()].filter(b => b.cell.s === kind);
+  if (kind === 'scatter' && boxes.length) react('win');
   let ms = 0;
   for (const b of boxes) ms = Math.max(ms, await playRig(b, kind === 'mult' ? /multiplier_loop$/ : /_win$/));
   if (boxes.length) await wait(Math.max(ms, 800));
