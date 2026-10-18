@@ -21,11 +21,15 @@ const PREFAB = {
 // multipliers come in four colours by size, each with its own sprite and animations
 const MULT = [[100, 'Yellow', 'yellow'], [25, 'Pink', 'purple'], [10, 'Blue', 'blue'], [0, 'Green', 'green']];
 const multLook = v => MULT.find(([min]) => v >= min);
+// how far (layout pixels) the landscape princess reaches over the reel frame's right edge
+const CHARACTER_OVERLAP = 72;
 
 let app, atlases, rigs, layouts, world, cover, symbolLayer, effectsLayer, current;
 const characters = new Set();
 let freeMode = false;
 const modeSprites = [], modeSpines = [];
+const baseOnly = []; // drawn in the base game only: the buy and bet panels, the blue reel back
+let freeHud = null;  // the free-spins column that takes their place
 const textures = new Map();
 const ui = {};            // named widgets the page updates or listens to
 const sprites = new Map(); // cell id → symbol container
@@ -238,11 +242,118 @@ async function makeSpine(it) {
     container.label = 'Princess v2';
     container.addChild(princess);
     container.alpha = it.alpha ?? 1;
+    hover(container, princess);
     return container;
   }
   if (baseBackground) modeSpines.push({ spine: s, item: it });
   s.alpha = it.alpha ?? 1;
   return s;
+}
+
+// The princess drifts up and down and sways a little, with stars twinkling round her, so she reads as
+// floating over the board rather than standing beside it. Measured in her own height, so it suits both layouts.
+function hover(container, princess) {
+  const sparkles = new PIXI.Graphics();
+  sparkles.blendMode = PIXI.BLEND_MODES.ADD;
+  container.addChildAt(sparkles, 0);
+  if (motion.reduced) return;
+  const box = princess.getLocalBounds();
+  const height = box.height * princess.scale.y, width = box.width * princess.scale.x;
+  const x0 = princess.x + (box.x + box.width / 2) * princess.scale.x, y0 = princess.y + (box.y + box.height / 2) * princess.scale.y;
+  const baseY = princess.y, baseRotation = princess.rotation;
+  // fixed spots round her silhouette, each twinkling on its own phase
+  const stars = Array.from({ length: 14 }, (_, i) => ({
+    x: x0 + Math.cos(i * 2.4) * width * (.32 + (i % 3) * .07), y: y0 + Math.sin(i * 2.4) * height * (.38 + (i % 4) * .04),
+    phase: i * .73, size: height * (.007 + (i % 3) * .004),
+  }));
+  let t = 0;
+  const tick = () => {
+    if (princess.destroyed) { PIXI.Ticker.shared.remove(tick); return; }
+    t += PIXI.Ticker.shared.deltaMS / 1000 * motion.speed;
+    const drift = Math.sin(t * Math.PI * 2 / 3.4);
+    princess.y = baseY + drift * height * .018;
+    princess.rotation = baseRotation + Math.sin(t * Math.PI * 2 / 5.2) * .012;
+    sparkles.clear();
+    for (const s of stars) {
+      const glow = Math.max(0, Math.sin(t * 1.7 + s.phase));
+      if (glow < .05) continue;
+      const r = s.size * (.6 + glow * .7), y = s.y + drift * height * .012;
+      sparkles.beginFill(s.phase % 1.5 > .75 ? 0xbfefff : 0xffe7a8, glow * .9)
+        .drawPolygon([s.x, y - r * 2, s.x + r * .35, y - r * .35, s.x + r * 2, y, s.x + r * .35, y + r * .35,
+          s.x, y + r * 2, s.x - r * .35, y + r * .35, s.x - r * 2, y, s.x - r * .35, y - r * .35]).endFill();
+    }
+  };
+  PIXI.Ticker.shared.add(tick);
+}
+
+// the star on the end of her wand: the highest point of the wand mesh as it is posed right now
+function wandTip(princess) {
+  const slot = princess.skeleton.findSlot('wand'), mesh = slot?.getAttachment();
+  if (!mesh?.computeWorldVertices) return { x: 0, y: 0 };
+  const points = new Float32Array(mesh.worldVerticesLength);
+  mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, points, 0, 2);
+  let tip = { x: points[0], y: points[1] };
+  for (let i = 2; i < points.length; i += 2) if (points[i + 1] < tip.y) tip = { x: points[i], y: points[i + 1] };
+  return tip;
+}
+
+// A multiplier orb lands and the princess strikes it, as in the original: she flashes and raises her wand
+// (react('spell') plays the white burst round her), a twinkle leaves her wand tip, and lightning comes down
+// from above the board onto the orb, which pops in a burst of stars.
+async function castAt(box) {
+  const princess = [...characters].find(p => !p.destroyed);
+  if (!princess || !effectsLayer || effectsLayer.destroyed) return;
+  react('spell');
+  const tip = wandTip(princess);
+  const from = world.toLocal(princess.toGlobal(new PIXI.Point(tip.x, tip.y)));
+  const to = { x: box.x, y: box.y };
+  const top = Math.min(...grid.ys) - grid.dy * 1.4;
+  const fx = new PIXI.Graphics();
+  fx.blendMode = PIXI.BLEND_MODES.ADD;
+  effectsLayer.addChild(fx);
+  const star = (g, x, y, r, color, alpha) => g.beginFill(color, alpha).drawPolygon([x, y - r, x + r * .3, y - r * .3, x + r, y,
+    x + r * .3, y + r * .3, x, y + r, x - r * .3, y + r * .3, x - r, y, x - r * .3, y - r * .3]).endFill();
+  // the wand twinkles as she casts
+  await motion.animate(220, p => {
+    if (fx.destroyed) return;
+    fx.clear();
+    star(fx, from.x, from.y, grid.dy * (.12 + Math.sin(p * Math.PI) * .22), 0xffffff, Math.sin(p * Math.PI));
+  });
+  if (box.destroyed || fx.destroyed) { fx.destroy(); return; }
+  // a jagged bolt, re-forked every few frames so it crackles, fading as the orb takes the charge
+  const jag = grid.dy * .22;
+  const fork = () => {
+    const steps = 9, points = [];
+    for (let i = 0; i <= steps; i++) {
+      const q = i / steps, wobble = i && i < steps ? (Math.random() - .5) * jag * 2 : 0;
+      points.push(to.x + wobble, top + (to.y - top) * q);
+    }
+    return points;
+  };
+  const line = (points, width, color, alpha) => {
+    fx.lineStyle(width, color, alpha).moveTo(points[0], points[1]);
+    for (let i = 2; i < points.length; i += 2) fx.lineTo(points[i], points[i + 1]);
+  };
+  const scale = box.scale.x;
+  let points = fork(), frame = 0;
+  await motion.animate(520, p => {
+    if (fx.destroyed) return;
+    if (++frame % 3 === 0) points = fork();
+    const strength = p < .15 ? p / .15 : 1 - (p - .15) / .85;
+    fx.clear();
+    line(points, grid.dy * .28, 0xb46cff, .25 * strength);
+    line(points, grid.dy * .12, 0xffc8f4, .55 * strength);
+    line(points, grid.dy * .035, 0xffffff, strength);
+    fx.lineStyle(0);
+    fx.beginFill(0xffffff, .5 * strength).drawCircle(to.x, to.y, grid.dy * (.25 + p * .25)).endFill();
+    for (let i = 0; i < 8; i++) {
+      const a = i * Math.PI / 4 + p, r = grid.dy * (.15 + p * .45);
+      star(fx, to.x + Math.cos(a) * r, to.y + Math.sin(a) * r, grid.dy * .09 * (1 - p), i % 2 ? 0xbfefff : 0xffe7a8, 1 - p);
+    }
+    if (!box.destroyed) box.scale.set(scale * (1 + Math.sin(p * Math.PI) * .14));
+  });
+  fx.destroy();
+  if (!box.destroyed) box.scale.set(scale);
 }
 
 // ---- the captured layout ----
@@ -284,7 +395,7 @@ async function build(name, onProgress = () => {}) {
   const L = layouts[name];
   const root = new PIXI.Container();
   for (const k of Object.keys(ui)) delete ui[k];
-  modeSprites.length = 0; modeSpines.length = 0;
+  modeSprites.length = 0; modeSpines.length = 0; baseOnly.length = 0;
   characters.clear();
   let symbolsAt = -1;
   for (const [index, it] of L.items.entries()) {
@@ -303,20 +414,25 @@ async function build(name, onProgress = () => {}) {
       }
     }
     if (/^stpr_character_01(?:_SkeletonData)?$/.test(it.skeleton || '') && L.canvas[0] > L.canvas[1]) {
-      // Fill the character column and float just below the logo.
-      const bounds = obj.getBounds();
+      // As in the original, she hovers over the board's right edge: her wing crosses the reel frame,
+      // her head tucks under the logo and her feet stay clear of the bottom bar.
+      const silhouette = obj.children.at(-1); // the princess, without the stars round her
+      const bounds = silhouette.getBounds();
       const anchor = L.items.find(item => item.path.endsWith('Reels/ClippingAnchors/DownRight'))?.leaves?.[0]?.b;
-      const left = anchor ? anchor[0] + anchor[2]/2 + 8 : L.canvas[0]*.85;
-      const width = L.canvas[0] - 4 - left;
-      const fit = width/bounds.width;
-      obj.scale.set(obj.scale.x*fit, obj.scale.y*fit);
-      const fitted = obj.getBounds();
-      obj.x += left + width/2 - (fitted.x + fitted.width/2);
+      const reelsRight = anchor ? anchor[0] + anchor[2]/2 : L.canvas[0]*.85;
+      const left = reelsRight - CHARACTER_OVERLAP;
       const logo = L.items.find(item => /Logo\/Land\/S$/.test(item.path));
       const logoBounds = logo && drawnBounds(logo);
-      const top = logoBounds ? logoBounds.y + logoBounds.h + 24 : L.canvas[1]*.3;
+      const top = logoBounds ? logoBounds.y + logoBounds.h - 14 : L.canvas[1]*.26;
+      const bar = L.items.find(item => item.path.endsWith('TopBar/Background/Sprite'));
+      const bottom = (bar ? drawnBounds(bar).y : L.canvas[1]*.87) - 36;
+      const fit = Math.min((L.canvas[0] + 30 - left)/bounds.width, (bottom - top)/bounds.height);
+      obj.scale.set(obj.scale.x*fit, obj.scale.y*fit);
+      const fitted = silhouette.getBounds();
+      obj.x += left - fitted.x;
       obj.y += top - fitted.y;
     }
+    if (BASE_ONLY.test(it.path)) { baseOnly.push(obj); obj.visible = !freeMode; }
     obj.item = it;
     root.addChild(obj);
     for (const [key, re] of Object.entries(NAMED)) if (!ui[key] && re.test(it.path)) ui[key] = obj;
@@ -331,9 +447,65 @@ async function build(name, onProgress = () => {}) {
     root.addChild(mask);
     symbolLayer.mask = mask;
   }
+  freeHud = await buildFreeHud(L);
+  if (freeHud) { freeHud.visible = freeMode; root.addChild(freeHud); }
   effectsLayer = new PIXI.Container();
   root.addChild(effectsLayer);
   return root;
+}
+
+// In free spins the original swaps its buy and bet panels for a total-multiplier panel and a spins-left
+// panel, with the winged cat perched on top. Built from the captured panels' places and the bet label's lettering.
+const BASE_ONLY = /BuyBetFeatures\/|Reels\/Reels\/Base\/Back\//;
+async function buildFreeHud(L) {
+  const find = re => L.items.find(it => re.test(it.path));
+  const buyIt = find(/BuyButtons\/AT\/Option_0\/Content\/Buy\/(Land|Port)\/Back\/S_0$/);
+  const betIt = find(/BetLevel\/RA\/Levels\/Content\/(Land|Port)\/Back\/S_0$/);
+  const titleIt = find(/BetLevel\/.*\/Texts\/Bet$/), valueIt = find(/BetLevel\/.*\/Texts\/Value$/);
+  const buy = buyIt && drawnBounds(buyIt), bet = betIt && drawnBounds(betIt);
+  if (!buy || !bet || !titleIt || !valueIt || !atlases.FSLeft) return null;
+  const hud = new PIXI.Container();
+  hud.label = 'Free spins column';
+  const k = titleIt.wt[0];
+  async function panel(cx, top, width, title) {
+    const back = new PIXI.Sprite(await spriteTexture('FSLeft', 'free_spin_left'));
+    back.anchor.set(.5, 0); back.scale.set(width / back.texture.width); back.position.set(cx, top);
+    const h = back.height;
+    const heading = makeLabel({ ...titleIt, text: title, size: titleIt.size * .56, w: 300, maxLines: 2, ax: .5, ay: .5 });
+    heading.scale.set(k); heading.position.set(cx, top + h * .36);
+    const value = makeLabel({ ...valueIt, text: '0', w: 200, ax: .5, ay: .5 });
+    value.scale.set(k); value.position.set(cx, top + h * .7);
+    hud.addChild(back, heading, value);
+    return { value, center: { x: cx, y: top + h * .55 } };
+  }
+  const cx = buy.x + buy.w / 2, width = buy.w * .96;
+  const mult = await panel(cx, buy.y + buy.h * .22, width, 'TOTAL\nMULTIPLIER');
+  const left = await panel(bet.x + bet.w / 2, bet.y + bet.h * .12, width, 'FREE SPINS\nLEFT');
+  // the cat perches on the multiplier panel; she cheers when it grows
+  const cat = new Spine(await skeleton('stpr_cat_3'));
+  cat.state.setAnimation(0, 'idle', true); cat.update(0);
+  const cb = cat.getLocalBounds(), ck = width * .8 / cb.width;
+  cat.scale.set(ck);
+  cat.position.set(cx - (cb.x + cb.width / 2) * ck, buy.y + buy.h * .5 - (cb.y + cb.height) * ck);
+  motion.track(cat);
+  hud.addChildAt(cat, 0);
+  hud.multiplier = mult; hud.left = left; hud.cat = cat;
+  return hud;
+}
+
+// what the free-spins column shows; leave a value out to keep it
+export function setFreeHud({ left, mult } = {}) {
+  if (!freeHud || freeHud.destroyed) return;
+  if (left != null) freeHud.left.value.setText(String(left));
+  if (mult != null) {
+    const grew = mult > (freeHud.mult ?? mult);
+    freeHud.mult = mult;
+    freeHud.multiplier.value.setText(`${mult}x`);
+    if (grew && !motion.reduced) {
+      freeHud.cat.state.setAnimation(0, 'happy', false);
+      freeHud.cat.state.addAnimation(0, 'idle', true, 0);
+    }
+  }
 }
 
 // where each cell's symbol root sits, and its scale: worked out from the captured idle symbols
@@ -563,7 +735,7 @@ export async function show(g, { instant = false, first = false, scatterTarget = 
               }
             }
             if (b.cell.s === 'scatter') listeners.scatterLanded?.();
-            return land(b);
+            return Promise.all([land(b), b.cell.s === 'mult' && castAt(b)]);
           }));
         }
       } else if (b.y !== p.y) {
@@ -609,6 +781,7 @@ export async function pop(g, wins) {
 // Wish stars or orbs that count play their win animation.
 export async function highlight(kind) {
   const boxes = [...sprites.values()].filter(b => b.cell.s === kind);
+  if (kind === 'scatter' && boxes.length) react('win');
   let ms = 0;
   for (const b of boxes) ms = Math.max(ms, await playRig(b, kind === 'mult' ? /multiplier_loop$/ : /_win$/));
   if (boxes.length) await wait(Math.max(ms, 800));
@@ -679,7 +852,9 @@ export async function collectMultipliers(onCollect) {
   react('spell');
   const meter = document.querySelector('.multiplier-meter').getBoundingClientRect();
   const canvas = app.view.getBoundingClientRect();
-  const target = world.toLocal(new PIXI.Point(meter.left + meter.width / 2 - canvas.left, meter.top + meter.height / 2 - canvas.top));
+  // in free spins the orbs fly to the total-multiplier panel, as in the original
+  const target = freeMode && freeHud ? freeHud.multiplier.center
+    : world.toLocal(new PIXI.Point(meter.left + meter.width / 2 - canvas.left, meter.top + meter.height / 2 - canvas.top));
   for (const [i, b] of boxes.entries()) {
     if (b.destroyed) continue;
     const orb = await makeSymbol(b.cell);
@@ -713,6 +888,8 @@ export async function setFree(on) {
   const changed = freeMode !== !!on;
   freeMode = !!on;
   if (!changed) return;
+  for (const obj of baseOnly) obj.visible = !freeMode;
+  if (freeHud) freeHud.visible = freeMode;
   for (const entry of modeSprites) {
     const { width, height } = entry.sprite;
     entry.sprite.texture = await spriteTexture(freeMode ? 'stpr_freegame_portrait' : entry.base.atlas,

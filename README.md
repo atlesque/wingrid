@@ -126,7 +126,15 @@ The `starlight-rebuild` source checkout was not modified.
 using Pixi 7 and Spine 3.7. It includes the stronger independent motion and
 original-pixel eyelid blinking from the character demo. Reduced-motion settings
 show the undeformed reference pose. The character replaces the old princess
-in both captured layouts, with the landscape silhouette fitted clear of the reels.
+in both captured layouts. In landscape she floats over the board's right edge, as the original's
+princess does: her wing crosses the reel frame (`CHARACTER_OVERLAP` in `scene.js`), her head tucks
+under the logo and her feet stay clear of the bottom bar. In both layouts she drifts and sways with
+stars twinkling round her. When a multiplier orb lands she flashes and raises her wand, and lightning
+strikes the orb from above the board, as in the original.
+
+In free spins the board turns purple and, in landscape, the buy and bet panels give way to a
+total-multiplier panel and a free-spins-left panel with the winged cat perched on top, as in the
+original. Collected orbs fly to that panel (`buildFreeHud` and `setFreeHud` in `scene.js`).
 
 Its source image, rig, atlas metadata, and source checksum live in
 `public/characters/princess-v2/` and are included in the deployment. To import
@@ -153,6 +161,14 @@ To recapture (for another screen, or after re-mirroring the archive), run the or
 - **Fonts**: `fonts.css` has the game's fonts under their original family names.
 
 `public/starlight/` is git-ignored. The art is licensed for this private copy, and it will be replaced with our own later. Each symbol is one prefab rig (`PREFAB` in `scene.js`), so replacements can go in one at a time.
+
+## Typography
+
+The canvas labels use the game's own captured fonts. The page's own text (bonus panel, banners,
+dialogs, loading screen, toasts and buttons) uses two free OFL fonts bundled from npm, so nothing is
+fetched from a font CDN: **Lilita One** for titles, numbers and buttons, matching the heavy rounded
+lettering on the reels, and **Nunito** for running text. Titles and amounts use the game's gold
+gradient with a deep purple outline.
 
 ## Sound, autoplay and volume
 
