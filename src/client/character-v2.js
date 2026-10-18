@@ -1,6 +1,24 @@
 import * as PIXI from 'pixi.js';
 import { TextureAtlas } from '@pixi-spine/base';
 import { Spine, SkeletonJson, AtlasAttachmentLoader } from '@pixi-spine/runtime-3.7';
+import { motion } from './motion.js';
+
+// Reactions use the approved mesh and its existing joints, so no old character artwork can reappear.
+const rotation = (peak, duration = 1.4) => [
+  { time: 0, angle: 0 }, { time: duration * .3, angle: peak },
+  { time: duration * .65, angle: peak * .65 }, { time: duration, angle: 0 },
+];
+function reaction({ tilt, lift, wand, wings, duration = 1.4 }) {
+  return { bones: {
+    body: { translate: [{ time: 0, x: 0, y: 0 }, { time: duration * .35, x: 0, y: lift }, { time: duration, x: 0, y: 0 }] },
+    chest: { rotate: rotation(tilt, duration) }, head: { rotate: rotation(-tilt * 1.5, duration) },
+    arm_left: { rotate: rotation(wand, duration) }, wand: { rotate: rotation(-wand * .6, duration) },
+    arm_right: { rotate: rotation(-wand * .5, duration) },
+    wing_left: { rotate: rotation(wings, duration) }, wing_right: { rotate: rotation(-wings, duration) },
+    hair_left_tip: { rotate: rotation(tilt * 2, duration) }, hair_right_tip: { rotate: rotation(-tilt * 2, duration) },
+    ribbon_left: { rotate: rotation(wings * .6, duration) }, ribbon_right: { rotate: rotation(-wings * .6, duration) },
+  } };
+}
 
 // Exact-source mesh rig, independent motion, and original-pixel eyelid blinking.
 const BASE = '/characters/princess-v2';
@@ -17,11 +35,18 @@ export async function createPrincessV2() {
   const image = { naturalWidth: texture.width, naturalHeight: texture.height };
   const atlas = new TextureAtlas();
   for (const name of Object.keys(atlasInfo.sprites)) atlas.addTexture(name, texture);
+  Object.assign(rig.animations, {
+    v2_anticipation: reaction({ tilt: -3, lift: 10, wand: 12, wings: 7 }),
+    v2_win: reaction({ tilt: 4, lift: 26, wand: 22, wings: 13, duration: 1.8 }),
+    v2_spell: reaction({ tilt: -5, lift: 18, wand: 36, wings: 9, duration: 1.6 }),
+    v2_bonus: reaction({ tilt: 5, lift: 38, wand: 28, wings: 17, duration: 2.2 }),
+  });
   const data = new SkeletonJson(new AtlasAttachmentLoader(atlas)).readSkeletonData(rig);
   const character = new Spine(data);
   character.autoUpdate = false;
   character.state.setAnimation(0, 'v2_idle', true);
   character.update(0);
+  motion.track(character);
   // Deform only the refined eyelid vertices. Each bone influence receives the
   // same source-space offset, so the blink follows the face and shared edges.
   const smooth = (a, b, value) => {
@@ -96,5 +121,13 @@ export async function createPrincessV2() {
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reducedMotion) character.setReferencePose(true);
   character.autoUpdate = !reducedMotion;
+  character.react = (name, loop = false) => {
+    if (referencePose) return;
+    character.state.setEmptyAnimation(1, .15);
+    if (name === 'idle') return;
+    character.state.setAnimation(1, `v2_${name}`, loop);
+    if (!loop) character.state.addEmptyAnimation(1, .2, 0);
+    character.blink();
+  };
   return character;
 }

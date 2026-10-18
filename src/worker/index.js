@@ -1,5 +1,6 @@
 import { secureRandom, BETS, START_CREDITS } from '../shared/engine.js';
-import { fresh, normalize, playSpin, topUp, setBet, canTopUp, RoundError, TOP_UP_EVERY } from '../shared/round.js';
+import { fresh, normalize, playSpin, spinView, pickJackpot, topUp, setBet, canTopUp, RoundError, TOP_UP_EVERY, round2 } from '../shared/round.js';
+import { JACKPOTS, JACKPOT_MIN_BET, JACKPOT_CHANCE_PER_CREDIT, jackpotTier, jackpotDeck, publicJackpot } from '../shared/jackpot.js';
 
 // ================= STARLIGHT API =================
 // The Worker owns every player's credits: the page asks it to spin and animates what comes back. A browser
@@ -66,7 +67,8 @@ async function art(req, env, url) {
 async function route(req, env, url, ctx) {
   const p = url.pathname, m = req.method;
   if (m === 'POST' && req.headers.get('origin') !== url.origin) throw new HttpError(403, 'bad_origin', 'That request did not come from this site.');
-  if (p === '/api/config' && m === 'GET') return json({ playUrl: env.PLAY_URL, gameId: env.PLAY_GAME_ID, bets: BETS, startCredits: START_CREDITS, topUpEvery: TOP_UP_EVERY });
+  if (p === '/api/config' && m === 'GET') return json({ playUrl: env.PLAY_URL, gameId: env.PLAY_GAME_ID, bets: BETS, startCredits: START_CREDITS, topUpEvery: TOP_UP_EVERY,
+    jackpots: { tiers: await poolsView(env), minBet: JACKPOT_MIN_BET, chancePerCredit: JACKPOT_CHANCE_PER_CREDIT } });
   if (p === '/api/guest' && m === 'POST') return newGuest(env);
 
   const session = await auth(req, env);
@@ -77,13 +79,46 @@ async function route(req, env, url, ctx) {
   if (p === '/api/spin' && m === 'POST') {
     const { buy = false } = await body(req);
     let out;
-    await change(env, session, (save, player) => {
-      out = playSpin(save, secureRandom(), { buy: !!buy });
-      return [env.DB.prepare('INSERT INTO spins (player_id, kind, bet, cost, win, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    await change(env, session, async (save, player) => {
+      const rng = secureRandom();
+      out = playSpin(save, rng, { buy: !!buy });
+      const statements = [env.DB.prepare('INSERT INTO spins (player_id, kind, bet, cost, win, created_at) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(player.id, out.kind, out.bet, out.cost, out.win, Date.now())];
+      // Optional jackpots are separate from the 5,000x slot-feature cap and only
+      // trigger at the end of paid base/ante spins which do not start free spins.
+      const tier = ['base', 'ante'].includes(out.kind) && !save.feature ? jackpotTier(rng, out.cost) : null;
+      if (tier) {
+        const definition = JACKPOTS.find(t => t.id === tier);
+        const pool = await env.DB.prepare('SELECT * FROM jackpot_pools WHERE tier = ?').bind(tier).first();
+        const amount = round2(Math.min(definition.cap, pool.amount + out.cost * definition.contribution));
+        const id = crypto.randomUUID();
+        save.jackpot = { id, tier, amount, deck: jackpotDeck(rng, tier), picks: [] };
+        out.event = { type: 'jackpot-start' };
+        statements.push(env.DB.prepare('UPDATE jackpot_pools SET amount = ?, version = version + 1 WHERE tier = ? AND version = ?')
+          .bind(definition.seed, tier, pool.version), mutationGuard(env),
+        env.DB.prepare('INSERT INTO jackpot_awards (id, player_id, tier, amount, created_at) VALUES (?, ?, ?, ?, ?)')
+          .bind(id, player.id, tier, amount, Date.now()));
+      }
+      if (out.cost > 0) for (const definition of JACKPOTS) {
+        if (definition.id === tier) continue;
+        statements.push(env.DB.prepare('UPDATE jackpot_pools SET amount = MIN(?, ROUND(amount + ?, 4)), version = version + 1 WHERE tier = ?')
+          .bind(definition.cap, out.cost * definition.contribution, definition.id));
+      }
+      return statements;
     });
     const state = await view(env, session);
-    return json({ spin: { kind: out.kind, bet: out.bet, cost: out.cost, win: out.win, event: out.event, feature: out.feature, ...out.result }, state });
+    return json({ spin: spinView(out), state });
+  }
+  if (p === '/api/jackpot/pick' && m === 'POST') {
+    const { id, index } = await body(req);
+    let result;
+    await change(env, session, save => {
+      if (!save.jackpot || id !== save.jackpot.id) throw new RoundError('no_jackpot', 'That jackpot is no longer open.');
+      result = pickJackpot(save, index);
+      return result.complete ? [env.DB.prepare('UPDATE jackpot_awards SET claimed_at = ? WHERE id = ? AND claimed_at IS NULL')
+        .bind(Date.now(), result.id), mutationGuard(env)] : [];
+    });
+    return json({ result, state: await view(env, session) });
   }
   if (p === '/api/bet' && m === 'POST') {
     const b = await body(req);
@@ -133,15 +168,16 @@ async function auth(req, env) {
 }
 
 // ---- saves ----
-const toSave = row => normalize({
+const toSave = row => ({ ...normalize({
   v: 1, credits: row.credits, bet: row.bet, ante: !!row.ante, stats: JSON.parse(row.stats),
   feature: row.feature ? JSON.parse(row.feature) : null, lastTopUp: row.last_top_up,
-});
+}), jackpot: row.jackpot ? JSON.parse(row.jackpot) : null });
 const player = (env, id) => env.DB.prepare('SELECT * FROM players WHERE id = ?').bind(id).first();
 
 function writeSave(env, row, save, extra = {}) {
   const sets = { credits: save.credits, bet: save.bet, ante: save.ante ? 1 : 0, stats: JSON.stringify(save.stats),
-    feature: save.feature ? JSON.stringify(save.feature) : null, last_top_up: save.lastTopUp, updated_at: Date.now(), ...extra };
+    feature: save.feature ? JSON.stringify(save.feature) : null, jackpot: save.jackpot ? JSON.stringify(save.jackpot) : null,
+    last_top_up: save.lastTopUp, updated_at: Date.now(), ...extra };
   const cols = Object.keys(sets);
   return env.DB.prepare(`UPDATE players SET ${cols.map(c => `${c} = ?`).join(', ')}, version = version + 1 WHERE id = ? AND version = ?`)
     .bind(...cols.map(c => sets[c]), row.id, row.version);
@@ -151,18 +187,29 @@ function writeSave(env, row, save, extra = {}) {
 async function change(env, session, fn, { push = true } = {}) {
   const row = await player(env, session.player_id);
   const save = toSave(row);
-  const more = fn(save, row) || [];
-  const [res] = await env.DB.batch([writeSave(env, row, save), ...more]);
+  const more = await fn(save, row) || [];
+  let res;
+  try { [res] = await env.DB.batch([writeSave(env, row, save), mutationGuard(env), ...more]); }
+  catch (error) {
+    if (String(error.cause?.message || error.message).includes('current_version')) throw new HttpError(409, 'busy', 'Another action finished first. Try again.');
+    throw error;
+  }
   if (!res.meta.changes) throw new HttpError(409, 'busy', 'Another spin is still being played. Try again.');
   if (push && session.play_token) await pushToPlay(env, session);
   return save;
+}
+
+const mutationGuard = env => env.DB.prepare('INSERT OR REPLACE INTO mutation_guard (id, ok) VALUES (1, changes())');
+async function poolsView(env) {
+  const { results } = await env.DB.prepare('SELECT tier, amount FROM jackpot_pools').all();
+  return JACKPOTS.map(tier => ({ ...tier, amount: round2(results.find(r => r.tier === tier.id).amount) }));
 }
 
 // what the page shows
 async function view(env, session) {
   const row = await player(env, session.player_id);
   const save = toSave(row);
-  return { ...save, betAmount: BETS[save.bet], canTopUp: canTopUp(save), nextTopUp: save.lastTopUp + TOP_UP_EVERY,
+  return { ...save, jackpot: publicJackpot(save.jackpot), jackpots: await poolsView(env), betAmount: BETS[save.bet], canTopUp: canTopUp(save), nextTopUp: save.lastTopUp + TOP_UP_EVERY,
     account: session.play_token ? { email: row.play_email } : null };
 }
 
@@ -182,12 +229,14 @@ async function play(env, session, path, opts = {}) {
 
 async function adopt(env, session, data, rev) {
   const row = await player(env, session.player_id);
+  if (row.jackpot) return; // a sync response may arrive after another tab reserved a prize
   await writeSave(env, row, data ? normalize(data) : fresh(), { play_rev: rev }).run();
 }
 
 async function pushToPlay(env, session) {
   try {
     const row = await player(env, session.player_id);
+    if (row.jackpot) return; // reserve/reveal remains local until its award is claimed
     const r = await play(env, session, `/api/games/${env.PLAY_GAME_ID}/progress`, { method: 'PUT', body: JSON.stringify({ data: toSave(row), rev: row.play_rev || 0 }) });
     if (r.status === 200) await env.DB.prepare('UPDATE players SET play_rev = ? WHERE id = ?').bind(r.body.rev, row.id).run();
     else if (r.status === 409) await adopt(env, session, r.body.data, r.body.rev);
@@ -197,6 +246,7 @@ async function pushToPlay(env, session) {
 async function pullFromPlay(env, session) {
   try {
     const row = await player(env, session.player_id);
+    if (row.jackpot) return;
     const r = await play(env, session, `/api/games/${env.PLAY_GAME_ID}/progress`);
     if (r.status !== 200 || r.body.rev === row.play_rev) return;
     if (r.body.data || row.play_rev != null) await adopt(env, session, r.body.data, r.body.rev);

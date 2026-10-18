@@ -1,6 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { Spine } from 'pixi-spine';
 import { createPrincessV2 } from './character-v2.js';
+import { skeleton } from './art.js';
+import { motion, playAnimation } from './motion.js';
 
 // ================= SCENE =================
 // Draws the game exactly as the original lays it out. layout/<name>.json is one captured frame of the original
@@ -20,8 +22,11 @@ const PREFAB = {
 const MULT = [[100, 'Yellow', 'yellow'], [25, 'Pink', 'purple'], [10, 'Blue', 'blue'], [0, 'Green', 'green']];
 const multLook = v => MULT.find(([min]) => v >= min);
 
-let app, atlases, rigs, layouts, world, cover, symbolLayer, current;
-const textures = new Map(), skeletons = new Map();
+let app, atlases, rigs, layouts, world, cover, symbolLayer, effectsLayer, current;
+const characters = new Set();
+let freeMode = false;
+const modeSprites = [], modeSpines = [];
+const textures = new Map();
 const ui = {};            // named widgets the page updates or listens to
 const sprites = new Map(); // cell id → symbol container
 
@@ -55,6 +60,22 @@ async function spriteTexture(atlasName, name, { trimmed = false } = {}) {
   }
   const a = atlases[atlasName], s = a && a.sprites[name];
   if (!s) return null;
+  // Wingrid's mascot stays outside the imported archive so asset refreshes and
+  // CI restoration cannot bring the original SCATTER portrait back.
+  if ((atlasName === 'S01' && name === 'S01') ||
+      (atlasName === 'thumbs' && ['S01', 'S01M'].includes(name))) {
+    const source = await PIXI.Assets.load('/characters/princess-v2/scatter.png');
+    const base = source.baseTexture;
+    const [pl, pt, pr, pb] = trimmed ? [0, 0, 0, 0] : s.pad;
+    const [w, h] = s.rotate ? [s.h, s.w] : [s.w, s.h];
+    const k = Math.min(w / base.width, h / base.height);
+    const texture = new PIXI.Texture(base, new PIXI.Rectangle(0, 0, base.width, base.height),
+      new PIXI.Rectangle(0, 0, (w + pl + pr) / k, (h + pt + pb) / k),
+      new PIXI.Rectangle((pl + (w - base.width * k) / 2) / k,
+        (pt + (h - base.height * k) / 2) / k, base.width, base.height));
+    spriteTextures.set(key, texture);
+    return texture;
+  }
   const base = await pageTexture(a.page);
   const [pl, pt, pr, pb] = s.pad;
   // (one archived page, S10, came out 2px smaller than its sprite list says: keep the frame on the page)
@@ -65,12 +86,6 @@ async function spriteTexture(atlasName, name, { trimmed = false } = {}) {
     : new PIXI.Texture(base, frame, new PIXI.Rectangle(0, 0, uw + pl + pr, uh + pt + pb), new PIXI.Rectangle(pl, pt, uw, uh), s.rotate ? 6 : 0);
   spriteTextures.set(key, tex);
   return tex;
-}
-
-async function skeleton(name) {
-  name = name.replace(/_SkeletonData$/, '');
-  if (!skeletons.has(name)) skeletons.set(name, PIXI.Assets.load(`${ART}/spines/${name}/${name}.json`).then(r => r.spineData));
-  return skeletons.get(name);
 }
 
 // ---- widgets ----
@@ -200,6 +215,8 @@ function layoutLabel(it, b) {
 }
 
 async function makeSpine(it) {
+  const baseBackground = /stpr_basegame_idle/.test(it.skeleton);
+  if (baseBackground && freeMode) it = { ...it, skeleton: 'stpr_freegame_idle_SkeletonData', anim: 'stpr_freegame_idle' };
   const data = await skeleton(it.skeleton);
   const s = new Spine(data);
   if (it.anim && data.findAnimation(it.anim)) s.state.setAnimation(0, it.anim, it.mode === 2 || it.mode === undefined);
@@ -211,6 +228,7 @@ async function makeSpine(it) {
     const target = s.getLocalBounds().clone();
     s.destroy({ children: true });
     const princess = await createPrincessV2();
+    characters.add(princess);
     const bounds = princess.getLocalBounds();
     const scale = Math.min(target.width / bounds.width, target.height / bounds.height);
     princess.scale.set(scale);
@@ -222,6 +240,7 @@ async function makeSpine(it) {
     container.alpha = it.alpha ?? 1;
     return container;
   }
+  if (baseBackground) modeSpines.push({ spine: s, item: it });
   s.alpha = it.alpha ?? 1;
   return s;
 }
@@ -265,6 +284,8 @@ async function build(name, onProgress = () => {}) {
   const L = layouts[name];
   const root = new PIXI.Container();
   for (const k of Object.keys(ui)) delete ui[k];
+  modeSprites.length = 0; modeSpines.length = 0;
+  characters.clear();
   let symbolsAt = -1;
   for (const [index, it] of L.items.entries()) {
     onProgress(75 + index / L.items.length * 19, 'Preparing the artwork and princess…');
@@ -272,6 +293,15 @@ async function build(name, onProgress = () => {}) {
     if (SKIP(it)) continue;
     const obj = await makeItem(it);
     if (!obj) continue;
+    if (it.k === 'UISprite' && /stpr_basegame_portrait/.test(it.atlas)) {
+      const sprite = obj.children[0];
+      modeSprites.push({ sprite, base: it });
+      if (freeMode) {
+        const { width, height } = sprite;
+        sprite.texture = await spriteTexture('stpr_freegame_portrait', 'stpr_freegame_portrait');
+        sprite.width = width; sprite.height = height;
+      }
+    }
     if (/^stpr_character_01(?:_SkeletonData)?$/.test(it.skeleton || '') && L.canvas[0] > L.canvas[1]) {
       // Fill the character column and float just below the logo.
       const bounds = obj.getBounds();
@@ -301,6 +331,8 @@ async function build(name, onProgress = () => {}) {
     root.addChild(mask);
     symbolLayer.mask = mask;
   }
+  effectsLayer = new PIXI.Container();
+  root.addChild(effectsLayer);
   return root;
 }
 
@@ -333,7 +365,7 @@ function rigOf(items) {
   const rig = { anims: [] };
   for (const it of items) {
     const chain = parse(it.chain);
-    if (chain.some(p => /PossibleWin|Excited|Frame|RemoveFX/.test(p.n)) && !(it.k === 'SpineController' && /winframe|disappearance|landing|_land$/.test(it.anim))) continue;
+    if (chain.some(p => /PossibleWin|Excited|Frame|RemoveFX/.test(p.n)) && it.k !== 'SpineController') continue;
     const pos = at(chain);
     if (it.k === 'UISprite') {
       const key = it.atlas.startsWith('Mult') ? it.atlas : 'idle';
@@ -431,6 +463,7 @@ async function makeSymbol(cell) {
     t.anchor.set(0.5);
     t.position.set(0, 4);
     box.addChild(t);
+    box.valueLabel = t;
   }
   box.cell = cell;
   return box;
@@ -439,16 +472,34 @@ async function makeSymbol(cell) {
 // a one-off Spine animation from the symbol's rig, drawn over the idle sprite
 async function playRig(box, match, { hideIdle = true, loop = false } = {}) {
   const rig = rigs[PREFAB[box.cell.s]];
-  const a = rig.anims.find(x => match.test(x.anim) && (box.cell.s !== 'mult' || !/multiplier/.test(x.anim) || x.anim.includes(multLook(box.cell.v)[2])));
+  let a = rig.anims.find(x => match.test(x.anim) && (box.cell.s !== 'mult' || !/multiplier/.test(x.anim) || x.anim.includes(multLook(box.cell.v)[2])));
+  // The captured prefab lists only its active win pose. Other poses live in that same skeleton.
+  if (!a && box.cell.s !== 'scatter') {
+    const primary = rig.anims[0];
+    const data = await skeleton(primary.skeleton);
+    const animation = data.animations.find(x => match.test(x.name));
+    if (animation) a = { ...primary, anim: animation.name };
+  }
   if (!a || box.destroyed) return 0;
+  if (box.cell.s === 'scatter' && /stpr_scatter/.test(a.anim)) {
+    const anticipating = /anticipate/.test(a.anim);
+    const ms = /_land$/.test(a.anim) ? 350 : anticipating ? 1200 : 1600;
+    scatterEffect(box, ms, anticipating);
+    return ms;
+  }
   const s = new Spine(await skeleton(a.skeleton));
+  if (hideIdle && box.activeRig && !box.activeRig.destroyed) box.activeRig.destroy({ children: true });
+  if (hideIdle) box.activeRig = s;
+  motion.track(s);
   s.position.set(a.x, a.y);
   s.scale.set(a.scale, a.scaleY);
-  const entry = s.state.setAnimation(0, a.anim, loop);
+  const { duration: ms, finished } = playAnimation(s, a.anim, loop);
   box.addChild(s);
+  // Orb art animates in a new Spine child; keep its numeric value above that
+  // child throughout landing/collection rather than hiding it behind the heart.
+  if (box.valueLabel) box.setChildIndex(box.valueLabel, box.children.length - 1);
   if (hideIdle) box.idle.visible = false;
-  const ms = entry.animation.duration * 1000;
-  if (!loop) setTimeout(() => { if (!s.destroyed) { s.destroy(); if (!box.destroyed && hideIdle) box.idle.visible = true; } }, ms);
+  if (!loop) finished.then(() => { if (!s.destroyed) { s.destroy(); if (!box.destroyed && hideIdle && !box.removing && box.activeRig === s) box.idle.visible = true; } });
   return ms;
 }
 
@@ -456,21 +507,11 @@ const cellPos = (c, r) => ({ x: grid.xs[c], y: grid.ys[r] });
 
 // ---- tweens on the Pixi ticker ----
 export let speed = 1;
-export function setSpeed(s) { speed = s; }
-export const wait = ms => new Promise(r => setTimeout(r, ms / speed));
+export function setSpeed(s) { motion.setSpeed(s); speed = motion.speed; document.documentElement.style.setProperty('--motion-speed', speed); }
+export const wait = (ms, options) => motion.wait(ms, options);
 function tween(obj, to, ms, ease = t => 1 - (1 - t) ** 3) {
   const from = Object.fromEntries(Object.keys(to).map(k => [k, obj[k]]));
-  return new Promise(res => {
-    let t = 0;
-    const step = () => {
-      if (obj.destroyed) { app.ticker.remove(step); return res(); }
-      t += app.ticker.deltaMS * speed;
-      const p = Math.min(1, t / ms), e = ease(p);
-      for (const k in to) obj[k] = from[k] + (to[k] - from[k]) * e;
-      if (p >= 1) { app.ticker.remove(step); res(); }
-    };
-    app.ticker.add(step);
-  });
+  return motion.animate(ms, p => { if (!obj.destroyed) for (const k in to) obj[k] = from[k] + (to[k] - from[k]) * p; }, { ease });
 }
 
 // Everything on the board falls away (start of a spin).
@@ -482,10 +523,19 @@ export async function clear() {
 }
 
 // Puts the grid on the board: cells already there slide to their new place, new ones drop in from the top.
-export async function show(g, { instant = false, first = false } = {}) {
+export async function show(g, { instant = false, first = false, scatterTarget = 4 } = {}) {
   lastGrid = g;
   const moves = [];
+  let anticipationAt = -1, count = 0;
+  const anticipation = new AbortController();
+  if (first && !instant) for (let c = 0; c < COLS - 1; c++) {
+    count += g[c].filter(cell => cell.s === 'scatter').length;
+    if (count >= scatterTarget - 1) { anticipationAt = c + 1; break; }
+  }
   const landed = new Array(COLS).fill(0), dropping = new Array(COLS).fill(0);
+  // Columns finish at different times; announce the final drop, not whichever
+  // callback first observes a partially built column.
+  for (let c = 0; c < COLS; c++) dropping[c] = g[c].filter(cell => !sprites.has(cell.id)).length;
   for (let c = 0; c < COLS; c++) {
     const col = g[c];
     const fresh = col.filter(cell => !sprites.has(cell.id)).length;
@@ -501,10 +551,17 @@ export async function show(g, { instant = false, first = false } = {}) {
         symbolLayer.addChild(b);
         sprites.set(cell.id, b);
         if (!instant) {
-          dropping[c]++;
-          moves.push(wait(c * 70 + (ROWS - r) * 25).then(() => tween(b, { y: p.y }, 360, t => t * t)).then(() => {
+          const suspense = anticipationAt >= 0 && c >= anticipationAt ? (c - anticipationAt + 1) * 650 : 0;
+          moves.push(wait(c * 70 + (ROWS - r) * 25 + suspense).then(() => tween(b, { y: p.y }, 360, t => t * t)).then(() => {
             // a column is down when its last new symbol lands: the reel stop on a spin, a fill on a tumble
-            if (++landed[c] === dropping[c]) listeners.columnLanded?.({ col: c, first });
+            if (++landed[c] === dropping[c]) {
+              listeners.columnLanded?.({ col: c, first });
+              if (c === anticipationAt - 1) {
+                react('anticipation', true);
+                listeners.anticipation?.();
+                for (const box of sprites.values()) if (box.cell.s === 'scatter' && box.cell.c <= c) scatterEffect(box, 1200, true, anticipation.signal);
+              }
+            }
             if (b.cell.s === 'scatter') listeners.scatterLanded?.();
             return land(b);
           }));
@@ -516,11 +573,12 @@ export async function show(g, { instant = false, first = false } = {}) {
     }
   }
   await Promise.all(moves);
+  anticipation.abort();
+  if (anticipationAt >= 0) react('idle');
 }
 
 function land(b) {
-  // scatters and multipliers have their own landing; everything gives a small bounce
-  if (b.cell.s === 'scatter' || b.cell.s === 'mult') playRig(b, /_land(ing)?$/);
+  playRig(b, /_land(ing)?$/);
   const y = b.y;
   return tween(b, { y: y - grid.dy * 0.06 }, 70).then(() => tween(b, { y }, 120));
 }
@@ -534,10 +592,17 @@ export async function pop(g, wins) {
     longest = Math.max(longest, await playRig(b, /_win$|hv3_loop$/));
     playRig(b, /winframe/, { hideIdle: false });
   }
-  await wait(Math.min(Math.max(longest, 900), 1600));
+  react('win');
+  await wait(Math.max(longest, 900));
   listeners.vanish?.();
-  for (const b of boxes) { for (const ch of [...b.children]) ch.visible = false; playRig(b, /disappearance/, { hideIdle: true }); }
-  await wait(450);
+  let out = 450;
+  for (const b of boxes) {
+    b.removing = true;
+    for (const ch of [...b.children]) ch.visible = false;
+    out = Math.max(out, await playRig(b, /_out$|_disappear$/));
+    out = Math.max(out, await playRig(b, /disappearance/, { hideIdle: false }));
+  }
+  await wait(out);
   for (const id of ids) { sprites.get(id)?.destroy({ children: true }); sprites.delete(id); }
 }
 
@@ -546,10 +611,124 @@ export async function highlight(kind) {
   const boxes = [...sprites.values()].filter(b => b.cell.s === kind);
   let ms = 0;
   for (const b of boxes) ms = Math.max(ms, await playRig(b, kind === 'mult' ? /multiplier_loop$/ : /_win$/));
-  if (boxes.length) await wait(Math.min(Math.max(ms, 800), 1800));
+  if (boxes.length) await wait(Math.max(ms, 800));
 }
 
-export function setFree() {}
+function scatterEffect(box, duration, anticipating = false, signal) {
+  const glow = new PIXI.Graphics();
+  box.addChildAt(glow, 0);
+  const sprite = box.idle;
+  const original = { x: sprite.scale.x, y: sprite.scale.y, angle: sprite.rotation };
+  const radius = Math.max(sprite.width, sprite.height) * .48;
+  async function run() {
+    do {
+      await motion.animate(duration, p => {
+        if (box.destroyed || glow.destroyed) return;
+        const wave = Math.sin(p * Math.PI);
+        glow.clear();
+        for (let i = 0; i < 10; i++) {
+          const a = i * Math.PI / 5 + p * Math.PI * (anticipating ? .35 : 1);
+          const r = radius * (1 + wave * .22);
+          const x = Math.cos(a) * r, y = Math.sin(a) * r;
+          const star = [];
+          for (let j = 0; j < 8; j++) {
+            const distance = j % 2 ? 3 : 9 + wave * 8, angle = j * Math.PI / 4;
+            star.push(x + Math.cos(angle) * distance, y + Math.sin(angle) * distance);
+          }
+          glow.beginFill(i % 2 ? 0x79e9ff : 0xffe28b, wave * .85).drawPolygon(star).endFill();
+          glow.lineStyle(3, 0xffecac, wave * .4).moveTo(x * .72, y * .72).lineTo(x * 1.12, y * 1.12);
+        }
+        sprite.rotation = original.angle + Math.sin(p * Math.PI * 4) * .025 * wave;
+        if (!anticipating) sprite.scale.set(original.x * (1 + .075 * wave), original.y * (1 + .075 * wave));
+      }, { signal });
+    } while (anticipating && signal && !signal.aborted && !box.destroyed);
+    if (!box.destroyed) { sprite.scale.set(original.x, original.y); sprite.rotation = original.angle; }
+    glow.destroy();
+  }
+  return run();
+}
+
+export function react(name, loop = false) {
+  for (const princess of characters) if (!princess.destroyed) princess.react(name, loop);
+  if (name === 'spell' || name === 'bonus') for (const princess of characters) {
+    if (princess.destroyed) continue;
+    const bounds = princess.getBounds();
+    const a = world.toLocal(new PIXI.Point(bounds.x, bounds.y));
+    const b = world.toLocal(new PIXI.Point(bounds.x + bounds.width, bounds.y + bounds.height));
+    sceneEffect('stpr_character_ol_fx', 'stpr_character_ol_fx', { x: a.x, y: a.y, width: b.x - a.x, height: b.y - a.y });
+  }
+}
+
+async function sceneEffect(name, animation, rect) {
+  const layer = effectsLayer;
+  const s = new Spine(await skeleton(name));
+  if (layer.destroyed) { s.destroy(); return; }
+  s.state.setAnimation(0, animation, false); s.update(.15);
+  const b = s.getLocalBounds();
+  const scale = (name === 'stpr_transition' ? Math.max : Math.min)(rect.width / Math.max(1, b.width), rect.height / Math.max(1, b.height));
+  s.scale.set(scale); s.position.set(rect.x + rect.width / 2 - (b.x + b.width / 2) * scale,
+    rect.y + rect.height / 2 - (b.y + b.height / 2) * scale);
+  layer.addChild(s); motion.track(s);
+  await playAnimation(s, animation).finished;
+  if (!s.destroyed) s.destroy({ children: true });
+}
+
+export async function collectMultipliers(onCollect) {
+  const boxes = [...sprites.values()].filter(b => b.cell.s === 'mult');
+  if (!boxes.length) return;
+  react('spell');
+  const meter = document.querySelector('.multiplier-meter').getBoundingClientRect();
+  const canvas = app.view.getBoundingClientRect();
+  const target = world.toLocal(new PIXI.Point(meter.left + meter.width / 2 - canvas.left, meter.top + meter.height / 2 - canvas.top));
+  for (const [i, b] of boxes.entries()) {
+    if (b.destroyed) continue;
+    const orb = await makeSymbol(b.cell);
+    const trail = new PIXI.Graphics();
+    effectsLayer.addChild(trail, orb);
+    orb.scale.set(grid.k * .8); const start = { x: b.x, y: b.y };
+    await motion.animate(620, p => {
+      if (orb.destroyed) return;
+      const x = start.x + (target.x - start.x) * p, y = start.y + (target.y - start.y) * p - Math.sin(p * Math.PI) * grid.dy * 1.5;
+      orb.position.set(x, y); orb.alpha = 1 - p * .3;
+      trail.clear().lineStyle(5, 0xffeab0, .8 * (1 - p)).moveTo(start.x, start.y)
+        .quadraticCurveTo((start.x + target.x) / 2, Math.min(start.y, target.y) - grid.dy * 1.5, x, y);
+    });
+    orb.destroy({ children: true }); trail.destroy();
+    onCollect(b.cell.v, i);
+    const color = multLook(b.cell.v)[2] === 'purple' ? 'pink' : multLook(b.cell.v)[2];
+    sceneEffect('stpr_multiplier_meter_fx', `stpr_multiplier_meter_${color}_fx`,
+      { x: target.x - grid.dy * .65, y: target.y - grid.dy * .55, width: grid.dy * 1.3, height: grid.dy * 1.1 });
+  }
+}
+
+export async function transition(change) {
+  const [width, height] = layouts[current].canvas;
+  const effect = sceneEffect('stpr_transition', 'stpr_transition', { x: -width * .1, y: 0, width: width * 1.2, height });
+  await wait(560);
+  await change();
+  await effect;
+}
+
+export async function setFree(on) {
+  const changed = freeMode !== !!on;
+  freeMode = !!on;
+  if (!changed) return;
+  for (const entry of modeSprites) {
+    const { width, height } = entry.sprite;
+    entry.sprite.texture = await spriteTexture(freeMode ? 'stpr_freegame_portrait' : entry.base.atlas,
+      freeMode ? 'stpr_freegame_portrait' : entry.base.sprite);
+    entry.sprite.width = width; entry.sprite.height = height;
+  }
+  for (const entry of modeSpines) {
+    const name = freeMode ? 'stpr_freegame_idle' : 'stpr_basegame_idle';
+    const next = new Spine(await skeleton(name));
+    next.state.setAnimation(0, name, true);
+    next.transform.setFromMatrix(entry.spine.localTransform);
+    const parent = entry.spine.parent;
+    parent.addChildAt(next, parent.getChildIndex(entry.spine));
+    entry.spine.destroy({ children: true }); entry.spine = next;
+  }
+}
 
 // The symbols the original showed when it was captured, as an engine grid: the board before the first spin.
 export function capturedGrid() {

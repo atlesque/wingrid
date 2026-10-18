@@ -32,6 +32,15 @@ export const CLIPS = {
   multVoice: ['373fcd708bcd70d4eb782f94907de207', '0aff080168381d74b8ef04d3d99a8de2', 'b03c7eb4', 'c7b7fb85', 'e8c6aa16', '37186c47', '5fba3b88', 'd83927ce', '0a3bc36fc50b9244e87c823d966be202'],
   freeSpinsWon: 'd5805036bab8f57429b5fd1e53422ff8',
   bigWin: 'f7edc1cc9167c8d458d93d7853718b98',
+  winVoices: {
+    nice: 'be9906e3ebb87f644b77189f8fee5d5f',
+    superb: ['9d410ccf521225748a9a57d4b0e6f60e', 'ca9c10c9c9f2c1949b3c8f94e987db41'],
+    mega: '4b1c955e88b5b554792afce7bbb6fd8c',
+    sensational: ['79ed4b89ec59d2f4e97acf8e18bb03ff', '9b2b89de733f75e408c3f64898e9d93f'],
+  },
+  jackpotPick: 'fb679d7b77b4ef140ae6e89892ab6bdc',
+  jackpotReveal: '34588ec2cde1a6147915909564947691',
+  jackpotWin: '2c4a94d9876ba6c4b9337459d43ad667',
 };
 const LAYERS = { idle: 0.6, spinning: 0.7, winning: 1 };
 const FADE = 3; // seconds, as the original crossfades its music layers
@@ -39,7 +48,7 @@ const FADE = 3; // seconds, as the original crossfades its music layers
 let ctx = null, master, musicGain, sfxGain, files = null;
 const buffers = new Map();
 const settings = load();
-let mood = 'idle', layerNodes = {}, countNode = null;
+let mood = 'idle', layerNodes = {}, countNode = null, freePending = null, countWanted = false;
 
 function load() {
   // the original's slider starts at 50
@@ -100,14 +109,18 @@ async function startMusic() {
   await Promise.all([CLIPS.ambience, CLIPS.idle, CLIPS.spinning, CLIPS.winning].map(buffer));
   const at = ctx.currentTime + 0.05;
   loop(CLIPS.ambience, 0.9, at);
-  for (const [name, vol] of Object.entries(LAYERS)) layerNodes[name] = await loop(CLIPS[name], name === mood ? vol : 0, at);
+  for (const name of Object.keys(LAYERS)) layerNodes[name] = await loop(CLIPS[name], 0, at);
+  applyMood();
 }
 
 // idle | spinning | winning | free
 export function setMood(m) {
-  if (m === mood) return;
   mood = m;
+  applyMood();
+}
+function applyMood() {
   if (!ctx) return;
+  const m = mood;
   const t = ctx.currentTime;
   for (const [name, node] of Object.entries(layerNodes)) {
     if (!node) continue;
@@ -117,7 +130,15 @@ export function setMood(m) {
     node.g.gain.linearRampToValueAtTime(target, t + FADE);
   }
   // free spins have their own music in place of the layers
-  if (m === 'free' && !layerNodes.free) loop(CLIPS.freeMusic, 0, t).then(n => { layerNodes.free = n; if (n) n.g.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE); });
+  if (m === 'free' && !layerNodes.free && !freePending) {
+    freePending = loop(CLIPS.freeMusic, 0, t).then(n => {
+      freePending = null;
+      if (!n) return;
+      if (mood !== 'free') { n.src.stop(); return; }
+      layerNodes.free = n;
+      n.g.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE);
+    });
+  }
   if (m !== 'free' && layerNodes.free) { const n = layerNodes.free; delete layerNodes.free; n.g.gain.linearRampToValueAtTime(0, t + FADE); n.src.stop(t + FADE + 0.1); }
 }
 
@@ -133,12 +154,23 @@ export async function play(id, { volume = 1 } = {}) {
 // the n-th of an ordered set (vanish per tumble, scatter per scatter), holding on the last
 export const playNth = (list, n, opts) => play(list[Math.min(n, list.length - 1)], opts);
 
+export function anticipate() {
+  if (!ctx || !settings.sfx) return;
+  const t = ctx.currentTime, oscillator = ctx.createOscillator(), g = ctx.createGain();
+  oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(330, t);
+  oscillator.frequency.exponentialRampToValueAtTime(880, t + .9);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.12, t + .12);
+  g.gain.linearRampToValueAtTime(0, t + 1.2);
+  oscillator.connect(g); g.connect(sfxGain); oscillator.start(t); oscillator.stop(t + 1.2);
+}
+
 // the coin counter's loop while a win counts up, then its closing sound
 export async function counting(on, { free = false } = {}) {
+  countWanted = on;
   if (!ctx) return;
   if (on && !countNode) {
     const b = await buffer(CLIPS.countLoop);
-    if (!b || countNode) return;
+    if (!b || countNode || !countWanted) return;
     const src = ctx.createBufferSource(), g = ctx.createGain();
     src.buffer = b; src.loop = true; src.connect(g); g.connect(sfxGain); src.start();
     countNode = { src, g };

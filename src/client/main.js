@@ -1,6 +1,9 @@
 import * as api from './api.js';
 import * as scene from './scene.js';
 import * as sound from './sound.js';
+import { createBonuses } from './bonuses.js';
+import { createPresentation } from './presentation.js';
+import { motion } from './motion.js';
 
 // ================= PAGE =================
 // The spin loop. Each spin is one request; the Worker answers with every tumble of it and the new state, and
@@ -8,7 +11,12 @@ import * as sound from './sound.js';
 // the original's own buttons, drawn in the scene; scene.on() says when one is pressed.
 const $ = s => document.querySelector(s);
 const fmt = n => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-let cfg, state, busy = false;
+let cfg, state, busy = false, running = false;
+const bonuses = createBonuses({ pick: api.pickJackpot,
+  onState: next => { state = next; render(); },
+  onError: error => toast(error.message, 2500), react: scene.react });
+const presentation = createPresentation({ react: scene.react });
+if (import.meta.env.DEV) globalThis.__wingrid = { scene, presentation, bonuses, get state() { return structuredClone(state); } };
 if (import.meta.env.DEV) globalThis.__sound = sound; // await __sound.status() in the console
 // autoplay: spins left, and the settings it was started with (turbo, quick spin, skip screens)
 let auto = 0, autoSettings = { turbo: false, quick: false, skip: true };
@@ -20,24 +28,6 @@ function toast(html, ms = 1200) {
   clearTimeout(toast.timer);
   toast.timer = setTimeout(() => { t.hidden = true; }, ms);
 }
-// a message over the game; with `ask`, it has a cancel button too and resolves to whether it was confirmed
-function banner(title, text, auto = 0, ask = false) {
-  const d = $('#banner');
-  d.querySelector('h2').textContent = title;
-  d.querySelector('p').textContent = text;
-  const [ok, no] = d.querySelectorAll('button');
-  ok.textContent = ask ? ask : 'Continue';
-  no.hidden = !ask;
-  d.showModal();
-  return new Promise(res => {
-    const done = v => { d.close(); res(v); };
-    ok.onclick = () => done(true);
-    no.onclick = () => done(false);
-    d.oncancel = () => res(false);
-    if (auto) setTimeout(() => d.open && done(true), auto);
-  });
-}
-
 const betAmount = () => cfg.bets[state.bet];
 const message = s => scene.setText('message', s);
 
@@ -48,18 +38,21 @@ function render() {
   scene.setText('buyCost', fmt(betAmount() * 100));
   scene.setText('anteValue', fmt(betAmount() * 1.25));
   scene.setAnte(state.ante);
-  const locked = busy || !!f;
+  const locked = busy || !!f || !!state.jackpot;
   scene.setEnabled('betDown', !locked && state.bet > 0);
   scene.setEnabled('betUp', !locked && state.bet < cfg.bets.length - 1);
-  scene.setEnabled('buy', !locked && state.credits >= betAmount() * 100);
+  scene.setEnabled('buy', !locked && !state.ante && state.credits >= betAmount() * 100);
   scene.setEnabled('ante', !locked);
   scene.setEnabled('anteArrow', !locked);
-  scene.setEnabled('autoplay', !f);
+  scene.setEnabled('autoplay', !f && !state.jackpot);
   scene.setText('autoplayLabel', auto > 0 ? `STOP (${auto})` : 'AUTOPLAY');
   if (!busy) message(f ? `FREE SPINS LEFT ${f.left}` : auto > 0 ? `AUTOPLAY SPINS LEFT ${auto}` : state.canTopUp ? 'OUT OF CREDITS: PRESS SPIN FOR 1,000 FREE' : scene.idleMessage());
   const a = state.account;
   $('#account').textContent = a ? 'Sign out' : 'Sign in';
   $('#sync').textContent = a ? `Saved to Atlesque Play as ${a.email}` : 'Playing as guest';
+  $('#account').disabled = busy || !!state.jackpot;
+  bonuses.render(state, cfg);
+  $('#bonus-hud').hidden = false;
 }
 
 async function playSpin(buy = false) {
@@ -67,6 +60,8 @@ async function playSpin(buy = false) {
   let r;
   try { r = await api.spin(buy); } catch (e) { busy = false; render(); toast(e.message, 2200); return false; }
   const s = r.spin, inFeature = s.kind === 'free';
+  bonuses.setMultiplier(inFeature ? state.feature?.totalMult || 0 : 0);
+  await scene.setFree(inFeature);
   scene.setText('credit', fmt(state.credits - s.cost)); // the cost leaves the balance as the reels go
   let shown = inFeature ? s.feature.won - s.win : 0;
   message(inFeature ? `FREE SPINS WIN ${fmt(shown)}` : auto > 0 ? `AUTOPLAY SPINS LEFT ${auto}` : 'GOOD LUCK!');
@@ -76,30 +71,53 @@ async function playSpin(buy = false) {
   tumbleNo = 0; scattersThisSpin = 0;
   await scene.clear();
   for (const [i, { grid, wins }] of s.steps.entries()) {
-    await scene.show(grid, { first: i === 0 });
+    await scene.show(grid, { first: i === 0, scatterTarget: inFeature ? 3 : 4 });
     if (!wins.length) break;
-    shown += wins.reduce((t, w) => t + w.pay, 0) * s.bet;
-    message(`${inFeature ? 'FREE SPINS WIN' : 'WIN'} ${fmt(shown)}`);
+    const from = shown;
+    shown = Math.min(shown + wins.reduce((t, w) => t + w.pay, 0) * s.bet, s.maxWin?.won ?? Infinity);
+    await motion.animate(320, p => message(`${inFeature ? 'FREE SPINS WIN' : 'WIN'} ${fmt(from + (shown - from) * p)}`));
     if (!inFeature) sound.setMood('winning');
     sound.play(sound.CLIPS.showWin);
     await scene.pop(grid, wins);
   }
   if (s.tumbleWin > 0 && s.multSum > 0) {
-    message(inFeature ? `+${s.multSum}x · TOTAL MULTIPLIER ${s.totalMult}x` : `${s.multSum}x MULTIPLIER`);
+    message(`${fmt(s.tumbleWin * s.bet)} × ${s.appliedMult} = ${fmt(s.tumbleWin * s.bet * s.appliedMult)}`);
     sound.play(sound.CLIPS.multVoice);
     await scene.highlight('mult');
+    let collected = inFeature ? s.totalMult - s.multSum : 0;
+    bonuses.setMultiplier(collected);
+    await scene.collectMultipliers(value => { collected += value; bonuses.setMultiplier(collected); sound.play(sound.CLIPS.jackpotReveal, { volume: .5 }); });
   }
-  if (s.scatters >= 3 || s.scatterWin) { sound.play(sound.CLIPS.scatterVoice); await scene.highlight('scatter'); }
+  if ((inFeature && s.scatters >= 3) || s.scatterWin) { sound.play(sound.CLIPS.scatterVoice); await scene.highlight('scatter'); }
   const won = s.win;
-  if (won > 0) { sound.counting(true); await scene.wait(Math.min(1500, 400 + won / s.bet * 40)); sound.counting(false, { free: inFeature }); }
+  if (won > 0 && won < s.bet * 20 && !s.maxWin) {
+    const end = inFeature ? s.feature.won : won;
+    sound.counting(true);
+    await motion.animate(Math.min(1500, 400 + won / s.bet * 40), p => message(`${inFeature ? 'FREE SPINS WIN' : 'WIN'} ${fmt(shown + (end - shown) * p)}`));
+    sound.counting(false, { free: inFeature });
+  }
 
   state = r.state;
-  busy = false; render();
+  render();
   const total = inFeature ? s.feature.won : s.win;
   if (total > 0) message(`${inFeature ? 'FREE SPINS WIN' : 'WIN'} ${fmt(total)}`);
-  const pause = autoSettings.skip && auto > 0 ? 1200 : 0;
-  if (s.event?.type === 'feature-start') { sound.play(sound.CLIPS.freeSpinsWon); await banner(`${s.event.spins} free spins`, 'Scatters landed! Multipliers now add up to one total multiplier for the whole feature.', pause || 3500); }
-  if (s.event?.type === 'feature-end') await banner('Free spins complete', `${s.event.played} free spins won ${fmt(s.event.won)}${s.event.totalMult ? ` with a ${s.event.totalMult}x total multiplier` : ''}.`, pause || 5000);
+  const skip = autoSettings.skip && auto > 0, pause = skip ? 900 : 0;
+  if (s.maxWin || s.win >= s.bet * 20) await presentation.win(s.maxWin?.won ?? s.win, s.bet, { capped: !!s.maxWin, skip });
+  if (s.event?.type === 'feature-start') {
+    await scene.transition(() => scene.setFree(true)); sound.play(sound.CLIPS.freeSpinsWon);
+    await presentation.feature(`${s.event.spins} FREE SPINS`, 'Winning orbs build a total multiplier for the whole feature.', { kind: 'feature-start', auto: pause || 3500 });
+  }
+  if (s.event?.type === 'feature-retrigger') {
+    sound.play(sound.CLIPS.freeSpinsWon);
+    const carry = s.totalMult ? `Your ${s.totalMult}x multiplier carries on.` : 'Collect winning orbs to build your multiplier.';
+    await presentation.feature(`+${s.event.spins} FREE SPINS`, `${s.event.left} spins left. ${carry}`, { kind: 'feature-retrigger', auto: pause || 2200 });
+  }
+  if (s.event?.type === 'feature-end') {
+    await presentation.feature('FREE SPINS COMPLETE', `${s.event.played} free spins${s.event.totalMult ? ` · ${s.event.totalMult}× total multiplier` : ''}`,
+      { kind: 'feature-end', amount: s.event.won, auto: pause || 5000 });
+    await scene.transition(() => scene.setFree(false)); sound.setMood('idle');
+  }
+  if (state.jackpot) await bonuses.reveal();
   // the music settles back to its idle layer a few seconds after play stops
   if (!state.feature) idleTimer = setTimeout(() => { if (!busy) sound.setMood('idle'); }, 5000);
   return true;
@@ -107,19 +125,22 @@ async function playSpin(buy = false) {
 
 // free spins play on by themselves, and so does autoplay until its spins run out or it is stopped
 async function run(buy) {
-  if (busy || !state) return;
+  if (running || busy || !state) return;
+  if (state.jackpot) { await bonuses.reveal(); return; }
   if (!buy && state.canTopUp) return topUp();
-  if (!(await playSpin(buy))) { auto = 0; render(); return; }
-  for (;;) {
-    if (state.feature) { await scene.wait(450); if (!(await playSpin())) break; continue; }
-    if (auto <= 0) break;
-    if (state.credits < betAmount() * (state.ante ? 1.25 : 1)) { auto = 0; break; }
-    auto--; render();
-    await scene.wait(autoSettings.quick || autoSettings.turbo ? 150 : 400);
-    if (auto < 0 || !(await playSpin())) break;
-  }
-  auto = Math.max(0, auto);
-  render();
+  running = true;
+  try {
+    if (!(await playSpin(buy))) { auto = 0; render(); return; }
+    for (;;) {
+      if (state.feature) { await scene.wait(450); if (!(await playSpin())) break; continue; }
+      if (auto <= 0) break;
+      if (state.credits < betAmount() * (state.ante ? 1.25 : 1)) { auto = 0; break; }
+      auto--; render();
+      await scene.wait(autoSettings.quick || autoSettings.turbo ? 150 : 400);
+      if (auto < 0 || !(await playSpin())) break;
+    }
+    auto = Math.max(0, auto);
+  } finally { running = false; busy = false; render(); }
 }
 function startAutoplay(set) {
   autoSettings = set;
@@ -141,22 +162,26 @@ scene.on('sound', () => { sound.play(sound.CLIPS.click); scene.overlayOpen('volu
 scene.on('volume', s => { sound.setSettings(s); renderSound(); });
 scene.on('columnLanded', ({ col, first }) => first ? sound.play(sound.CLIPS.reelStop[col]) : sound.play(sound.CLIPS.fill));
 scene.on('scatterLanded', () => sound.playNth(sound.CLIPS.scatter, scattersThisSpin++));
-scene.on('vanish', () => { sound.playNth(sound.CLIPS.vanish, tumbleNo++); setTimeout(() => sound.play(sound.CLIPS.tumble), 350); });
+scene.on('anticipation', () => sound.anticipate());
+scene.on('vanish', () => { sound.playNth(sound.CLIPS.vanish, tumbleNo++); scene.wait(350).then(() => sound.play(sound.CLIPS.tumble)); });
 function renderSound() { const st = sound.getSettings(); scene.renderVolume({ volume: st.volume, muted: st.muted }); scene.setSoundIcon(!st.muted && st.volume > 0); }
 scene.on('betDown', () => bet({ bet: state.bet - 1 }));
 scene.on('betUp', () => bet({ bet: state.bet + 1 }));
 scene.on('ante', () => bet({ ante: !state.ante }));
 scene.on('anteArrow', () => bet({ ante: !state.ante }));
 scene.on('buy', async () => {
-  if (busy || state.feature) return;
-  if (await banner('Buy free spins', `Start 15 free spins now for ${fmt(betAmount() * 100)}.`, 0, 'Buy')) run(true);
+  if (busy || running || state.feature || state.ante || state.jackpot) return;
+  busy = true; render();
+  const accepted = await presentation.buy(betAmount() * 100);
+  busy = false;
+  if (accepted) run(true); else render();
 });
 scene.on('rebuilt', () => state && render());
 $('#account').onclick = async () => {
   if (state.account) { state = await api.signOut(); render(); toast('Signed out. Playing as a new guest.', 2000); }
   else api.beginSignIn(cfg);
 };
-addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat && !$('#banner').open) { e.preventDefault(); if (auto > 0) stopAutoplay(); else run(); } });
+addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat && !document.querySelector('dialog[open]')) { e.preventDefault(); if (auto > 0) stopAutoplay(); else run(); } });
 // browsers only allow sound after the player does something
 const unlock = () => { sound.unlock(); sound.preload(); };
 addEventListener('pointerdown', unlock);
@@ -197,7 +222,8 @@ await new Promise(resolve => setTimeout(resolve, 250));
 $('#loading').classList.add('leaving');
 setTimeout(() => { $('#loading').hidden = true; }, 400);
 // a feature left unfinished (closed tab) carries on where it stopped
-if (state.feature) { toast(`${state.feature.left} free spins left`); await scene.wait(1200); run(); }
+if (state.jackpot) await bonuses.reveal();
+else if (state.feature) { await scene.setFree(true); sound.setMood('free'); toast(`${state.feature.left} free spins left`); await scene.wait(1200); run(); }
 
 } catch (error) {
   console.error(error);

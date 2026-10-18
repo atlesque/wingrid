@@ -60,3 +60,71 @@ dialog::backdrop { background: rgba(5, 2, 25, 0.6); }
 dialog h2 { margin: 0 0 8px; color: var(--gold); }
 dialog p { color: var(--muted); font-weight: 500; }
 dialog .actions { display: flex; gap: 10px; justify-content: center; }
+
+#bonus-hud { position: fixed; left: 1%; bottom: 17%; width: 12%; padding: 8px 6px; border-radius: 10px;
+  background: #24103aeb; border: 1px solid var(--edge); font-size: clamp(9px, 0.9vw, 15px); }
+#bonus-hud[hidden], .jackpot-gems[hidden], .bonus-rules[hidden] { display: none; }
+.feature-status { margin: 0 0 8px; color: var(--gold); line-height: 1.5; }
+.jackpot-pools > div { display: flex; gap: 6px; justify-content: space-between; margin: 5px 0; }
+.jackpot-pools strong { color: #ffe6a4; font-variant-numeric: tabular-nums; }
+#bonus-hud button { width: 100%; padding: 6px 3px; border-radius: 6px; font-size: inherit; margin-top: 5px; }
+.multiplier-meter { display: block; margin: 8px auto; padding: 8px; border-radius: 50%; border: 2px solid var(--gold);
+  color: #fff2bd; text-shadow: 0 0 12px #fb8cff; background: radial-gradient(ellipse, #75448b, #24103a); font-size: 1.4em; text-align: center; }
+.multiplier-meter.is-collecting { animation: meter-hit .4s ease-out; }
+@keyframes meter-hit { 40% { transform: scale(1.16); box-shadow: 0 0 24px #ffd36b; } }
+#celebration { padding: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none; border: 0; border-radius: 0;
+  background: radial-gradient(ellipse, #3c1852d9, #08021bd9); overflow: hidden; }
+#celebration[open] { display: grid; place-items: center; }
+.event-art, .jackpot-art { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.event-art canvas, .jackpot-art canvas { display: block; width: 100%; height: 100%; }
+.celebration-panel { position: relative; width: min(590px, 82vw); min-height: 260px; padding: 54px 30px 36px;
+  text-align: center; text-shadow: 0 2px 6px #10002d, 0 0 14px #16002f; }
+.celebration-panel h2 { font-size: clamp(24px, 4vw, 44px); color: #fff1b4; letter-spacing: .04em; }
+.celebration-panel p { color: #fff6da; line-height: 1.5; }
+.celebration-panel output { display: block; font-size: clamp(32px, 6vw, 68px); font-weight: 900; color: #fff0b5; font-variant-numeric: tabular-nums; margin: 16px 0; }
+.celebration-panel output[hidden] { display: none; }
+#celebration[data-event="big-win"] output, #celebration[data-event="max-win"] output { margin-top: 64px; }
+.celebration-panel .actions { margin-top: 24px; }
+.celebration-panel button, .jackpot-close { background: linear-gradient(#ffe9a3, #db9e3d); color: #331440; font-weight: 800; padding: 12px 25px; box-shadow: 0 4px 18px #0a001e88; }
+#celebration[data-choice="yes"] .event-continue { animation: purchase-yes calc(.4s / var(--motion-speed, 1)) ease; }
+#celebration[data-choice="no"] .event-cancel { animation: purchase-no calc(.4s / var(--motion-speed, 1)) ease; }
+@keyframes purchase-yes { 50% { transform: scale(1.15); box-shadow: 0 0 30px #ffe8a4; } }
+@keyframes purchase-no { 25%, 75% { transform: translateX(-6px); } 50% { transform: translateX(6px); } }
+.event-stars { display: block; color: #ffdf8d; letter-spacing: 12px; margin-bottom: 12px; }
+#celebration[data-event="max-win"] .event-stars { font-size: 32px; animation: max-win-glow 1.5s infinite alternate; }
+@keyframes max-win-glow { to { text-shadow: 0 0 25px #fff, 0 0 50px #ffda6b; } }
+#jackpot { width: min(560px, calc(100vw - 24px)); max-width: none; max-height: 90dvh; }
+.jackpot-logo { height: 85px; }
+#jackpot > :not(.jackpot-art) { position: relative; }
+#jackpot:has(.bonus-rules:not([hidden])) .jackpot-logo { display: none; }
+.jackpot-gems button { position: relative; overflow: hidden; }
+.jackpot-gems button .gem-label { position: relative; z-index: 1; text-shadow: 0 2px 4px #130626; }
+.jackpot-gems button.is-unrevealed .gem-label { opacity: 0; }
+.jackpot-gems button.has-art .gem-label { opacity: 0; }
+.jackpot-art ~ .jackpot-gems button:not(:disabled):hover { background: #80499d22; border-color: #fff4c0; }
+.jackpot-gems button.is-flipping { animation: gem-flip calc(.65s / var(--motion-speed, 1)) ease; }
+.jackpot-gems button.is-matched { box-shadow: 0 0 20px #ffe59a, inset 0 0 20px #e6ae4b; }
+.jackpot-gems button.is-anticipating { animation: gem-anticipation .8s infinite alternate; }
+@keyframes gem-flip { 45% { transform: rotateY(90deg) scale(.9); } }
+@keyframes gem-anticipation { to { border-color: #fff0b0; box-shadow: 0 0 18px #e8a9ff; } }
+.jackpot-gems { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
+.jackpot-gems button { height: 78px; border-radius: 12px; font-size: 15px; background: linear-gradient(145deg, #653587, #18144e); }
+.jackpot-art ~ .jackpot-gems button { background: #3e1c6230; }
+.jackpot-gems button:not(:disabled):hover { background: #80499d; border-color: #fff4c0; }
+.jackpot-gems button:disabled { cursor: default; }
+.jackpot-gems [data-tier] { color: #fff2b6; border-color: var(--gold); box-shadow: inset 0 0 14px #ffd36b44; }
+.bonus-rules { text-align: left; font-size: 13px; line-height: 1.5; }
+@media (orientation: portrait) {
+  #bonus-hud { position: relative; left: auto; bottom: auto; width: auto; margin: 12px; padding: 12px; font-size: 13px; }
+  .jackpot-pools { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  #bonus-hud.is-free .feature-status { position: fixed; z-index: 1; top: 48px; left: 8px; right: 8px; margin: 0;
+    padding: 8px; border: 1px solid var(--edge); border-radius: 8px; background: var(--panel); text-align: center; }
+}
+@media (orientation: portrait) {
+  .multiplier-meter { position: fixed; z-index: 2; top: 90px; right: 12px; width: 100px; font-size: 20px; }
+  .celebration-panel { padding: 30px 16px; min-height: 230px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .multiplier-meter.is-collecting, .jackpot-gems button.is-flipping, .jackpot-gems button.is-anticipating,
+  #celebration[data-event="max-win"] .event-stars, #celebration[data-choice] button { animation: none; }
+}

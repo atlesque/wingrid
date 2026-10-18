@@ -8,6 +8,51 @@ Our own JavaScript version of the archived Starlight Princess slot. It's a 6×5 
 
 None of Pragmatic's engine code is used. The archive is only a source of art.
 
+## Bonus behavior
+
+Wingrid runs its own rules in `src/shared/engine.js` and `round.js`; `/api/spin`
+does not use the archive's emulator or its recorded response subset. Natural
+4+ SCATTERs and the 100x buy start 15 free spins; 3+ SCATTERs within the feature
+add five more. Base-game orbs add together at the end of a winning tumble sequence.
+In free spins, winning orbs add to a persistent multiplier, used whenever new orbs
+land with a symbol win. Scatter pays remain separate. The triggering spin and the
+entire free-spin feature share a 5,000x base-bet cap. Buying is disabled during ante.
+
+The client switches to the free-spin background, shows spins left, feature winnings
+and the multiplier total, announces retriggers and celebrates 20x/35x/50x/100x wins.
+`spin.win` is the actual credited amount; `tumbleWin` and `scatterWin` are in base bets.
+
+The archived `MDL_Jackpot` is an optional operator service, with no jackpot outcome
+in the captured mock API. Wingrid now has its own **play-credit** progressive system
+in `src/shared/jackpot.js`, with explicit rates and seeds shown under **Jackpots &
+bonus rules**. These rules and probabilities are Wingrid's, not Pragmatic's proprietary
+jackpot mathematics or a claim of matching the original RTP.
+
+Four shared D1 pools receive 1% of paid spin cost. Eligible base/ante spins can
+reserve a pool; bought and free spins cannot trigger jackpots. The server stores
+the hidden match-three reveal and reserves the prize atomically, resets the pool
+to its seed, and credits the player exactly once on completion. Reloading resumes
+unopened gems. Pending prizes are local to the Wingrid database and are never
+accepted from an imported account save. Optimistic-write guards roll back a stale
+spin, its log and pool changes together.
+
+Apply `0002_jackpots.sql` before deploying this version (`npm run db:migrate:remote`).
+Tests cover fixed-seed natural/bought/retrigger and multiplier results, cap accounting,
+API credit units, hidden-deck reveals, replay rejection and competing transactions.
+
+Presentation uses the archived symbol landing/win/exit poses, feature banners,
+buy confirmation, screen wipe, multiplier-meter effects and all four big-win tiers.
+The approved brown-haired character has mesh-based anticipation, win, spell and bonus
+reactions. SCATTER uses its approved emblem with orbiting stars, shimmer and anticipation
+effects; it never plays the old red-haired portrait rig. Winning orbs fly to the multiplier
+meter. Jackpots have animated gems, two-match anticipation, matching frames and tier
+celebrations. `spin.maxWin` explicitly signals the capped total, including a feature
+whose last spin only pays the small remaining balance.
+
+`src/client/motion.js` shares one speed clock between counters, tweens and Spine tracks.
+Reduced-motion preferences shorten transitions and suppress repeating CSS effects.
+Audio resumes in the correct mood after unlocking and discards stale asynchronous loads.
+
 ## Guests and accounts
 
 A new browser gets a guest session (`POST /api/guest`) and plays straight away. **Sign in** sends the player to Atlesque Play ([mbp-games](https://github.com/atlesque/mbp-games)) and back with a one-time code. The Worker swaps that code for the account token, so the token never sits in the page. After that:
@@ -87,6 +132,13 @@ Its source image, rig, atlas metadata, and source checksum live in
 `public/characters/princess-v2/` and are included in the deployment. To import
 updated art/rig files from the archive demo, run `npm run character:import`.
 The runtime adapter is maintained in `src/client/character-v2.js`.
+
+Wingrid's SCATTER emblem uses the approved brown-haired mascot artwork in
+`public/characters/princess-v2/scatter.png`. The scene adapter keeps the symbol's
+original padding and proportions and pulses this artwork for landing and win
+effects, rather than displaying the original portrait's animation. It also uses
+the new emblem for SCATTER thumbnails. The asset lives outside `public/starlight/`
+so archive imports and CI artwork restoration preserve the Wingrid customization.
 
 ## Looking exactly like the original
 

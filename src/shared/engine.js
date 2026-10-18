@@ -10,7 +10,7 @@ export const MAX_WIN = 5000; // times the bet, for one spin or one whole free sp
 export const FREE_SPINS = 15, RETRIGGER_SPINS = 5;
 export const TRIGGER_SCATTERS = 4, RETRIGGER_SCATTERS = 3;
 export const BUY_COST = 100;  // times the bet
-export const ANTE_COST = 1.25; // times the bet, for twice the chance of wish stars
+export const ANTE_COST = 1.25; // times the bet, for increased natural feature chances
 export const BETS = [0.2, 0.4, 1, 2, 4, 10, 20, 50, 100];
 export const START_CREDITS = 1000;
 

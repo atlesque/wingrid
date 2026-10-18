@@ -1,4 +1,5 @@
 import { spin, spinCost, BETS, START_CREDITS, MAX_WIN } from './engine.js';
+import { revealJackpot } from './jackpot.js';
 
 // ================= ROUNDS =================
 // What one press of the spin button does to a player's save. The Worker runs this and is the only place a
@@ -14,6 +15,7 @@ export const fresh = () => ({
   ante: false,
   stats: { spins: 0, wagered: 0, won: 0, biggestWin: 0, biggestX: 0, features: 0, topUps: 0 },
   feature: null, // { left, played, totalMult, won, bet } while free spins are in progress
+  jackpot: null, // an unclaimed, server-owned jackpot reveal; never sync its hidden deck
   lastTopUp: 0,
 });
 
@@ -27,6 +29,7 @@ export function normalize(d) {
     ante: !!d.ante,
     stats: { ...f.stats, ...(d.stats || {}) },
     feature: d.feature && d.feature.left > 0 ? d.feature : null,
+    jackpot: null, // only the local database may restore a reserved jackpot
   };
 }
 
@@ -34,11 +37,17 @@ export class RoundError extends Error {
   constructor(code, message) { super(message); this.code = code; }
 }
 
+// Payouts used by the page are credits; calculation fields remain in bets.
+export const spinView = out => ({ ...out.result, kind: out.kind, bet: out.bet,
+  cost: out.cost, win: out.win, event: out.event, feature: out.feature, maxWin: out.maxWin });
+
 // Plays the next spin: a free spin while a feature is running, else a paid spin at the saved bet.
 // Changes `save` in place and returns what the page needs to animate it.
 export function playSpin(save, rng, { buy = false } = {}) {
+  if (save.jackpot) throw new RoundError('in_jackpot', 'Reveal your jackpot gems first.');
   const f = save.feature;
   if (f && buy) throw new RoundError('in_feature', 'Finish the free spins first.');
+  if (buy && save.ante) throw new RoundError('ante_buy', 'Turn off double chance before buying free spins.');
   const b = f ? f.bet : BETS[save.bet];
   const kind = f ? 'free' : buy ? 'buy' : save.ante ? 'ante' : 'base';
   const cost = f ? 0 : round2(b * spinCost({ ante: save.ante, buy }));
@@ -56,7 +65,7 @@ export function playSpin(save, rng, { buy = false } = {}) {
     f.totalMult = r.totalMult;
     f.left -= 1;
     f.played += 1;
-    if (r.freeSpins) f.left += r.freeSpins;
+    if (r.freeSpins) { f.left += r.freeSpins; event = { type: 'feature-retrigger', spins: r.freeSpins, left: f.left }; }
     if (f.won >= MAX_WIN * b) f.left = 0;
   }
   save.credits = round2(save.credits + win);
@@ -65,7 +74,7 @@ export function playSpin(save, rng, { buy = false } = {}) {
   s.won = round2(s.won + win);
   if (win > s.biggestWin) s.biggestWin = round2(win);
 
-  if (!f && r.freeSpins) {
+  if (!f && r.freeSpins && r.win < MAX_WIN) {
     s.features++;
     save.feature = { left: r.freeSpins, played: 0, totalMult: 0, won: win, bet: b };
     event = { type: 'feature-start', spins: r.freeSpins };
@@ -78,11 +87,28 @@ export function playSpin(save, rng, { buy = false } = {}) {
   }
   if (!f && r.win > s.biggestX) s.biggestX = round2(r.win);
 
-  return { kind, bet: b, cost, win, result: r, event, feature: f ? { ...f } : null };
+  const capped = f ? f.won >= MAX_WIN * b : r.win >= MAX_WIN;
+  return { kind, bet: b, cost, win, result: r, event, feature: f ? { ...f } : null,
+    maxWin: capped ? { limit: MAX_WIN, won: f ? f.won : win } : null };
+}
+
+export function pickJackpot(save, index) {
+  if (!save.jackpot) throw new RoundError('no_jackpot', 'There is no jackpot to reveal.');
+  let complete;
+  try { complete = revealJackpot(save.jackpot, index); }
+  catch (error) { throw new RoundError('bad_pick', error.message); }
+  const pending = save.jackpot;
+  if (!complete) return { complete: false, pick: pending.picks.at(-1) };
+  save.credits = round2(save.credits + pending.amount);
+  save.stats.won = round2(save.stats.won + pending.amount);
+  save.stats.biggestWin = Math.max(save.stats.biggestWin, pending.amount);
+  save.stats.jackpots = (save.stats.jackpots || 0) + 1;
+  save.jackpot = null;
+  return { complete: true, pick: pending.picks.at(-1), id: pending.id, tier: pending.tier, won: pending.amount };
 }
 
 export function canTopUp(save, now = Date.now()) {
-  return !save.feature && save.credits < BETS[0] && now - save.lastTopUp >= TOP_UP_EVERY;
+  return !save.feature && !save.jackpot && save.credits < BETS[0] && now - save.lastTopUp >= TOP_UP_EVERY;
 }
 export function topUp(save, now = Date.now()) {
   if (!canTopUp(save, now)) throw new RoundError('no_top_up', 'Free credits are for when you run out, once an hour.');
@@ -92,6 +118,7 @@ export function topUp(save, now = Date.now()) {
 }
 
 export function setBet(save, { bet, ante }) {
+  if (save.jackpot) throw new RoundError('in_jackpot', 'Reveal your jackpot gems first.');
   if (save.feature) throw new RoundError('in_feature', 'Finish the free spins first.');
   if (bet !== undefined) {
     if (!Number.isInteger(bet) || bet < 0 || bet >= BETS.length) throw new RoundError('bad_bet', 'That bet is not on the list.');
