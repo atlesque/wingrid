@@ -1,15 +1,16 @@
 // ================= SOUND =================
-// The original's music and sound effects, played the way it plays them (worked out by watching its sound engine
-// during spins): an ambience loop that never stops, and music in layers that all run in step and crossfade by
-// what is happening (idle, spinning, winning). One-shots go through their own gain. Browsers only start audio
-// after a tap or key, so everything waits for the first one.
+// Our own music (public/music) and the original's sound effects, played the way the original plays them (worked
+// out by watching its sound engine during spins): an ambience loop that never stops, and music in layers that all
+// run in step and crossfade by what is happening (idle, spinning, winning). One-shots go through their own gain.
+// Browsers only start audio after a tap or key, so everything waits for the first one.
 const AUDIO = '/starlight/audio';
 export const CLIPS = {
   ambience: '51cda7df5f1469b40b92ce0120eccf88',
-  // music layers: idle, spinning, tumbling wins
-  idle: '84727c186a64a8e488b0a1640dac1516',
-  spinning: 'd895812ba86aaab44b6fce31b7ee5252',
-  winning: '0ac5ef7d38cc3a74bb965419442e920a',
+  // music layers: idle, spinning, tumbling wins. The idle layer is the base loop without its drums, so the two
+  // stay in step; like the original, winning is the spinning music played louder.
+  idle: '/music/wingrid-idle-loop.mp3',
+  spinning: '/music/wingrid-base-loop.mp3',
+  winning: '/music/wingrid-base-loop.mp3',
   freeMusic: '7e85f50bf3f20ff488d9abaef2aeb709',
   countLoop: 'c3d156f99863c604080c38863d943c75',
   // one-shots
@@ -58,8 +59,9 @@ function load() {
 function save() { try { localStorage.setItem('starlight_sound', JSON.stringify(settings)); } catch (e) {} }
 export const getSettings = () => ({ ...settings });
 
-// clip ids in the list above may be short; the audio folder's index has the full names
+// clip ids in the list above may be short; the audio folder's index has the full names. Paths are our own files.
 async function resolve(id) {
+  if (id.startsWith('/')) return id;
   if (!files) files = fetch(`${AUDIO}/index.json`).then(r => r.json()).catch(() => []);
   const list = await files;
   return list.find(f => f.startsWith(id));
@@ -68,7 +70,7 @@ function buffer(id) {
   if (!buffers.has(id)) buffers.set(id, (async () => {
     const file = await resolve(id);
     if (!file) return null;
-    const data = await (await fetch(`${AUDIO}/${file}`)).arrayBuffer();
+    const data = await (await fetch(file.startsWith('/') ? file : `${AUDIO}/${file}`)).arrayBuffer();
     return ctx.decodeAudioData(data);
   })().catch(() => null));
   return buffers.get(id);
