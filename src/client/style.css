@@ -22,8 +22,8 @@
 html, body { margin: 0; height: 100%; overflow: hidden; background: #10183f; color: var(--ink);
   font: 700 14px/1.2 var(--text); }
 /* The backdrop: one painting that covers the whole screen behind the game's transparent canvas, whatever the
-   screen's shape. It stays put while a phone scrolls down to the controls, and is as tall as the screen gets
-   when a phone browser hides its toolbars. Free spins crossfade it to the night festival. */
+   screen's shape, as tall as the screen gets when a phone browser hides its toolbars. Free spins crossfade it
+   to the night festival. */
 #backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; height: 100lvh; overflow: hidden; pointer-events: none; }
 #backdrop > div { position: absolute; inset: 0; background: center 40% / cover no-repeat;
   transition: opacity calc(1.4s / var(--motion-speed, 1)) ease; }
@@ -37,12 +37,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #10183f; col
 }
 #stage { position: fixed; inset: 0; }
 #stage canvas { display: block; width: 100%; height: 100%; }
-/* Keep the portrait artwork at full width, even on shorter phone screens.
-   Let the page scroll to the lower controls instead of shrinking the game. */
-@media (orientation: portrait) {
-  html, body { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
-  #stage { position: relative; inset: auto; width: 100%; aspect-ratio: 750 / 1624; min-height: 100dvh; }
-}
+/* The game fits the screen in both orientations, so every control is in reach without scrolling. */
 button { font: 400 1em/1.2 var(--display); letter-spacing: .03em; color: inherit; cursor: pointer; border: 1px solid var(--edge); background: var(--panel); border-radius: 999px; padding: 6px 12px; }
 
 /* the account sits quietly in a corner, over the game */
@@ -54,6 +49,9 @@ button { font: 400 1em/1.2 var(--display); letter-spacing: .03em; color: inherit
   background: var(--gold); color: #241347; font-weight: 700; box-shadow: 0 2px 8px rgba(18, 10, 52, 0.35); }
 #account:hover { background: #ffe3a0; }
 #account:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+/* a short landscape phone: just the button, above the buy panel */
+.who.is-tight #sync { display: none; }
+.who.is-tight #account { padding: 5px 10px; font-size: 11px; }
 
 #loading { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; padding: 24px;
   background: radial-gradient(ellipse at 50% 40%, #50317a 0, #211044 45%, #0b0730 100%);
@@ -86,17 +84,29 @@ dialog::backdrop { background: rgba(5, 2, 25, 0.6); }
 dialog h2 { margin: 0 0 8px; }
 dialog p { color: var(--muted); font-weight: 500; }
 dialog .actions { display: flex; gap: 10px; justify-content: center; }
+#settings { width: min(340px, calc(100vw - 32px)); }
+#settings .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 14px 0;
+  font: 400 18px/1.2 var(--display); letter-spacing: .03em; }
+#settings input[type="checkbox"] { width: 26px; height: 26px; accent-color: var(--gold); }
+#settings input[type="range"] { flex: 1; max-width: 190px; height: 32px; accent-color: var(--gold); }
+#settings .actions { margin-top: 20px; }
+#settings .actions button { min-height: 44px; padding: 8px 18px; }
 
-#bonus-hud { position: fixed; left: 1%; bottom: 17%; width: 12%; padding: 8px 6px; border-radius: 10px;
-  background: #24103aeb; border: 1px solid var(--edge); font-size: clamp(9px, 0.9vw, 15px); }
+/* placed by main.js inside the game's empty side panel, whose frame it shares */
+#bonus-hud { position: fixed; left: 0; top: 0; width: 160px; height: 200px; padding: .9em .8em; overflow: hidden; pointer-events: none;
+  display: flex; flex-direction: column; justify-content: center; font-size: 12px; }
+#bonus-hud.is-compact { padding: .5em .45em; }
+#bonus-hud.is-compact .feature-status, #bonus-hud.is-compact .multiplier-meter { display: none; }
+#bonus-hud.is-compact .jackpot-pools > div { margin: .2em 0; }
+#bonus-hud.is-compact .jackpot-pools span { letter-spacing: 0; }
 #bonus-hud[hidden], .jackpot-gems[hidden], .bonus-rules[hidden] { display: none; }
 .feature-status { margin: 0 0 8px; color: var(--gold); line-height: 1.35; font-family: var(--display); font-weight: 400; letter-spacing: .03em;
   text-shadow: 0 2px 0 #3e0f5c, 0 0 8px #12002a; }
 .jackpot-pools > div { display: flex; gap: 6px; justify-content: space-between; margin: 5px 0; }
 .jackpot-pools span { font-family: var(--display); font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
 .jackpot-pools strong { color: #ffe6a4; font-family: var(--display); font-weight: 400; font-variant-numeric: tabular-nums; text-shadow: 0 2px 0 #3e0f5c; }
-#bonus-hud button { width: 100%; padding: 6px 3px; border-radius: 6px; font-size: inherit; margin-top: 5px; }
-.multiplier-meter { display: block; margin: 8px auto; padding: 8px; border-radius: 50%; border: 2px solid var(--gold);
+#bonus-hud button { pointer-events: auto; width: 100%; padding: .4em .2em; border-radius: .5em; font-size: inherit; margin-top: .4em; }
+.multiplier-meter { display: block; width: fit-content; min-width: 3.4em; margin: .4em auto .6em; padding: .25em .6em; border-radius: 50%; border: 2px solid var(--gold);
   font-family: var(--display); color: #fff2bd; text-shadow: 0 2px 0 #3e0f5c, 0 0 12px #fb8cff;
   background: radial-gradient(ellipse, #75448b, #24103a); font-size: 1.6em; text-align: center; }
 .multiplier-meter.is-collecting { animation: meter-hit .4s ease-out; }
@@ -144,13 +154,14 @@ dialog .actions { display: flex; gap: 10px; justify-content: center; }
 .jackpot-gems [data-tier] { color: #fff2b6; border-color: var(--gold); box-shadow: inset 0 0 14px #ffd36b44; }
 .bonus-rules { text-align: left; font-size: 13px; line-height: 1.5; }
 @media (orientation: portrait) {
-  #bonus-hud { position: relative; left: auto; bottom: auto; width: auto; margin: 12px; padding: 12px; font-size: 13px; }
-  .jackpot-pools { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
   #bonus-hud.is-free .feature-status { position: fixed; z-index: 1; top: 48px; left: 8px; right: 8px; margin: 0;
     padding: 8px; border: 1px solid var(--edge); border-radius: 8px; background: var(--panel); text-align: center; }
 }
 @media (orientation: portrait) {
-  .multiplier-meter { position: fixed; z-index: 2; top: 90px; right: 12px; width: 100px; font-size: 20px; }
+  /* up in the account line, clear of the logo and the banner */
+  .multiplier-meter { position: fixed; z-index: 2; top: 6px; right: 8px; width: 84px; margin: 0; padding: 4px; font-size: 18px; }
+  /* in portrait these two sit over the game, outside the side panel */
+  #bonus-hud.is-compact .multiplier-meter, #bonus-hud.is-free .feature-status { display: block; }
   .celebration-panel { padding: 30px 16px; min-height: 230px; }
 }
 @media (prefers-reduced-motion: reduce) {
