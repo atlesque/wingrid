@@ -821,6 +821,11 @@ function scatterEffect(box, duration, anticipating = false, signal) {
   return run();
 }
 
+// She mouths each of her voice lines (sound.onVoice says when one starts).
+export function speak(line) {
+  for (const princess of characters) if (!princess.destroyed) princess.speak(line);
+}
+
 export function react(name, loop = false) {
   for (const princess of characters) if (!princess.destroyed) princess.react(name, loop);
   if (name === 'spell' || name === 'bonus') for (const princess of characters) {

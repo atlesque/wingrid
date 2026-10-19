@@ -165,14 +165,46 @@ export async function bigWinMusic(on) {
   }
 }
 
+// The princess's own lines. Whenever one plays, voice listeners hear about it so she can mouth it: they get
+// the line's loudness (one value per 1/RATE s, 0 to 1) and a clock for how far into it the audio is, or null
+// when the line can't be heard (sound effects off, or audio not started yet) and she should mouth it anyway.
+const VOICES = new Set([CLIPS.scatterVoice, CLIPS.multVoice, Object.values(CLIPS.winVoices)].flat(2));
+const voiceListeners = new Set(), envelopes = new WeakMap(), RATE = 60;
+export function onVoice(listener) { voiceListeners.add(listener); return () => voiceListeners.delete(listener); }
+function envelope(b) {
+  if (typeof b?.getChannelData !== 'function') return null;
+  if (!envelopes.has(b)) {
+    const data = b.getChannelData(0), step = Math.max(1, Math.round(b.sampleRate / RATE));
+    const out = new Float32Array(Math.ceil(data.length / step));
+    let peak = 1e-6;
+    for (let i = 0; i < out.length; i++) {
+      let sum = 0;
+      const end = Math.min(data.length, (i + 1) * step);
+      for (let j = i * step; j < end; j++) sum += data[j] * data[j];
+      out[i] = Math.sqrt(sum / Math.max(1, end - i * step));
+      peak = Math.max(peak, out[i]);
+    }
+    for (let i = 0; i < out.length; i++) out[i] /= peak;
+    envelopes.set(b, out);
+  }
+  return envelopes.get(b);
+}
+function speak(b, start) {
+  const loudness = envelope(b);
+  const line = loudness && { loudness, rate: RATE, elapsed: () => ctx.currentTime - start };
+  for (const listener of voiceListeners) listener(line);
+}
+
 export async function play(id, { volume = 1 } = {}) {
-  if (!ctx || !settings.sfx) return;
-  const b = await buffer(Array.isArray(id) ? id[Math.floor(Math.random() * id.length)] : id);
-  if (!b) return;
+  const chosen = Array.isArray(id) ? id[Math.floor(Math.random() * id.length)] : id, voice = VOICES.has(chosen);
+  if (!ctx || !settings.sfx) { if (voice) speak(null); return; }
+  const b = await buffer(chosen);
+  if (!b) { if (voice) speak(null); return; }
   const src = ctx.createBufferSource(), g = ctx.createGain();
   src.buffer = b; g.gain.value = volume;
   src.connect(g); g.connect(sfxGain);
   src.start();
+  if (voice) speak(b, ctx.currentTime);
 }
 // the n-th of an ordered set (vanish per tumble, scatter per scatter), holding on the last
 export const playNth = (list, n, opts) => play(list[Math.min(n, list.length - 1)], opts);
