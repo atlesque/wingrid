@@ -1,16 +1,18 @@
 // ================= SOUND =================
-// The original's music and sound effects, played the way it plays them (worked out by watching its sound engine
-// during spins): an ambience loop that never stops, and music in layers that all run in step and crossfade by
-// what is happening (idle, spinning, winning). One-shots go through their own gain. Browsers only start audio
-// after a tap or key, so everything waits for the first one.
+// Our own music (public/music) and the original's sound effects, played the way the original plays them (worked
+// out by watching its sound engine during spins): an ambience loop that never stops, and music in layers that all
+// run in step and crossfade by what is happening (idle, spinning, winning). One-shots go through their own gain.
+// Browsers only start audio after a tap or key, so everything waits for the first one.
 const AUDIO = '/starlight/audio';
 export const CLIPS = {
   ambience: '51cda7df5f1469b40b92ce0120eccf88',
-  // music layers: idle, spinning, tumbling wins
-  idle: '84727c186a64a8e488b0a1640dac1516',
-  spinning: 'd895812ba86aaab44b6fce31b7ee5252',
-  winning: '0ac5ef7d38cc3a74bb965419442e920a',
-  freeMusic: '7e85f50bf3f20ff488d9abaef2aeb709',
+  // music layers: idle, spinning, tumbling wins. The idle layer is the base loop without its drums, so the two
+  // stay in step; like the original, winning is the spinning music played louder.
+  idle: '/music/wingrid-idle-loop.mp3',
+  spinning: '/music/wingrid-base-loop.mp3',
+  winning: '/music/wingrid-base-loop.mp3',
+  freeMusic: '/music/wingrid-free-loop.mp3',
+  bigWinMusic: '/music/wingrid-bigwin-loop.mp3',
   countLoop: 'c3d156f99863c604080c38863d943c75',
   // one-shots
   click: 'ac8c53df56f9f2141b4ed263cfa094ce',
@@ -45,7 +47,7 @@ export const CLIPS = {
 const LAYERS = { idle: 0.6, spinning: 0.7, winning: 1 };
 const FADE = 3; // seconds, as the original crossfades its music layers
 
-let ctx = null, master, musicGain, sfxGain, files = null;
+let ctx = null, master, musicGain, layerBus, sfxGain, files = null;
 const buffers = new Map();
 const settings = load();
 let mood = 'idle', layerNodes = {}, countNode = null, freePending = null, countWanted = false;
@@ -58,8 +60,9 @@ function load() {
 function save() { try { localStorage.setItem('starlight_sound', JSON.stringify(settings)); } catch (e) {} }
 export const getSettings = () => ({ ...settings });
 
-// clip ids in the list above may be short; the audio folder's index has the full names
+// clip ids in the list above may be short; the audio folder's index has the full names. Paths are our own files.
 async function resolve(id) {
+  if (id.startsWith('/')) return id;
   if (!files) files = fetch(`${AUDIO}/index.json`).then(r => r.json()).catch(() => []);
   const list = await files;
   return list.find(f => f.startsWith(id));
@@ -68,7 +71,7 @@ function buffer(id) {
   if (!buffers.has(id)) buffers.set(id, (async () => {
     const file = await resolve(id);
     if (!file) return null;
-    const data = await (await fetch(`${AUDIO}/${file}`)).arrayBuffer();
+    const data = await (await fetch(file.startsWith('/') ? file : `${AUDIO}/${file}`)).arrayBuffer();
     return ctx.decodeAudioData(data);
   })().catch(() => null));
   return buffers.get(id);
@@ -89,18 +92,20 @@ export function unlock() {
   ctx = new (window.AudioContext || window.webkitAudioContext)();
   master = ctx.createGain(); master.connect(ctx.destination);
   musicGain = ctx.createGain(); musicGain.connect(master);
+  // the layers and free-spin music go through their own bus, so a big win can duck them under its music
+  layerBus = ctx.createGain(); layerBus.connect(musicGain);
   sfxGain = ctx.createGain(); sfxGain.connect(master);
   applyGains();
   startMusic();
 }
 
-async function loop(id, volume, at) {
+async function loop(id, volume, at, out = layerBus) {
   const b = await buffer(id);
   if (!b) return null;
   const src = ctx.createBufferSource(), g = ctx.createGain();
   src.buffer = b; src.loop = true;
   g.gain.value = volume;
-  src.connect(g); g.connect(musicGain);
+  src.connect(g); g.connect(out);
   src.start(at ?? ctx.currentTime);
   return { src, g };
 }
@@ -140,6 +145,24 @@ function applyMood() {
     });
   }
   if (m !== 'free' && layerNodes.free) { const n = layerNodes.free; delete layerNodes.free; n.g.gain.linearRampToValueAtTime(0, t + FADE); n.src.stop(t + FADE + 0.1); }
+}
+
+// A big win plays its own music over the ducked layers until the celebration closes.
+let winMusic = null, winWanted = false;
+export async function bigWinMusic(on) {
+  winWanted = on;
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  if (on && !winMusic) {
+    layerBus.gain.setTargetAtTime(0.04, t, 0.15);
+    const n = await loop(CLIPS.bigWinMusic, 1, undefined, musicGain);
+    if (!n) return;
+    if (!winWanted || winMusic) { n.src.stop(); return; }
+    winMusic = n;
+  } else if (!on) {
+    layerBus.gain.setTargetAtTime(1, t, 0.6);
+    if (winMusic) { const n = winMusic; winMusic = null; n.g.gain.setTargetAtTime(0, t, 0.3); n.src.stop(t + 2); }
+  }
 }
 
 // The princess's own lines. Whenever one plays, voice listeners hear about it so she can mouth it: they get
