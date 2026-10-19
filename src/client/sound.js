@@ -11,7 +11,7 @@ export const CLIPS = {
   idle: '/music/wingrid-idle-loop.mp3',
   spinning: '/music/wingrid-base-loop.mp3',
   winning: '/music/wingrid-base-loop.mp3',
-  freeMusic: '7e85f50bf3f20ff488d9abaef2aeb709', // the original's until our free-spins take is rendered
+  freeMusic: '/music/wingrid-free-loop.mp3',
   bigWinMusic: '/music/wingrid-bigwin-loop.mp3',
   countLoop: 'c3d156f99863c604080c38863d943c75',
   // one-shots

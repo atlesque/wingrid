@@ -9,9 +9,10 @@ with the render node's output).
 | wingrid-base-loop.mp3 | base game, spinning and winning layers | wingrid-base-v1, 11.10 s for 80.25 s (48 bars at 143.5 BPM) |
 | wingrid-idle-loop.mp3 | base game, idle layer | the same loop with its drums removed (harmonic part only), so the layers stay in step |
 | wingrid-bigwin-loop.mp3 | big-win celebration, over the ducked base music | wingrid-bigwin-v1, 88.80 s for 13.25 s (8 bars) |
+| wingrid-free-loop.mp3 | free spins, in place of the base layers | wingrid-free-v1, 44.20 s for 40.28 s (24 bars) |
 
 Each loop's head is crossfaded with the audio that followed its end in the take, so the wrap continues the way the
-take did. Loudness is matched to the original game's music (about -18.5 LUFS).
+take did. Loudness is matched to the original game's music (about -18.5 LUFS, free spins about -16.5 like the original's).
 
 ## wingrid-base-v1.mp3
 
