@@ -90,7 +90,6 @@ export async function createPrincessV2() {
   // Speaking opens the mouth along the line between her lips: the lower lip and chin drop, the upper lip
   // lifts a little, and a mouth drawn into the gap shows behind them. Her brows lift as she talks.
   const { mouth, brows } = face;
-  const [left, right] = [mouth.seam[0][0], mouth.seam.at(-1)[0]];
   const seam = x => {
     const points = mouth.seam;
     if (x <= points[0][0]) return points[0][1];
@@ -100,10 +99,11 @@ export async function createPrincessV2() {
     }
     return points.at(-1)[1];
   };
-  // how far the lips part at x, 0 at the corners; it widens further down so the chin drops as one
+  // how far the lips part at x: an oval round the middle of her mouth that closes well before the corners,
+  // so the smile keeps its shape; it widens further down so the chin drops as one
   const parting = (x, depth = 0) => {
-    const margin = 4 + depth * .5;
-    return smooth(left - margin, left + 10, x) * (1 - smooth(right - 12, right + margin, x));
+    const u = (x - mouth.centre) / (mouth.halfWidth + depth * .5);
+    return Math.abs(u) >= 1 ? 0 : Math.pow(1 - u*u, .75);
   };
   const jaw = field((x, y) => {
     const depth = y - seam(x);
@@ -151,8 +151,8 @@ export async function createPrincessV2() {
     };
     const top = [], bottom = [], teeth = [], tongue = [];
     for (let i = 0; i <= 16; i++) {
-      const x = left + (right - left) * i / 16, y = seam(x), gap = mouth.open * open * parting(x);
-      const upper = y - .4 - gap * mouth.lift, lower = y + 1.2 + gap;
+      const x = mouth.centre + mouth.halfWidth * (i / 8 - 1), y = seam(x), part = parting(x);
+      const gap = mouth.open * open * part, upper = y - .4 * part - gap * mouth.lift, lower = y + 1.2 * part + gap;
       top.push(place(x, upper));
       teeth.push(place(x, upper + gap * .24));
       tongue.push(place(x, lower - gap * .3));
@@ -174,18 +174,18 @@ export async function createPrincessV2() {
     started=clock;
     next=clock+intervals[interval++%intervals.length];
   };
-  // Mouth a line: with its loudness when it can be heard, or a few syllables when it can't.
+  // Mouth a line: following its syllables when it can be heard, or a few syllables when it can't.
   character.speak=(voice=null)=>{
     if (referencePose) return;
-    line=voice || { loudness: null }; said=0;
+    line=voice || { opening: null }; said=0;
   };
-  function loudness(dt) {
+  function opening(dt) {
     if (!line) return 0;
     said+=dt;
-    if (line.loudness) {
+    if (line.opening) {
       const at=line.elapsed?.() ?? said, i=Math.floor(at*line.rate);
-      if (i>=line.loudness.length) { line=null; return 0; }
-      return i<0 ? 0 : line.loudness[i];
+      if (i>=line.opening.length) { line=null; return 0; }
+      return i<0 ? 0 : line.opening[i];
     }
     if (said>1.1) { line=null; return 0; }
     return Math.max(0, Math.sin(said*Math.PI*2*4.6))*(1-smooth(.8,1.1,said));
@@ -202,8 +202,8 @@ export async function createPrincessV2() {
       const closure=elapsed<.07 ? smooth(0,.07,elapsed)
         : elapsed<.095 ? 1 : 1-smooth(.095,.205,elapsed);
       amount=Math.max(0,Math.min(1,closure));
-      const target=smooth(.06,.55,loudness(dt));
-      mouthOpen+=(target-mouthOpen)*Math.min(1,dt*(target>mouthOpen ? 32 : 16));
+      const target=Math.pow(opening(dt),.8);
+      mouthOpen+=(target-mouthOpen)*Math.min(1,dt*(target>mouthOpen ? 36 : 26));
       if (mouthOpen<.002) mouthOpen=0;
       browRaise+=((line ? 1 : 0)-browRaise)*Math.min(1,dt*(line ? 8 : 3));
       if (browRaise<.002) browRaise=0;

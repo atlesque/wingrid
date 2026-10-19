@@ -57,20 +57,25 @@ test('big-win music starts once however often a celebration asks for it', async 
   const wins = a.nodes.filter(n => n.buffer?.includes(a.module.CLIPS.bigWinMusic));
   assert.equal(wins.filter(n => !n.stopped).length, 1);
 });
-test('her voice lines tell voice listeners how loud they are, other sounds do not', async () => {
+test('her voice lines tell voice listeners when her mouth opens, other sounds do not', async () => {
   const a = await audio(); a.module.unlock(); await flush();
   const heard = [];
   a.module.onVoice(line => heard.push(line));
-  const samples = new Float32Array(4800).map((_, i) => i < 2400 ? .5 : .1);
   a.module.play(a.module.CLIPS.showWin); await flush();
   assert.equal(heard.length, 0);
-  // decoded audio: a buffer with its samples
-  globalThis.fetch = async () => ({ json: async () => [`${a.module.CLIPS.winVoices.nice}.ogg`], arrayBuffer: async () => ({ sampleRate: 48000, getChannelData: () => samples }) });
+  // decoded audio: a buffer with its samples, two 800 Hz syllables of 0.15 s with silence between
+  const rate = 48000, samples = new Float32Array(rate).map((_, i) => {
+    const t = i / rate;
+    return (t > .1 && t < .25) || (t > .5 && t < .65) ? Math.sin(2 * Math.PI * 800 * t) * .5 : 0;
+  });
+  globalThis.fetch = async () => ({ json: async () => [`${a.module.CLIPS.winVoices.nice}.ogg`], arrayBuffer: async () => ({ sampleRate: rate, getChannelData: () => samples }) });
   await a.module.play(a.module.CLIPS.winVoices.nice);
   assert.equal(heard.length, 1);
-  assert.equal(heard[0].rate, 60);
-  assert.deepEqual([...heard[0].loudness.slice(0, 3)].map(v => +v.toFixed(2)), [1, 1, 1]);
-  assert.equal(+heard[0].loudness.at(-1).toFixed(2), .2);
+  const { opening, rate: frames } = heard[0];
+  assert.equal(frames, 60);
+  const at = s => opening[Math.round(s * frames)];
+  assert.ok(at(.18) > .5 && at(.58) > .5, 'open on each syllable');
+  assert.equal(at(.05), 0); assert.equal(at(.4), 0); assert.equal(at(.9), 0);
 });
 test('a voice line she cannot be heard saying still tells voice listeners', async () => {
   const a = await audio(); const heard = [];
