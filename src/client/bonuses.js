@@ -28,7 +28,7 @@ export function createBonuses({ pick, onState, onError, react }) {
     hud.classList.toggle('is-free', !!f);
     hud.querySelector('.feature-status').textContent = f
       ? `${f.left} FREE SPINS LEFT · TOTAL ${f.totalMult}x · WON ${money(f.won)}`
-      : 'MULTIPLIERS 2x–500x · 4 SCATTERS = 15 FREE SPINS';
+      : 'MULTIPLIERS 2x–500x · 4 MBP = 15 FREE SPINS';
     meter.textContent = `${f?.totalMult ?? displayMult}×`;
     hud.querySelector('.jackpot-pools').replaceChildren(...(state.jackpots || cfg.jackpots.tiers).map(tier => {
       const row = document.createElement('div'), name = document.createElement('span'), amount = document.createElement('strong');
