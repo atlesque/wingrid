@@ -1,0 +1,5 @@
+// Only for applying migrations/ to the Preview database (npm run db:migrate:preview).
+// Keep database_name and database_id in step with previews.d1_databases in wrangler.jsonc.
+{
+  "d1_databases": [{ "binding": "PREVIEW_DB", "database_name": "wingrid-preview", "database_id": "ece942cb-3fb8-4c39-8922-62a09e522162", "migrations_dir": "migrations" }]
+}

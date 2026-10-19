@@ -7,6 +7,7 @@
     "assets:ci": "node scripts/restore-ci-assets.mjs",
     "db:migrate": "wrangler d1 migrations apply wingrid --local",
     "db:migrate:remote": "wrangler d1 migrations apply wingrid --remote",
+    "db:migrate:preview": "wrangler d1 migrations apply wingrid-preview --remote --config wrangler.preview-migrations.jsonc",
     "dev": "vite",
     "build": "vite build",
     "build:ci": "npm test && npm run assets:ci && npm run build && wrangler deploy --dry-run",
