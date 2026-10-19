@@ -50,7 +50,7 @@ function render() {
   scene.setEnabled('anteArrow', !locked);
   scene.setEnabled('autoplay', !f && !state.jackpot);
   scene.setText('autoplayLabel', auto > 0 ? `STOP (${auto})` : 'AUTOPLAY');
-  if (!busy) message(f ? `FREE SPINS LEFT ${f.left}` : auto > 0 ? `AUTOPLAY SPINS LEFT ${auto}` : state.canTopUp ? 'OUT OF CREDITS: PRESS SPIN FOR 1,000 FREE' : scene.idleMessage());
+  if (!busy) message(f ? `FREE SPINS LEFT ${f.left}` : state.jackpot ? 'JACKPOT WAITING: PRESS SPIN TO REVEAL' : auto > 0 ? `AUTOPLAY SPINS LEFT ${auto}` : state.canTopUp ? 'OUT OF CREDITS: PRESS SPIN FOR 1,000 FREE' : scene.idleMessage());
   const a = state.account;
   $('#account').textContent = a ? 'Sign out' : 'Sign in';
   $('#sync').textContent = a ? `Saved to Atlesque Play as ${a.email}` : 'Playing as guest';
@@ -228,8 +228,9 @@ loadingProgress(100, 'Ready to play');
 await new Promise(resolve => setTimeout(resolve, 250));
 $('#loading').classList.add('leaving');
 setTimeout(() => { $('#loading').hidden = true; }, 400);
-// a feature left unfinished (closed tab) carries on where it stopped
-if (state.jackpot) await bonuses.reveal();
+// a feature left unfinished (closed tab) carries on where it stopped; a reserved jackpot waits for the
+// player to press spin or the jackpot button rather than covering the game the moment it loads
+if (state.jackpot) toast('Your jackpot is waiting. Press spin to reveal it.', 3000);
 else if (state.feature) { await scene.setFree(true); sound.setMood('free'); toast(`${state.feature.left} free spins left`); await scene.wait(1200); run(); }
 
 } catch (error) {
