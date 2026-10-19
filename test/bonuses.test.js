@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { seeded, spin, countScatters, scatterPay, MAX_WIN } from '../src/shared/engine.js';
 import { fresh, playSpin, spinView, setBet } from '../src/shared/round.js';
-import { JACKPOTS, jackpotTier, jackpotDeck, revealJackpot, publicJackpot } from '../src/shared/jackpot.js';
+import { JACKPOTS, JACKPOT_COOLDOWN_SPINS, jackpotReady, jackpotTier, jackpotDeck, revealJackpot, publicJackpot } from '../src/shared/jackpot.js';
 
 test('natural SCATTERs pay and start 15 free spins', () => {
   const save = fresh();
@@ -90,4 +90,12 @@ test('all four tiers can trigger and the jackpot eligibility threshold is enforc
   }
   assert.equal(jackpotTier(() => 0, 0.19), null);
   assert.equal(jackpotTier(() => 0.9, 1), null);
+  assert.equal(jackpotTier(() => 0.019, 100), 'minor');
+  assert.equal(jackpotTier(() => 0.02, 100), null); // even the biggest bet is capped at a 2% chance
+});
+
+test('a jackpot cannot trigger again until the cooldown has passed', () => {
+  assert.equal(jackpotReady({ spins: 3 }), true);
+  assert.equal(jackpotReady({ spins: JACKPOT_COOLDOWN_SPINS - 1, lastJackpotSpin: 0 }), false);
+  assert.equal(jackpotReady({ spins: JACKPOT_COOLDOWN_SPINS, lastJackpotSpin: 0 }), true);
 });

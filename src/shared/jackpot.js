@@ -7,10 +7,15 @@ export const JACKPOTS = [
   { id: 'grand', name: 'Grand', seed: 2500, cap: 10000, contribution: 0.001, weight: 2 },
 ];
 export const JACKPOT_MIN_BET = 0.2;
-export const JACKPOT_CHANCE_PER_CREDIT = 0.002;
+export const JACKPOT_CHANCE_PER_CREDIT = 0.001;
+export const JACKPOT_MAX_CHANCE = 0.02;
+// paid spins a player must play after one jackpot before the next can trigger
+export const JACKPOT_COOLDOWN_SPINS = 150;
+
+export const jackpotReady = stats => stats.lastJackpotSpin == null || stats.spins - stats.lastJackpotSpin >= JACKPOT_COOLDOWN_SPINS;
 
 export function jackpotTier(rng, bet) {
-  if (bet < JACKPOT_MIN_BET || rng() >= Math.min(0.1, bet * JACKPOT_CHANCE_PER_CREDIT)) return null;
+  if (bet < JACKPOT_MIN_BET || rng() >= Math.min(JACKPOT_MAX_CHANCE, bet * JACKPOT_CHANCE_PER_CREDIT)) return null;
   let pick = rng() * JACKPOTS.reduce((sum, tier) => sum + tier.weight, 0);
   return JACKPOTS.find(tier => (pick -= tier.weight) < 0).id;
 }
