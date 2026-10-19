@@ -166,32 +166,51 @@ export async function bigWinMusic(on) {
 }
 
 // The princess's own lines. Whenever one plays, voice listeners hear about it so she can mouth it: they get
-// the line's loudness (one value per 1/RATE s, 0 to 1) and a clock for how far into it the audio is, or null
-// when the line can't be heard (sound effects off, or audio not started yet) and she should mouth it anyway.
+// how far her mouth opens through the line (one value per 1/RATE s, 0 to 1) and a clock for how far into it
+// the listener hears, or null when the line can't be heard (sound effects off, or audio not started yet) and
+// she should mouth it anyway.
 const VOICES = new Set([CLIPS.scatterVoice, CLIPS.multVoice, Object.values(CLIPS.winVoices)].flat(2));
-const voiceListeners = new Set(), envelopes = new WeakMap(), RATE = 60;
+const voiceListeners = new Set(), mouthings = new WeakMap(), RATE = 60;
 export function onVoice(listener) { voiceListeners.add(listener); return () => voiceListeners.delete(listener); }
-function envelope(b) {
+// The jaw follows the low vowel band (around 300 to 2,000 Hz, where the first formant sits), not the whole
+// clip: hisses barely open it, and a held note or reverb tail lets it close again, because each frame counts
+// only by how far it rises above the level of the third of a second round it. That gives one opening a
+// syllable instead of a mouth held open through the line.
+function mouthing(b) {
   if (typeof b?.getChannelData !== 'function') return null;
-  if (!envelopes.has(b)) {
-    const data = b.getChannelData(0), step = Math.max(1, Math.round(b.sampleRate / RATE));
-    const out = new Float32Array(Math.ceil(data.length / step));
-    let peak = 1e-6;
-    for (let i = 0; i < out.length; i++) {
+  if (!mouthings.has(b)) {
+    const data = b.getChannelData(0), rate = b.sampleRate, step = Math.max(1, Math.round(rate / RATE));
+    const w = 2 * Math.PI * 800 / rate, alpha = Math.sin(w) / (2 * .7), a0 = 1 + alpha;
+    const b0 = alpha / a0, a1 = -2 * Math.cos(w) / a0, a2 = (1 - alpha) / a0;
+    const level = new Float32Array(Math.ceil(data.length / step));
+    let x1 = 0, x2 = 0, y1 = 0, y2 = 0, peak = 1e-6;
+    for (let i = 0; i < level.length; i++) {
       let sum = 0;
       const end = Math.min(data.length, (i + 1) * step);
-      for (let j = i * step; j < end; j++) sum += data[j] * data[j];
-      out[i] = Math.sqrt(sum / Math.max(1, end - i * step));
-      peak = Math.max(peak, out[i]);
+      for (let j = i * step; j < end; j++) {
+        const y = b0 * (data[j] - x2) - a1 * y1 - a2 * y2;
+        x2 = x1; x1 = data[j]; y2 = y1; y1 = y;
+        sum += y * y;
+      }
+      level[i] = Math.sqrt(sum / Math.max(1, end - i * step));
+      peak = Math.max(peak, level[i]);
     }
-    for (let i = 0; i < out.length; i++) out[i] /= peak;
-    envelopes.set(b, out);
+    const out = new Float32Array(level.length), half = 10;
+    for (let i = 0; i < level.length; i++) {
+      let around = 0;
+      for (let k = i - half; k <= i + half; k++) around += level[Math.max(0, Math.min(level.length - 1, k))];
+      const now = level[i] / peak, rise = now - .55 * around / (2 * half + 1) / peak;
+      out[i] = now < .06 ? 0 : Math.max(0, Math.min(1, rise * 1.8));
+    }
+    mouthings.set(b, out);
   }
-  return envelopes.get(b);
+  return mouthings.get(b);
 }
 function speak(b, start) {
-  const loudness = envelope(b);
-  const line = loudness && { loudness, rate: RATE, elapsed: () => ctx.currentTime - start };
+  const opening = mouthing(b);
+  // the clock trails the audio clock by the output's own delay, so her mouth moves when the sound is heard
+  const delay = () => ctx.outputLatency || ctx.baseLatency || 0;
+  const line = opening && { opening, rate: RATE, elapsed: () => ctx.currentTime - start - delay() };
   for (const listener of voiceListeners) listener(line);
 }
 
