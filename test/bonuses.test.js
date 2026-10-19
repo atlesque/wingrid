@@ -15,7 +15,7 @@ test('natural SCATTERs pay and start 15 free spins', () => {
 });
 
 test('multiple base-game orbs add and multiply the complete tumble win', () => {
-  const r = spin(seeded(632));
+  const r = spin(seeded(3623));
   assert.ok(r.steps.length > 1 && r.mults.length > 1);
   assert.equal(r.appliedMult, r.mults.reduce((a, b) => a + b, 0));
   assert.equal(r.win, Math.min(MAX_WIN, r.tumbleWin * r.appliedMult + r.scatterWin));
