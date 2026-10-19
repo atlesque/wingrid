@@ -35,4 +35,15 @@ take did. Loudness is matched to the original game's music (about -18.5 LUFS).
 
   > instrumental fantasy game victory music, celestial magical-girl pop orchestral, 144 BPM, E-flat major, triumphant celebration that keeps building in intensity, brass fanfare, soaring choir pads, sparkling bells and glockenspiel, harp glissandos, rolling timpani and taiko, cymbal swells, joyful and huge, no vocals
 
+## wingrid-free-v1.mp3
+
+- Model: YuE2-3B (local, RTX 5090 render node), instrumental
+- Seed: 1
+- Duration requested: 60 s; actual: 94.5 s (YuE2 treats duration as advisory)
+- Format: MP3, 320 kbps, 48 kHz stereo
+- Job ID: 20261019-155954-43b288
+- Prompt (shortened; the longer free-spins prompt ran out of GPU memory under the wrapper's 22 GiB cap):
+
+  > instrumental fantasy game music, celestial magical-girl pop orchestral, 144 BPM, E-flat major, epic euphoric bonus round, choir pads, bells, harp arpeggios, plucked synth lead, fast strings, brass, driving dance drums with taiko, high energy, no vocals
+
 No reference audio was used and no artist or song was named.
