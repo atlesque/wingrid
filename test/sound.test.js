@@ -44,3 +44,24 @@ test('a slow counter sound never starts after counting has finished', async () =
   const pending = a.module.counting(true); await flush(); await a.module.counting(false); a.count(); await pending;
   assert.equal(a.started.some(url => url.includes(a.module.CLIPS.countLoop)), false);
 });
+test('her voice lines tell voice listeners how loud they are, other sounds do not', async () => {
+  const a = await audio(); a.module.unlock(); await flush();
+  const heard = [];
+  a.module.onVoice(line => heard.push(line));
+  const samples = new Float32Array(4800).map((_, i) => i < 2400 ? .5 : .1);
+  a.module.play(a.module.CLIPS.showWin); await flush();
+  assert.equal(heard.length, 0);
+  // decoded audio: a buffer with its samples
+  globalThis.fetch = async () => ({ json: async () => [`${a.module.CLIPS.winVoices.nice}.ogg`], arrayBuffer: async () => ({ sampleRate: 48000, getChannelData: () => samples }) });
+  await a.module.play(a.module.CLIPS.winVoices.nice);
+  assert.equal(heard.length, 1);
+  assert.equal(heard[0].rate, 60);
+  assert.deepEqual([...heard[0].loudness.slice(0, 3)].map(v => +v.toFixed(2)), [1, 1, 1]);
+  assert.equal(+heard[0].loudness.at(-1).toFixed(2), .2);
+});
+test('a voice line she cannot be heard saying still tells voice listeners', async () => {
+  const a = await audio(); const heard = [];
+  a.module.onVoice(line => heard.push(line));
+  await a.module.play(a.module.CLIPS.multVoice);
+  assert.deepEqual(heard, [null]);
+});

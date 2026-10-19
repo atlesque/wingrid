@@ -19,6 +19,7 @@ const bonuses = createBonuses({ pick: api.pickJackpot,
   onState: next => { state = next; render(); },
   onError: error => toast(error.message, 2500), react: scene.react });
 const presentation = createPresentation({ react: scene.react });
+sound.onVoice(scene.speak);
 if (import.meta.env.DEV) globalThis.__wingrid = { scene, presentation, bonuses, get state() { return structuredClone(state); } };
 if (import.meta.env.DEV) globalThis.__sound = sound; // await __sound.status() in the console
 // autoplay: spins left, and the settings it was started with (turbo, quick spin, skip screens)
