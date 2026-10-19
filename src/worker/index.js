@@ -1,6 +1,6 @@
 import { secureRandom, BETS, START_CREDITS } from '../shared/engine.js';
 import { fresh, normalize, playSpin, spinView, pickJackpot, topUp, setBet, canTopUp, RoundError, TOP_UP_EVERY, round2 } from '../shared/round.js';
-import { JACKPOTS, JACKPOT_MIN_BET, JACKPOT_CHANCE_PER_CREDIT, jackpotTier, jackpotDeck, publicJackpot } from '../shared/jackpot.js';
+import { JACKPOTS, JACKPOT_MIN_BET, JACKPOT_CHANCE_PER_CREDIT, JACKPOT_MAX_CHANCE, JACKPOT_COOLDOWN_SPINS, jackpotTier, jackpotReady, jackpotDeck, publicJackpot } from '../shared/jackpot.js';
 
 // ================= STARLIGHT API =================
 // The Worker owns every player's credits: the page asks it to spin and animates what comes back. A browser
@@ -68,7 +68,8 @@ async function route(req, env, url, ctx) {
   const p = url.pathname, m = req.method;
   if (m === 'POST' && req.headers.get('origin') !== url.origin) throw new HttpError(403, 'bad_origin', 'That request did not come from this site.');
   if (p === '/api/config' && m === 'GET') return json({ playUrl: env.PLAY_URL, gameId: env.PLAY_GAME_ID, bets: BETS, startCredits: START_CREDITS, topUpEvery: TOP_UP_EVERY,
-    jackpots: { tiers: await poolsView(env), minBet: JACKPOT_MIN_BET, chancePerCredit: JACKPOT_CHANCE_PER_CREDIT } });
+    jackpots: { tiers: await poolsView(env), minBet: JACKPOT_MIN_BET, chancePerCredit: JACKPOT_CHANCE_PER_CREDIT,
+      maxChance: JACKPOT_MAX_CHANCE, cooldownSpins: JACKPOT_COOLDOWN_SPINS } });
   if (p === '/api/guest' && m === 'POST') return newGuest(env);
 
   const session = await auth(req, env);
@@ -85,14 +86,16 @@ async function route(req, env, url, ctx) {
       const statements = [env.DB.prepare('INSERT INTO spins (player_id, kind, bet, cost, win, created_at) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(player.id, out.kind, out.bet, out.cost, out.win, Date.now())];
       // Optional jackpots are separate from the 5,000x slot-feature cap and only
-      // trigger at the end of paid base/ante spins which do not start free spins.
-      const tier = ['base', 'ante'].includes(out.kind) && !save.feature ? jackpotTier(rng, out.cost) : null;
+      // trigger at the end of paid base/ante spins which do not start free spins,
+      // and never again until the player has played JACKPOT_COOLDOWN_SPINS more paid spins.
+      const tier = ['base', 'ante'].includes(out.kind) && !save.feature && jackpotReady(save.stats) ? jackpotTier(rng, out.cost) : null;
       if (tier) {
         const definition = JACKPOTS.find(t => t.id === tier);
         const pool = await env.DB.prepare('SELECT * FROM jackpot_pools WHERE tier = ?').bind(tier).first();
         const amount = round2(Math.min(definition.cap, pool.amount + out.cost * definition.contribution));
         const id = crypto.randomUUID();
         save.jackpot = { id, tier, amount, deck: jackpotDeck(rng, tier), picks: [] };
+        save.stats.lastJackpotSpin = save.stats.spins;
         out.event = { type: 'jackpot-start' };
         statements.push(env.DB.prepare('UPDATE jackpot_pools SET amount = ?, version = version + 1 WHERE tier = ? AND version = ?')
           .bind(definition.seed, tier, pool.version), mutationGuard(env),
