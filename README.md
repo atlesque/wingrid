@@ -108,11 +108,12 @@ Worker's Cloudflare deployment history.
 Every other branch gets a [Worker Preview](https://developers.cloudflare.com/workers/previews/)
 at `<branch>-wingrid.<subdomain>.workers.dev`, which Cloudflare posts on the pull request. A preview
 runs with the `previews` block of `wrangler.jsonc`: its own `wingrid-preview` D1, so preview spins
-never touch production credits. Cloudflare preview build settings:
+never touch production credits. Cloudflare preview build settings (Settings > Builds > Previews Base):
 
-- Enable Preview Builds: on (Settings > Build > Branch control)
+- Builds for Preview branches: on
+- Build command: `npm run build:ci`
 - Preview command: `npm run db:migrate:preview && npx wrangler preview`
-- Preview URLs: on (Domains tab > Worker URL > Preview)
+- Worker URL > Preview: on (Domains tab)
 
 `npm run db:migrate:preview` applies `migrations/` to `wingrid-preview` through
 `wrangler.preview-migrations.jsonc`, whose database must match `previews.d1_databases`. Signing in
