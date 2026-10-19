@@ -19,8 +19,22 @@
   background: var(--gold-fill); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: var(--outline);
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: #000; color: var(--ink);
+html, body { margin: 0; height: 100%; overflow: hidden; background: #10183f; color: var(--ink);
   font: 700 14px/1.2 var(--text); }
+/* The backdrop: one painting that covers the whole screen behind the game's transparent canvas, whatever the
+   screen's shape. It stays put while a phone scrolls down to the controls, and is as tall as the screen gets
+   when a phone browser hides its toolbars. Free spins crossfade it to the night festival. */
+#backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; height: 100lvh; overflow: hidden; pointer-events: none; }
+#backdrop > div { position: absolute; inset: 0; background: center 40% / cover no-repeat;
+  transition: opacity calc(1.4s / var(--motion-speed, 1)) ease; }
+#backdrop .base { background-image: url(/theme/japan/backdrop-base-land.webp); }
+#backdrop .free { background-image: url(/theme/japan/backdrop-free-land.webp); opacity: 0; }
+:root[data-mode="free"] #backdrop .free { opacity: 1; }
+@media (orientation: portrait) {
+  #backdrop > div { background-position: center 30%; }
+  #backdrop .base { background-image: url(/theme/japan/backdrop-base-port.webp); }
+  #backdrop .free { background-image: url(/theme/japan/backdrop-free-port.webp); }
+}
 #stage { position: fixed; inset: 0; }
 #stage canvas { display: block; width: 100%; height: 100%; }
 /* Keep the portrait artwork at full width, even on shorter phone screens.
@@ -140,6 +154,7 @@ dialog .actions { display: flex; gap: 10px; justify-content: center; }
   .celebration-panel { padding: 30px 16px; min-height: 230px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  #backdrop > div { transition: none; }
   .multiplier-meter.is-collecting, .jackpot-gems button.is-flipping, .jackpot-gems button.is-anticipating,
   #celebration[data-event="max-win"] .event-stars, #celebration[data-choice] button { animation: none; }
 }

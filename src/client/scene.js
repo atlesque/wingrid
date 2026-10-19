@@ -3,6 +3,7 @@ import { Spine } from 'pixi-spine';
 import { createPrincessV2 } from './character-v2.js';
 import { skeleton } from './art.js';
 import { motion, playAnimation } from './motion.js';
+import { createAmbience } from './ambience.js';
 
 // ================= SCENE =================
 // Draws the game exactly as the original lays it out. layout/<name>.json is one captured frame of the original
@@ -11,6 +12,10 @@ import { motion, playAnimation } from './motion.js';
 // original's reels were, built from the original symbol rigs (layout/symbols.json).
 export const COLS = 6, ROWS = 5;
 const ART = '/starlight';
+// Wingrid's Japan theme (public/theme/japan/). The page paints the backdrop behind this canvas (#backdrop in
+// style.css), so the captured background is left out. The reel frames are our own lacquer boards, drawn by
+// scripts/japan-board.mjs to the original base frame's box, so their window is the symbol grid.
+const BOARD = { BaseReels: '/theme/japan/board-base.webp', ReelWithFrameFS: '/theme/japan/board-free.webp' };
 
 // engine symbol id → the original's symbol prefab
 const PREFAB = {
@@ -24,10 +29,9 @@ const multLook = v => MULT.find(([min]) => v >= min);
 // how far (layout pixels) the landscape princess reaches over the reel frame's right edge
 const CHARACTER_OVERLAP = 72;
 
-let app, atlases, rigs, layouts, world, cover, symbolLayer, effectsLayer, current;
+let app, atlases, rigs, layouts, world, ambience, symbolLayer, effectsLayer, current;
 const characters = new Set();
 let freeMode = false;
-const modeSprites = [], modeSpines = [];
 const baseOnly = []; // drawn in the base game only: the buy and bet panels, the blue reel back
 let freeHud = null;  // the free-spins column that takes their place
 const textures = new Map();
@@ -219,8 +223,6 @@ function layoutLabel(it, b) {
 }
 
 async function makeSpine(it) {
-  const baseBackground = /stpr_basegame_idle/.test(it.skeleton);
-  if (baseBackground && freeMode) it = { ...it, skeleton: 'stpr_freegame_idle_SkeletonData', anim: 'stpr_freegame_idle' };
   const data = await skeleton(it.skeleton);
   const s = new Spine(data);
   if (it.anim && data.findAnimation(it.anim)) s.state.setAnimation(0, it.anim, it.mode === 2 || it.mode === undefined);
@@ -245,7 +247,6 @@ async function makeSpine(it) {
     hover(container, princess);
     return container;
   }
-  if (baseBackground) modeSpines.push({ spine: s, item: it });
   s.alpha = it.alpha ?? 1;
   return s;
 }
@@ -359,6 +360,7 @@ async function castAt(box) {
 // ---- the captured layout ----
 const DYNAMIC = /ReelsManager\//;
 const SKIP = it => it.k === 'UISprite' && it.atlas === 'common' && /BlackBands|ClippingAnchors|\/Mask\/|GUIArranger/.test(it.path) // letterbox bands and clipping helpers
+  || /^Game\/Background\//.test(it.path) // the backdrop is the page's, behind the canvas
   || /Volatility\//.test(it.path) || /AggregatedInfoLabel$/.test(it.path) || it.k === 'UITexture';
 // widgets the page drives, by a piece of their path
 const NAMED = {
@@ -391,28 +393,54 @@ async function makeItem(it) {
   return obj;
 }
 
+// Our board, where the original drew its base-game reel frame (the free-spins frame sat a little higher and
+// larger, around the same reels; ours share one shape and change colour).
+async function makeBoard(it, L) {
+  const b = drawnBounds(L.items.find(x => x.atlas === 'BaseReels'));
+  const sprite = new PIXI.Sprite(await PIXI.Assets.load(BOARD[it.atlas]));
+  sprite.anchor.set(0.5);
+  sprite.position.set(b.x + b.w / 2, b.y + b.h / 2);
+  sprite.width = b.w; sprite.height = b.h;
+  const box = new PIXI.Container();
+  box.addChild(sprite);
+  box.bounds = b;
+  return box;
+}
+
+// The dark gradient behind the bottom controls stops at the captured canvas's edges, where the original had
+// black bands. Our backdrop shows round the game instead, so carry the gradient out to the sides. In landscape
+// it sits at the foot of the game: its darkest shade carries on down to the screen's bottom edge. In portrait
+// the controls stand above the screen's foot: the shade fades out again below them.
+const BAR = /TopBar\/Background\/Sprite$|BottomBar\/Background\/bg_gradient$/;
+function extendBar(box, portrait) {
+  const sprite = box.children[0], b = box.bounds, far = 6000;
+  sprite.width = b.w + far * 2;
+  if (!portrait) {
+    box.addChild(new PIXI.Graphics().beginFill(0x000000, sprite.alpha).drawRect(b.x - far, b.y + b.h - 1, b.w + far * 2, far).endFill());
+    return;
+  }
+  const below = new PIXI.Sprite(sprite.texture); // the same gradient, the right way up: dark at its top
+  below.anchor.set(0.5);
+  below.width = sprite.width; below.height = b.h;
+  below.position.set(sprite.x, b.y + b.h * 1.5 - 1);
+  below.alpha = sprite.alpha;
+  box.addChild(below);
+}
+
 async function build(name, onProgress = () => {}) {
   const L = layouts[name];
   const root = new PIXI.Container();
   for (const k of Object.keys(ui)) delete ui[k];
-  modeSprites.length = 0; modeSpines.length = 0; baseOnly.length = 0;
+  baseOnly.length = 0;
   characters.clear();
   let symbolsAt = -1;
   for (const [index, it] of L.items.entries()) {
     onProgress(75 + index / L.items.length * 19, 'Preparing the artwork and princess…');
     if (DYNAMIC.test(it.path)) { if (symbolsAt < 0) symbolsAt = root.children.length; continue; }
     if (SKIP(it)) continue;
-    const obj = await makeItem(it);
+    const obj = BOARD[it.atlas] ? await makeBoard(it, L) : await makeItem(it);
     if (!obj) continue;
-    if (it.k === 'UISprite' && /stpr_basegame_portrait/.test(it.atlas)) {
-      const sprite = obj.children[0];
-      modeSprites.push({ sprite, base: it });
-      if (freeMode) {
-        const { width, height } = sprite;
-        sprite.texture = await spriteTexture('stpr_freegame_portrait', 'stpr_freegame_portrait');
-        sprite.width = width; sprite.height = height;
-      }
-    }
+    if (BAR.test(it.path)) extendBar(obj, L.canvas[1] > L.canvas[0]);
     if (/^stpr_character_01(?:_SkeletonData)?$/.test(it.skeleton || '') && L.canvas[0] > L.canvas[1]) {
       // As in the original, she hovers over the board's right edge: her wing crosses the reel frame,
       // her head tucks under the logo and her feet stay clear of the bottom bar.
@@ -557,7 +585,8 @@ export async function init(el, onProgress = () => {}) {
   ]);
   onProgress(10, 'Loading symbols and animations…');
   for (const r of Object.values(rigs)) if (!r.idle && r.MultGreen) r.idle = r.MultGreen;
-  app = new PIXI.Application({ resizeTo: el, backgroundColor: 0x0b0730, antialias: true, autoDensity: true, resolution: Math.min(devicePixelRatio, 2) });
+  // transparent: the backdrop behind the canvas shows through wherever the game draws nothing
+  app = new PIXI.Application({ resizeTo: el, backgroundAlpha: 0, antialias: true, autoDensity: true, resolution: Math.min(devicePixelRatio, 2) });
   el.appendChild(app.view);
   if (import.meta.env.DEV) globalThis.__PIXI_APP__ = app;
   const names = [...new Set(Object.values(rigs).flatMap(r => r.anims.map(a => a.skeleton)))];
@@ -584,10 +613,9 @@ async function layout(onProgress = () => {}) {
     world = await build(name, onProgress);
     grid = cellsOf(name);
     app.stage.removeChildren();
-    // the background, scaled to cover whatever the layout's own aspect leaves uncovered
-    const bgItem = L.items.find(it => /Background\/Base\/.*\/S$/.test(it.path) && it.k === 'UISprite');
-    if (bgItem) { cover = await makeSprite({ ...bgItem, ax: 0.5, ay: 0.5 }); app.stage.addChild(cover); }
-    app.stage.addChild(world);
+    // cherry petals drift over the backdrop, behind the game
+    ambience ||= createAmbience({ free: freeMode });
+    app.stage.addChild(ambience.layer, world);
     await ensureOverlays();
     hookButtons();
     sprites.clear();
@@ -598,10 +626,7 @@ async function layout(onProgress = () => {}) {
   world.scale.set(k);
   world.position.set((sw - cw * k) / 2, (sh - ch * k) / 2);
   placeOverlays();
-  if (cover) {
-    const b = cover.children[0], kc = Math.max(sw / b.width, sh / b.height);
-    cover.transform.setFromMatrix(new PIXI.Matrix(kc, 0, 0, kc, sw / 2, sh / 2));
-  }
+  ambience.resize(sw, sh);
 }
 
 function hookButtons() {
@@ -895,21 +920,9 @@ export async function setFree(on) {
   if (!changed) return;
   for (const obj of baseOnly) obj.visible = !freeMode;
   if (freeHud) freeHud.visible = freeMode;
-  for (const entry of modeSprites) {
-    const { width, height } = entry.sprite;
-    entry.sprite.texture = await spriteTexture(freeMode ? 'stpr_freegame_portrait' : entry.base.atlas,
-      freeMode ? 'stpr_freegame_portrait' : entry.base.sprite);
-    entry.sprite.width = width; entry.sprite.height = height;
-  }
-  for (const entry of modeSpines) {
-    const name = freeMode ? 'stpr_freegame_idle' : 'stpr_basegame_idle';
-    const next = new Spine(await skeleton(name));
-    next.state.setAnimation(0, name, true);
-    next.transform.setFromMatrix(entry.spine.localTransform);
-    const parent = entry.spine.parent;
-    parent.addChildAt(next, parent.getChildIndex(entry.spine));
-    entry.spine.destroy({ children: true }); entry.spine = next;
-  }
+  // the backdrop crossfades to the night festival (style.css), and fireflies join the petals
+  document.documentElement.dataset.mode = freeMode ? 'free' : 'base';
+  ambience?.setFree(freeMode);
 }
 
 // The symbols the original showed when it was captured, as an engine grid: the board before the first spin.
