@@ -407,14 +407,24 @@ async function makeBoard(it, L) {
   return box;
 }
 
-// The dark gradient behind the bottom controls stops at the captured canvas's edges. Where the screen is
-// another shape the backdrop shows round the game, so carry the gradient out to the sides and its darkest
-// shade down to the screen's bottom edge.
+// The dark gradient behind the bottom controls stops at the captured canvas's edges, where the original had
+// black bands. Our backdrop shows round the game instead, so carry the gradient out to the sides. In landscape
+// it sits at the foot of the game: its darkest shade carries on down to the screen's bottom edge. In portrait
+// the controls stand above the screen's foot: the shade fades out again below them.
 const BAR = /TopBar\/Background\/Sprite$|BottomBar\/Background\/bg_gradient$/;
-function extendBar(box) {
+function extendBar(box, portrait) {
   const sprite = box.children[0], b = box.bounds, far = 6000;
   sprite.width = b.w + far * 2;
-  box.addChild(new PIXI.Graphics().beginFill(0x000000, sprite.alpha).drawRect(b.x - far, b.y + b.h - 1, b.w + far * 2, far).endFill());
+  if (!portrait) {
+    box.addChild(new PIXI.Graphics().beginFill(0x000000, sprite.alpha).drawRect(b.x - far, b.y + b.h - 1, b.w + far * 2, far).endFill());
+    return;
+  }
+  const below = new PIXI.Sprite(sprite.texture); // the same gradient, the right way up: dark at its top
+  below.anchor.set(0.5);
+  below.width = sprite.width; below.height = b.h;
+  below.position.set(sprite.x, b.y + b.h * 1.5 - 1);
+  below.alpha = sprite.alpha;
+  box.addChild(below);
 }
 
 async function build(name, onProgress = () => {}) {
@@ -430,7 +440,7 @@ async function build(name, onProgress = () => {}) {
     if (SKIP(it)) continue;
     const obj = BOARD[it.atlas] ? await makeBoard(it, L) : await makeItem(it);
     if (!obj) continue;
-    if (BAR.test(it.path)) extendBar(obj);
+    if (BAR.test(it.path)) extendBar(obj, L.canvas[1] > L.canvas[0]);
     if (/^stpr_character_01(?:_SkeletonData)?$/.test(it.skeleton || '') && L.canvas[0] > L.canvas[1]) {
       // As in the original, she hovers over the board's right edge: her wing crosses the reel frame,
       // her head tucks under the logo and her feet stay clear of the bottom bar.
