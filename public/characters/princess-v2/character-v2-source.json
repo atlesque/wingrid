@@ -1,6 +1,6 @@
 {
   "source": "character-v2-reference.png",
-  "sha256": "c635a1f7572c12222cb98a208483b955ae610915ccf542e475766aa7c1276f83",
+  "sha256": "9ff1b4e4cd41ff99829967fabafa4076744af71d0594aaca85bd33c0c89c0183",
   "width": 1024,
   "height": 1536,
   "gridStep": 24,
@@ -8,5 +8,6 @@
   "bones": 21,
   "triangles": 8708,
   "sharedVertices": true,
-  "referencePose": "identity mapping of every source pixel"
+  "referencePose": "identity mapping of every source pixel",
+  "retouched": "thumb and the gold piece under it removed from the hand holding the wand top, so that hand shows four fingers"
 }

@@ -8,3 +8,5 @@ for (const name of ['character-v2-reference.png', 'character-v2-rig.json', 'char
   cpSync(join(source, name), join(target, name));
 }
 console.log('Imported Princess v2 source, rig, atlas and provenance.');
+// the imported rig carries the old weights; give it the ones that keep each piece in one piece
+await import('./build-character-rig.mjs');
