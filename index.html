@@ -6,8 +6,11 @@
   <title>Wingrid</title>
   <link rel="stylesheet" href="/starlight/fonts.css">
   <link rel="stylesheet" href="/src/client/style.css">
+  <link rel="preload" as="image" href="/theme/japan/backdrop-base-land.webp" media="(orientation: landscape)">
+  <link rel="preload" as="image" href="/theme/japan/backdrop-base-port.webp" media="(orientation: portrait)">
 </head>
 <body>
+  <div id="backdrop" aria-hidden="true"><div class="base"></div><div class="free"></div></div>
   <div id="stage"></div>
 
   <aside id="bonus-hud" aria-label="Bonuses and jackpots" hidden>

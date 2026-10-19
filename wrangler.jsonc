@@ -5,7 +5,7 @@
   "compatibility_date": "2026-09-01",
   // Wingrid copy of starlight-rebuild; serves the existing Wingrid custom domain
   "workers_dev": false,
-  "preview_urls": false,
+  "preview_urls": true,
   "routes": [{ "pattern": "wingrid.atlesque.dev", "custom_domain": true }],
   "assets": { "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
   // locally a D1 under .wrangler/state (npm run db:migrate); deployed, the real one (npm run db:migrate:remote)
@@ -15,5 +15,15 @@
     "PLAY_URL": "https://play.atlesque.dev",
     "PLAY_GAME_ID": "wingrid"
   },
-  "observability": { "enabled": true, "traces": { "enabled": true } }
+  "observability": { "enabled": true, "traces": { "enabled": true } },
+  // Worker Previews for non-main branches (npx wrangler preview). Previews inherit none of the bindings
+  // or vars above, so they get their own D1 (migrated by npm run db:migrate:preview) and never touch
+  // production credits.
+  "previews": {
+    "d1_databases": [{ "binding": "DB", "database_name": "wingrid-preview", "database_id": "ece942cb-3fb8-4c39-8922-62a09e522162" }],
+    "vars": {
+      "PLAY_URL": "https://play.atlesque.dev",
+      "PLAY_GAME_ID": "wingrid"
+    }
+  }
 }

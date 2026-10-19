@@ -2,7 +2,7 @@
 
 Our own JavaScript version of the archived Starlight Princess slot. It's a 6×5 tumbling grid that pays for 8 or more of a symbol anywhere, with multiplier orbs and free spins, and it runs on a Cloudflare stack:
 
-- **Front end** (`index.html`, `src/client/`): PixiJS 7 with `pixi-spine`, drawing the archived Spine skeletons and backgrounds. The page never decides a spin. It sends the request and animates the tumbles it gets back.
+- **Front end** (`index.html`, `src/client/`): PixiJS 7 with `pixi-spine`, drawing the archived Spine skeletons over Wingrid's own Japan-theme backdrop and board. The page never decides a spin. It sends the request and animates the tumbles it gets back.
 - **Worker** (`src/worker/index.js`): owns credits, bets, free spins and stats in **D1**. Every spin runs here with `crypto.getRandomValues`, and a version check on the player row stops two requests from spending the same credits.
 - **Rules** (`src/shared/engine.js`, `round.js`): Wingrid's engine plus the round logic, shared by the Worker and the tests. Credits are play money only.
 
@@ -18,7 +18,7 @@ In free spins, winning orbs add to a persistent multiplier, used whenever new or
 land with a symbol win. Scatter pays remain separate. The triggering spin and the
 entire free-spin feature share a 5,000x base-bet cap. Buying is disabled during ante.
 
-The client switches to the free-spin background, shows spins left, feature winnings
+The client switches to the night-festival backdrop and purple board, shows spins left, feature winnings
 and the multiplier total, announces retriggers and celebrates 20x/35x/50x/100x wins.
 `spin.win` is the actual credited amount; `tumbleWin` and `scatterWin` are in base bets.
 
@@ -103,8 +103,21 @@ Cloudflare production build settings:
 The build runs tests, restores artwork, builds the app, and validates the deployment
 package. Deployment applies D1 migrations, deploys the Worker, and checks the live
 home page and `/api/config`. To retry a deployment, use **Retry build** in the
-Worker's Cloudflare deployment history. Production-only automatic deployments
-are intended; preview deployments are disabled.
+Worker's Cloudflare deployment history.
+
+Every other branch gets a [Worker Preview](https://developers.cloudflare.com/workers/previews/)
+at `<branch>-wingrid.<subdomain>.workers.dev`, which Cloudflare posts on the pull request. A preview
+runs with the `previews` block of `wrangler.jsonc`: its own `wingrid-preview` D1, so preview spins
+never touch production credits. Cloudflare preview build settings (Settings > Builds > Previews Base):
+
+- Builds for Preview branches: on
+- Build command: `npm run build:ci`
+- Preview command: `npm run db:migrate:preview && npx wrangler preview`
+- Worker URL > Preview: on (Domains tab)
+
+`npm run db:migrate:preview` applies `migrations/` to `wingrid-preview` through
+`wrangler.preview-migrations.jsonc`, whose database must match `previews.d1_databases`. Signing in
+with Atlesque Play may only work on the production domain; guests can play on previews.
 
 The imported artwork remains outside Git. `npm run assets:ci` downloads the
 existing files served at `https://wingrid.atlesque.dev/starlight/` and verifies
@@ -161,6 +174,28 @@ To recapture (for another screen, or after re-mirroring the archive), run the or
 - **Fonts**: `fonts.css` has the game's fonts under their original family names.
 
 `public/starlight/` is git-ignored. The art is licensed for this private copy, and it will be replaced with our own later. Each symbol is one prefab rig (`PREFAB` in `scene.js`), so replacements can go in one at a time.
+
+## Japan theme
+
+The princess loves Japan, so the game is set there. Everything below is Wingrid's own art, in
+`public/theme/japan/`, and none of it comes from the archive.
+
+- **Backdrop**: one painting covers the whole screen behind the game's transparent canvas (`#backdrop`
+  in `index.html` and `style.css`), so the board never sits on a second, differently scaled copy of the
+  background. CSS `cover` fits it to any screen shape: landscape screens get a 16:9 painting and portrait
+  screens a 9:16 one. It stays put while a phone scrolls down to the controls. The base game shows Mount
+  Fuji over a lake in cherry-blossom season; free spins crossfade to a moonlit lantern festival. The
+  paintings were rendered on our own image node; prompts and seeds are in `docs/japan-theme.md`.
+- **Board**: both reel frames are vermilion lacquer with gold mouldings, corner fittings and a cherry-blossom
+  crest. The window is patterned with seigaiha waves in the base game and asanoha in free spins.
+  `scripts/japan-board.mjs` draws them to the original reel frame's box, so the window lines up with the
+  symbol grid, and `node scripts/render-japan-art.mjs` renders them to WebP.
+- **Ambience**: cherry petals drift over the backdrop behind the game (`src/client/ambience.js`), with
+  fireflies in free spins. Reduced motion turns them off.
+
+The captured layouts still place everything else. `scene.js` leaves out their background sprite and its
+tower animation, and carries the bottom bar's shade out to the screen's edges where the original had
+letterbox bands.
 
 ## Typography
 
