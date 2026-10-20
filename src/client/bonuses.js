@@ -146,7 +146,11 @@ export function createBonuses({ pick, onState, onError, react }) {
   dialog.oncancel = event => { if (state.jackpot || revealing) event.preventDefault(); };
   hud.querySelector('button').onclick = () => {
     if (state.jackpot) { reveal(); return; }
-    title.textContent = 'WINGRID BONUSES'; detail.textContent = 'Play credits only. All prizes are settled by the game server.';
+    title.textContent = 'HOW TO WIN'; detail.textContent = '';
+    rules.querySelector('.rule-jackpots').replaceChildren(...config.jackpots.tiers.map(tier => {
+      const chip = document.createElement('span'), x = document.createElement('b');
+      x.textContent = `${tier.x.toLocaleString('en-US')}×`; chip.append(`${tier.name} `, x); return chip;
+    }));
     gems.hidden = true; rules.hidden = false; close.hidden = false; art?.clear();
     if (!dialog.open) dialog.showModal();
     title.tabIndex = -1; title.focus(); dialog.scrollTop = 0;

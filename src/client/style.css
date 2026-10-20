@@ -185,7 +185,20 @@ dialog .is-primary, .celebration-panel button, .jackpot-close { background: line
 .jackpot-gems button:not(:disabled):hover { background: #80499d; border-color: #fff4c0; }
 .jackpot-gems button:disabled { cursor: default; }
 .jackpot-gems [data-tier] { color: #fff2b6; border-color: var(--gold); box-shadow: inset 0 0 14px #ffd36b44; }
-.bonus-rules { text-align: left; font-size: 13px; line-height: 1.5; }
+.bonus-rules { list-style: none; margin: .4em 0 .8em; padding: 0; text-align: left; font-size: 15px; line-height: 1.35; }
+.bonus-rules li { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+.bonus-rules p { margin: 0; }
+.bonus-rules b { color: var(--gold); font-weight: 800; }
+.rule-icon { flex: none; display: grid; place-items: center; width: 56px; height: 47px; object-fit: contain; font-family: var(--display); font-size: 20px; }
+.rule-count { border-radius: 12px; border: 2px solid var(--gold); color: #fff2bd; background: linear-gradient(#b33a2c, #6e1420); text-shadow: 0 2px 0 #3e0f5c; }
+.rule-orb { width: 47px; margin: 0 4.5px; border-radius: 50%; border: 2px solid var(--gold); color: #fff2bd; text-shadow: 0 2px 0 #3e0f5c, 0 0 10px #fb8cff;
+  background: radial-gradient(circle at 35% 30%, #c98ae0, #6a2f8c 55%, #24103a); }
+.rule-gem { color: #ffe6a4; font-size: 34px; text-shadow: 0 0 12px #ffcb52, 0 2px 0 #3e0f5c; }
+.bonus-rules .rule-jackpots { flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: -2px; }
+.rule-jackpots span { padding: .25em .7em; border-radius: 999px; border: 1px solid var(--edge); background: #24103a; font-family: var(--display);
+  letter-spacing: .04em; text-transform: uppercase; font-size: 13px; }
+.rule-jackpots b { color: #ffe6a4; font-weight: 400; }
+.bonus-rules .rule-small { justify-content: center; margin-top: 14px; font-size: 12px; opacity: .75; text-align: center; }
 @media (orientation: portrait) {
   #bonus-hud.is-free .feature-status { position: fixed; z-index: 1; top: 48px; left: 8px; right: 8px; margin: 0;
     padding: 8px; border: 1px solid var(--edge); border-radius: 8px; background: var(--panel); text-align: center; }
@@ -202,3 +215,4 @@ dialog .is-primary, .celebration-panel button, .jackpot-close { background: line
   .multiplier-meter.is-collecting, .jackpot-gems button.is-flipping, .jackpot-gems button.is-anticipating,
   #celebration[data-event="max-win"] .event-stars { animation: none; }
 }
+#jackpot h2:focus { outline: none; }
