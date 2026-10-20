@@ -57,29 +57,34 @@ test('big-win music starts once however often a celebration asks for it', async 
   const wins = a.nodes.filter(n => n.buffer?.includes(a.module.CLIPS.bigWinMusic));
   assert.equal(wins.filter(n => !n.stopped).length, 1);
 });
-test('her voice lines tell voice listeners when her mouth opens, other sounds do not', async () => {
+test('her voice lines tell voice listeners which line plays and how far in it is heard, other sounds do not', async () => {
   const a = await audio(); a.module.unlock(); await flush();
   const heard = [];
   a.module.onVoice(line => heard.push(line));
   a.module.play(a.module.CLIPS.showWin); await flush();
   assert.equal(heard.length, 0);
-  // decoded audio: a buffer with its samples, two 800 Hz syllables of 0.15 s with silence between
-  const rate = 48000, samples = new Float32Array(rate).map((_, i) => {
-    const t = i / rate;
-    return (t > .1 && t < .25) || (t > .5 && t < .65) ? Math.sin(2 * Math.PI * 800 * t) * .5 : 0;
-  });
-  globalThis.fetch = async () => ({ json: async () => [`${a.module.CLIPS.winVoices.nice}.ogg`], arrayBuffer: async () => ({ sampleRate: rate, getChannelData: () => samples }) });
   await a.module.play(a.module.CLIPS.winVoices.nice);
   assert.equal(heard.length, 1);
-  const { opening, rate: frames } = heard[0];
-  assert.equal(frames, 60);
-  const at = s => opening[Math.round(s * frames)];
-  assert.ok(at(.18) > .5 && at(.58) > .5, 'open on each syllable');
-  assert.equal(at(.05), 0); assert.equal(at(.4), 0); assert.equal(at(.9), 0);
+  assert.equal(heard[0].clip, a.module.CLIPS.winVoices.nice);
+  assert.equal(typeof heard[0].elapsed(), 'number');
 });
 test('a voice line she cannot be heard saying still tells voice listeners', async () => {
   const a = await audio(); const heard = [];
   a.module.onVoice(line => heard.push(line));
   await a.module.play(a.module.CLIPS.multVoice);
-  assert.deepEqual(heard, [null]);
+  assert.equal(heard.length, 1);
+  assert.ok(a.module.CLIPS.multVoice.includes(heard[0].clip));
+  assert.equal(heard[0].elapsed, undefined);
+});
+test('every voice line has mouth shapes for its sounds, in order, ending at rest', async () => {
+  const a = await audio();
+  const { lines } = JSON.parse(await readFile(new URL('../public/characters/princess-v2/character-v2-lipsync.json', import.meta.url), 'utf8'));
+  const { mouths } = JSON.parse(await readFile(new URL('../public/characters/princess-v2/character-v2-face.json', import.meta.url), 'utf8'));
+  const { scatterVoice, multVoice, winVoices } = a.module.CLIPS;
+  for (const clip of [scatterVoice, multVoice, Object.values(winVoices)].flat(2)) {
+    const keys = lines[clip]?.keys;
+    assert.ok(keys?.length, `${clip} has mouth shapes`);
+    assert.ok(keys.every(([time, name], i) => mouths.frames.includes(name) && (i === 0 || time > keys[i - 1][0])), `${clip} keys in order`);
+    assert.equal(keys.at(-1)[1], 'X');
+  }
 });

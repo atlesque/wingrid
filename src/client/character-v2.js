@@ -31,8 +31,9 @@ async function loadJson(name) {
   return response.json();
 }
 export async function createPrincessV2() {
-  const [rig, atlasInfo, face] = await Promise.all([
-    loadJson('character-v2-rig.json'), loadJson('character-v2-atlas.json'), loadJson('character-v2-face.json')
+  const [rig, atlasInfo, face, lipsync] = await Promise.all([
+    loadJson('character-v2-rig.json'), loadJson('character-v2-atlas.json'), loadJson('character-v2-face.json'),
+    loadJson('character-v2-lipsync.json')
   ]);
   const texture = await PIXI.Assets.load(`${BASE}/${atlasInfo.image}`);
   const image = { naturalWidth: texture.width, naturalHeight: texture.height };
@@ -87,29 +88,8 @@ export async function createPrincessV2() {
     }
     return [dx, dy];
   });
-  // Speaking opens the mouth along the line between her lips: the lower lip and chin drop, the upper lip
-  // lifts a little, and a mouth drawn into the gap shows behind them. Her brows lift as she talks.
-  const { mouth, brows } = face;
-  const seam = x => {
-    const points = mouth.seam;
-    if (x <= points[0][0]) return points[0][1];
-    for (let i = 1; i < points.length; i++) if (x <= points[i][0]) {
-      const [x0, y0] = points[i-1], [x1, y1] = points[i];
-      return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
-    }
-    return points.at(-1)[1];
-  };
-  // how far the lips part at x: an oval round the middle of her mouth that closes well before the corners,
-  // so the smile keeps its shape; it widens further down so the chin drops as one
-  const parting = (x, depth = 0) => {
-    const u = (x - mouth.centre) / (mouth.halfWidth + depth * .5);
-    return Math.abs(u) >= 1 ? 0 : Math.pow(1 - u*u, .75);
-  };
-  const jaw = field((x, y) => {
-    const depth = y - seam(x);
-    if (depth >= 0) return [0, mouth.open * parting(x, depth) * (1 - smooth(mouth.jaw[0], mouth.jaw[1], depth))];
-    return [0, -mouth.open * mouth.lift * parting(x) * (1 - smooth(0, 9, -depth))];
-  });
+  // Her brows lift as she talks.
+  const { mouths, brows } = face;
   const browLift = field((x, y) => {
     let dy = 0;
     for (const brow of brows) {
@@ -119,9 +99,9 @@ export async function createPrincessV2() {
     }
     return [0, dy];
   });
-  const channels = [[eyelids, 0], [jaw, 0], [browLift, 0]];
-  function applyFace(blink, open, brow) {
-    channels[0][1] = blink; channels[1][1] = open; channels[2][1] = brow;
+  const channels = [[eyelids, 0], [browLift, 0]];
+  function applyFace(blink, brow) {
+    channels[0][1] = blink; channels[1][1] = brow;
     const slots = new Map();
     for (const [parts, amount] of channels) {
       if (!amount) continue;
@@ -131,64 +111,69 @@ export async function createPrincessV2() {
         for (let i=0;i<offsets.length;i++) deform[i]+=offsets[i]*amount;
       }
     }
-    for (const {slot} of [...eyelids, ...jaw, ...browLift]) if (!slots.has(slot)) slot.attachmentVertices.length = 0;
+    for (const {slot} of channels.flatMap(([parts]) => parts)) if (!slots.has(slot)) slot.attachmentVertices.length = 0;
   }
-  // The inside of her mouth, in painting pixels on the head, redrawn each frame where the lips have parted.
-  const inside = new PIXI.Graphics();
+  // Her mouth shapes are painted frames of her lower face (character-v2-mouths.png, made from the painted sheet by
+  // scripts/build-character-mouths.py), laid over the painting on her head: one per sound, each fading in over the
+  // last as she moves from sound to sound.
+  const sheet = await PIXI.Assets.load(`${BASE}/${mouths.image}`);
+  const [frameWidth, frameHeight] = mouths.size;
+  const frames = new Map(mouths.frames.map((name, i) => {
+    const sprite = new PIXI.Sprite(new PIXI.Texture(sheet.baseTexture, new PIXI.Rectangle(i * frameWidth, 0, frameWidth, frameHeight)));
+    sprite.position.set(...mouths.at); sprite.scale.set(1 / mouths.scale); sprite.visible = false;
+    return [name, sprite];
+  }));
+  const mouthLayer = new PIXI.Container();
+  for (const sprite of frames.values()) mouthLayer.addChild(sprite);
   const head = character.skeleton.findBone('head');
   const bones = new Map(rig.bones.map(bone => [bone.name, bone]));
   const pivot = [image.naturalWidth/2, image.naturalHeight/2];
   for (let bone = bones.get('head'); bone; bone = bones.get(bone.parent)) {
     pivot[0] += bone.x || 0; pivot[1] -= bone.y || 0;
   }
-  function drawInside(open) {
-    inside.clear();
-    if (open < .04) return;
-    // painting pixels (y down) to the head bone's y-up space, then to the skeleton as the meshes are placed
-    const m = head.matrix, place = (x, y) => {
-      const lx = x - pivot[0], ly = pivot[1] - y;
-      return [lx * m.a + ly * m.c + m.tx, lx * m.b + ly * m.d + m.ty];
-    };
-    const top = [], bottom = [], teeth = [], tongue = [];
-    for (let i = 0; i <= 16; i++) {
-      const x = mouth.centre + mouth.halfWidth * (i / 8 - 1), y = seam(x), part = parting(x);
-      const gap = mouth.open * open * part, upper = y - .4 * part - gap * mouth.lift, lower = y + 1.2 * part + gap;
-      top.push(place(x, upper));
-      teeth.push(place(x, upper + gap * .24));
-      tongue.push(place(x, lower - gap * .3));
-      bottom.push(place(x, lower));
+  let shown = 'X', before = 'X', blend = 1;
+  function drawMouth(name, dt) {
+    if (name !== shown) { before = shown; shown = name; blend = 0; }
+    blend = Math.min(1, blend + dt / .06);
+    for (const [frame, sprite] of frames) {
+      sprite.visible = frame === shown || (frame === before && blend < 1);
+      sprite.alpha = frame === shown ? blend : 1;
     }
-    inside.beginFill(0x6e2230).drawPolygon([...top, ...[...bottom].reverse()].flat()).endFill();
-    // the tongue's glow at the bottom, and a band of upper teeth just under the top lip
-    inside.beginFill(0xb84a58, .85).drawPolygon([...tongue, ...[...bottom].reverse()].flat()).endFill();
-    inside.beginFill(0xf6ece6, .9).drawPolygon([...top, ...teeth.reverse()].flat()).endFill();
+    frames.get(shown).parent.addChild(frames.get(shown));
+    // painting pixels (y down) to the head bone's y-up space, then to the skeleton as the meshes are placed
+    const m = head.matrix;
+    mouthLayer.transform.setFromMatrix(new PIXI.Matrix(m.a, m.b, -m.c, -m.d,
+      m.tx - m.a * pivot[0] + m.c * pivot[1], m.ty - m.b * pivot[0] + m.d * pivot[1]));
   }
   const spineUpdate=character.update.bind(character);
   const intervals=[3.1,4.7,3.8,5.2,3.6,.28,4.4];
   let referencePose=false, clock=0, started=-Infinity, next=intervals[0], interval=1, amount=0;
-  let line=null, said=0, mouthOpen=0, browRaise=0;
+  let line=null, said=0, browRaise=0;
   Object.defineProperty(character,'blinkAmount',{get:()=>amount});
-  Object.defineProperty(character,'mouthOpen',{get:()=>mouthOpen});
   character.blink=()=>{
     if (referencePose) return;
     started=clock;
     next=clock+intervals[interval++%intervals.length];
   };
-  // Mouth a line: following its syllables when it can be heard, or a few syllables when it can't.
-  character.speak=(voice=null)=>{
+  // Mouth a line: the sounds of its words, timed to the audio (character-v2-lipsync.json holds each line's
+  // sounds, worked out from the recordings), on her own time when it can't be heard, or a few syllables for a
+  // line with no sounds on record.
+  character.speak=({clip, elapsed}={})=>{
     if (referencePose) return;
-    line=voice || { opening: null }; said=0;
+    line={keys:lipsync.lines[clip]?.keys, elapsed}; said=0;
   };
-  function opening(dt) {
-    if (!line) return 0;
+  // the mouth shape for this moment of the line
+  function sound(dt) {
+    if (!line) return 'X';
     said+=dt;
-    if (line.opening) {
-      const at=line.elapsed?.() ?? said, i=Math.floor(at*line.rate);
-      if (i>=line.opening.length) { line=null; return 0; }
-      return i<0 ? 0 : line.opening[i];
+    if (!line.keys) {
+      if (said>1.1) { line=null; return 'X'; }
+      return Math.sin(said*Math.PI*2*4.6)>.2 ? 'A' : 'X';
     }
-    if (said>1.1) { line=null; return 0; }
-    return Math.max(0, Math.sin(said*Math.PI*2*4.6))*(1-smooth(.8,1.1,said));
+    // the lips form a moment before the sound they make
+    const at=(line.elapsed?.() ?? said)+.04, keys=line.keys;
+    if (at>keys.at(-1)[0]+.1) { line=null; return 'X'; }
+    return keys.findLast(([time])=>time<=at)?.[1] ?? 'X';
   }
   character.update=dt=>{
     dt=Math.min(Math.max(dt,0),.05);
@@ -202,28 +187,28 @@ export async function createPrincessV2() {
       const closure=elapsed<.07 ? smooth(0,.07,elapsed)
         : elapsed<.095 ? 1 : 1-smooth(.095,.205,elapsed);
       amount=Math.max(0,Math.min(1,closure));
-      const target=Math.pow(opening(dt),.8);
-      mouthOpen+=(target-mouthOpen)*Math.min(1,dt*(target>mouthOpen ? 36 : 26));
-      if (mouthOpen<.002) mouthOpen=0;
+      drawMouth(sound(dt), dt);
       browRaise+=((line ? 1 : 0)-browRaise)*Math.min(1,dt*(line ? 8 : 3));
       if (browRaise<.002) browRaise=0;
-      applyFace(amount, mouthOpen, browRaise);
+      applyFace(amount, browRaise);
     }
     spineUpdate(dt);
-    drawInside(mouthOpen);
+    if (!referencePose) drawMouth(shown, 0);
   };
   character.setReferencePose = reference => {
     referencePose=reference;
     clock=0; started=-Infinity; next=intervals[0]; interval=1;
-    line=null; amount=mouthOpen=browRaise=0;
-    applyFace(0, 0, 0);
+    line=null; amount=browRaise=0;
+    applyFace(0, 0);
     character.state.clearTracks();
     character.skeleton.setToSetupPose();
     if (!reference) character.state.setAnimation(0, 'v2_idle', true);
     spineUpdate(0);
-    drawInside(0);
+    // the reference pose is the painting alone
+    mouthLayer.visible=!reference;
+    drawMouth('X', 1);
   };
-  character.addChild(inside);
+  character.addChild(mouthLayer);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reducedMotion) character.setReferencePose(true);
   character.autoUpdate = !reducedMotion;
