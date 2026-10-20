@@ -40,25 +40,47 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #10183f; col
 /* The game fits the screen in both orientations, so every control is in reach without scrolling. */
 button { font: 400 1em/1.2 var(--display); letter-spacing: .03em; color: inherit; cursor: pointer; border: 1px solid var(--edge); background: var(--panel); border-radius: 999px; padding: 6px 12px; }
 
-/* the account sits quietly in a corner, over the game */
-.who { position: fixed; top: 8px; left: 8px; max-width: calc(100% - 16px); display: flex; gap: 12px; align-items: center;
-  font-size: 12px; pointer-events: none; }
-#sync { color: #fff; font-weight: 500; max-width: 46vw; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  text-shadow: 0 1px 3px #120a34, 0 0 6px #120a34; }
-#account { flex-shrink: 0; pointer-events: auto; border: 1px solid var(--gold); border-radius: 8px; padding: 8px 14px;
-  background: var(--gold); color: #241347; font-weight: 700; box-shadow: 0 2px 8px rgba(18, 10, 52, 0.35); }
-#account:hover { background: #ffe3a0; }
+/* The Atlesque Play account: a small badge in a corner, over the game, in Atlesque Play's own look (its rainbow
+   mark, near-black ink, lime accent, pill buttons). It opens a card with the player and sign in or out. */
+.who { --ap-ink: #0a0a0f; --ap-text: #f4f4f7; --ap-dim: #a3a3b8; --ap-lime: #c8ff3d; --ap-cyan: #3ef0ff; --ap-violet: #8b5cf6; --ap-pink: #ff4fa3;
+  --ap-rainbow: linear-gradient(100deg, var(--ap-lime), var(--ap-cyan) 38%, var(--ap-violet) 70%, var(--ap-pink));
+  position: fixed; z-index: 3; top: 8px; left: 8px; pointer-events: none; font: 700 14px/1.4 var(--text); }
+#account { pointer-events: auto; display: flex; align-items: center; gap: 5px; height: 40px; padding: 0 9px 0 6px;
+  border: 0; border-radius: 999px; background: var(--ap-rainbow); color: var(--ap-ink);
+  box-shadow: 0 0 0 1.5px rgba(10, 10, 15, 0.55), 0 0 16px rgba(139, 92, 246, 0.55), 0 3px 10px rgba(10, 10, 15, 0.4); }
+#account:hover { filter: brightness(1.08); }
 #account:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-/* a glassy band behind the account line, fading out downwards, so it reads over any part of the backdrop */
-.who::before { content: ""; position: absolute; z-index: -1; inset: -8px -56px -14px -8px; pointer-events: none;
-  background: linear-gradient(180deg, rgba(18, 10, 52, 0.55), rgba(18, 10, 52, 0.2));
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent), linear-gradient(180deg, #000 55%, transparent);
-  mask-image: linear-gradient(90deg, #000 70%, transparent), linear-gradient(180deg, #000 55%, transparent);
-  -webkit-mask-composite: source-in; mask-composite: intersect; }
-/* a short landscape phone: just the button, above the buy panel */
-.who.is-tight #sync { display: none; }
-.who.is-tight #account { padding: 5px 10px; font-size: 11px; }
+/* the Atlesque Play mark: a rainbow tile with a dark window, on a dark plate so it shows on the rainbow */
+.ap-mark { width: 28px; height: 28px; border-radius: 10px; flex: none; display: grid; place-items: center; background: var(--ap-ink); }
+.ap-mark::before { content: ""; width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center;
+  background: conic-gradient(from 200deg, var(--ap-lime), var(--ap-cyan), var(--ap-violet), var(--ap-pink), var(--ap-lime)); }
+.ap-mark::after { content: ""; width: 9px; height: 9px; border-radius: 3px; background: var(--ap-ink); }
+.ap-mark::before, .ap-mark::after { grid-area: 1 / 1; }
+.ap-user { width: 22px; height: 22px; flex: none; }
+#account-card { pointer-events: auto; position: absolute; top: calc(100% + 8px); left: 0; width: 270px; max-width: calc(100vw - 16px);
+  padding: 14px; border-radius: 18px; color: var(--ap-text); background: rgba(20, 20, 28, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 24px rgba(139, 92, 246, 0.25);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+#account-card[hidden] { display: none; }
+.ap-who { display: flex; align-items: center; gap: 10px; }
+.ap-av { width: 34px; height: 34px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #fff; font-weight: 800;
+  text-transform: uppercase; background: linear-gradient(135deg, var(--ap-violet), var(--ap-pink)); }
+#sync { min-width: 0; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ap-note { margin: 10px 0 12px; color: var(--ap-dim); font-size: 13px; font-weight: 700; }
+/* Atlesque Play's name, in its gradient, links to its site */
+.ap-note a { font-weight: 800; background: linear-gradient(90deg, var(--ap-lime), var(--ap-cyan) 60%, #b69bff); -webkit-background-clip: text; background-clip: text;
+  color: transparent; text-decoration: underline; text-decoration-color: rgba(62, 240, 255, 0.5); text-underline-offset: 3px; }
+.ap-note a:hover { text-decoration-color: var(--ap-cyan); }
+.ap-note a:focus-visible { outline: 2px solid var(--ap-lime); outline-offset: 2px; border-radius: 4px; }
+#account-action { width: 100%; height: 42px; border: 0; border-radius: 999px; font: 800 14px/1 var(--text); letter-spacing: 0;
+  background: var(--ap-lime); color: var(--ap-ink); }
+#account-action.is-out { background: #1c1c27; color: var(--ap-text); border: 1px solid rgba(255, 255, 255, 0.12); }
+#account-action:hover:not(:disabled) { filter: brightness(1.08); }
+#account-action:disabled { opacity: 0.5; cursor: default; }
+#account-action:focus-visible { outline: 2px solid var(--ap-lime); outline-offset: 2px; }
+/* a short landscape phone: a smaller badge, above the jackpot panel */
+.who.is-tight #account { height: 32px; padding: 0 7px 0 4px; }
+.who.is-tight .ap-mark { transform: scale(.85); }
 
 #loading { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; padding: 24px;
   background: radial-gradient(ellipse at 50% 40%, #50317a 0, #211044 45%, #0b0730 100%);

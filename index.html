@@ -65,8 +65,16 @@
   </dialog>
 
   <div class="who">
-    <span id="sync" role="status">Playing as guest</span>
-    <button id="account" type="button">Sign in</button>
+    <!-- the Atlesque Play account, as a small badge in its own colours; it opens a card with the player and sign in or out -->
+    <button id="account" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="account-card" aria-label="Account: playing as guest">
+      <span class="ap-mark" aria-hidden="true"></span>
+      <svg class="ap-user" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="currentColor"/><path d="M4.5 20.5c.8-4 3.8-6.2 7.5-6.2s6.7 2.2 7.5 6.2z" fill="currentColor"/></svg>
+    </button>
+    <div id="account-card" role="dialog" aria-label="Account" hidden>
+      <div class="ap-who"><span class="ap-av" aria-hidden="true"></span><span id="sync" role="status">Playing as guest</span></div>
+      <p class="ap-note"></p>
+      <button id="account-action" type="button">Sign in</button>
+    </div>
   </div>
 
   <div id="loading" aria-label="Wingrid loading">
