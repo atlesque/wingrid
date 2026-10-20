@@ -40,7 +40,7 @@ export async function start() {
   if (!token) return newGuest();
   return (await authed('/api/state')).state;
 }
-export const spin = (buy = false) => authed('/api/spin', { method: 'POST', body: { buy } });
+export const spin = () => authed('/api/spin', { method: 'POST', body: {} });
 export const pickJackpot = (id, index) => authed('/api/jackpot/pick', { method: 'POST', body: { id, index } });
 export const setBet = b => authed('/api/bet', { method: 'POST', body: b }).then(r => r.state);
 export const topUp = () => authed('/api/topup', { method: 'POST' }).then(r => r.state);

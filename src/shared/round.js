@@ -1,10 +1,10 @@
-import { spin, spinCost, BETS, START_CREDITS, MAX_WIN } from './engine.js';
+import { spin, BETS, START_CREDITS, MAX_WIN } from './engine.js';
 import { revealJackpot } from './jackpot.js';
 
 // ================= ROUNDS =================
 // What one press of the spin button does to a player's save. The Worker runs this and is the only place a
 // save changes; the page only animates the result it gets back. The save has the same shape as Wingrid's,
-// so it syncs to the same Atlesque Play progress: { credits, bet, ante, stats, feature, lastTopUp }.
+// so it syncs to the same Atlesque Play progress: { credits, bet, stats, feature, lastTopUp }.
 export const TOP_UP_EVERY = 60 * 60e3; // a broke player can claim START_CREDITS again after this long
 export const round2 = n => Math.round(n * 100) / 100;
 
@@ -12,7 +12,6 @@ export const fresh = () => ({
   v: 1,
   credits: START_CREDITS,
   bet: 2, // index into BETS
-  ante: false,
   stats: { spins: 0, wagered: 0, won: 0, biggestWin: 0, biggestX: 0, features: 0, topUps: 0 },
   feature: null, // { left, played, totalMult, won, bet } while free spins are in progress
   jackpot: null, // an unclaimed, server-owned jackpot reveal; never sync its hidden deck
@@ -23,10 +22,10 @@ export const fresh = () => ({
 export function normalize(d) {
   const f = fresh();
   if (!d || typeof d !== 'object' || typeof d.credits !== 'number' || !isFinite(d.credits) || d.credits < 0) return f;
+  const { ante, ...rest } = d; // double chance is gone; older saves may still carry it
   return {
-    ...f, ...d,
+    ...f, ...rest,
     bet: Number.isInteger(d.bet) && d.bet >= 0 && d.bet < BETS.length ? d.bet : f.bet,
-    ante: !!d.ante,
     stats: { ...f.stats, ...(d.stats || {}) },
     feature: d.feature && d.feature.left > 0 ? d.feature : null,
     jackpot: null, // only the local database may restore a reserved jackpot
@@ -43,19 +42,17 @@ export const spinView = out => ({ ...out.result, kind: out.kind, bet: out.bet,
 
 // Plays the next spin: a free spin while a feature is running, else a paid spin at the saved bet.
 // Changes `save` in place and returns what the page needs to animate it.
-export function playSpin(save, rng, { buy = false } = {}) {
+export function playSpin(save, rng) {
   if (save.jackpot) throw new RoundError('in_jackpot', 'Reveal your jackpot gems first.');
   const f = save.feature;
-  if (f && buy) throw new RoundError('in_feature', 'Finish the free spins first.');
-  if (buy && save.ante) throw new RoundError('ante_buy', 'Turn off double chance before buying free spins.');
   const b = f ? f.bet : BETS[save.bet];
-  const kind = f ? 'free' : buy ? 'buy' : save.ante ? 'ante' : 'base';
-  const cost = f ? 0 : round2(b * spinCost({ ante: save.ante, buy }));
+  const kind = f ? 'free' : 'base';
+  const cost = f ? 0 : b;
   if (save.credits < cost) throw new RoundError('no_credits', 'Not enough credits for that spin.');
 
   save.credits = round2(save.credits - cost);
   if (!f) save.stats.spins++;
-  const r = spin(rng, { mode: f ? 'free' : save.ante ? 'ante' : 'base', totalMult: f ? f.totalMult : 0, buy });
+  const r = spin(rng, { mode: f ? 'free' : 'base', totalMult: f ? f.totalMult : 0 });
 
   let win = round2(r.win * b);
   let event = null;
@@ -117,12 +114,11 @@ export function topUp(save, now = Date.now()) {
   save.stats.topUps++;
 }
 
-export function setBet(save, { bet, ante }) {
+export function setBet(save, { bet }) {
   if (save.jackpot) throw new RoundError('in_jackpot', 'Reveal your jackpot gems first.');
   if (save.feature) throw new RoundError('in_feature', 'Finish the free spins first.');
   if (bet !== undefined) {
     if (!Number.isInteger(bet) || bet < 0 || bet >= BETS.length) throw new RoundError('bad_bet', 'That bet is not on the list.');
     save.bet = bet;
   }
-  if (ante !== undefined) save.ante = !!ante;
 }

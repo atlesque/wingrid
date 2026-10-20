@@ -14,7 +14,6 @@ export function createPresentation({ react }) {
   const surface = () => art ||= createArt(dialog.querySelector('.event-art'));
   const rect = () => surface().rect(panel, 1.4);
   function open(kind, heading, description) {
-    delete dialog.dataset.choice;
     dialog.dataset.event = kind; title.textContent = heading; detail.textContent = description;
     value.textContent = ''; value.hidden = true; cancel.hidden = true; ok.disabled = true; ok.textContent = 'Continue';
     dialog.oncancel = event => event.preventDefault();
@@ -50,22 +49,6 @@ export function createPresentation({ react }) {
   }
   return {
     feature: frame,
-    async buy(cost) {
-      open('buy', 'BUY FREE SPINS', `15 free spins · ${money(cost)} play credits`);
-      const banner = await surface().add('stpr_buy_feature', 'stpr_buy_feature_center_in', rect());
-      banner.hideSlots(/green_button|red_button|^right$|^x$|^buy|^free_spins/);
-      ok.disabled = true;
-      await banner.play('stpr_buy_feature_center_in'); banner.play('stpr_buy_feature_center_loop', true);
-      ok.disabled = false; ok.textContent = 'Buy'; cancel.hidden = false; ok.focus();
-      const accepted = await choice();
-      ok.disabled = true; cancel.disabled = true; dialog.dataset.choice = accepted ? 'yes' : 'no';
-      sound.play(sound.CLIPS.click);
-      await banner.play(`stpr_buy_feature_center_${accepted ? 'yes' : 'no'}`);
-      cancel.hidden = true; cancel.disabled = false;
-      await banner.play('stpr_buy_feature_center_out');
-      surface().clear(); dialog.close();
-      return accepted;
-    },
     async win(amount, bet, { capped = false, skip = false } = {}) {
       const stages = winStages(amount, bet, capped);
       if (!stages.length) return;
