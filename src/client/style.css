@@ -47,12 +47,15 @@ button { font: 400 1em/1.2 var(--display); letter-spacing: .03em; color: inherit
   --ap-lime: #c8ff3d; --ap-cyan: #3ef0ff; --ap-violet: #8b5cf6; --ap-pink: #ff4fa3;
   position: fixed; z-index: 3; top: 8px; left: 8px; pointer-events: none; font: 500 14px/1.4 "Inter", var(--text); letter-spacing: -0.005em; }
 .who button, .who a { font: 600 14px/1 "Inter", var(--text); letter-spacing: 0; }
-#account { pointer-events: auto; display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 4px 0 5px;
+#account { pointer-events: auto; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px 0 5px;
   border: 1px solid var(--ap-line); border-radius: 999px; background: var(--ap-bg); color: var(--ap-text);
   box-shadow: 0 4px 14px rgba(5, 5, 12, 0.35), 0 0 18px -4px rgba(139, 92, 246, 0.45); transition: border-color .15s, box-shadow .15s; }
+.ap-state { font-size: 13px; white-space: nowrap; }
+.ap-caret { width: 16px; height: 16px; margin-left: -2px; color: var(--ap-dim); transition: transform .15s; }
+#account[aria-expanded="true"] .ap-caret { transform: rotate(180deg); }
 #account:hover, #account[aria-expanded="true"] { border-color: rgba(255, 255, 255, 0.22); box-shadow: 0 4px 14px rgba(5, 5, 12, 0.35), 0 0 22px -2px rgba(139, 92, 246, 0.6); }
 #account:focus-visible { outline: 2px solid var(--ap-lime); outline-offset: 2px; }
-/* Atlesque Play's mark: a rainbow tile with a dark window */
+/* Atlesque Play's mark (on its link in the card): a rainbow tile with a dark window */
 .ap-mark { width: 28px; height: 28px; border-radius: 9px; flex: none; display: grid; place-items: center;
   background: conic-gradient(from 200deg, var(--ap-lime), var(--ap-cyan), var(--ap-violet), var(--ap-pink), var(--ap-lime)); }
 .ap-mark::after { content: ""; width: 11px; height: 11px; border-radius: 4px; background: var(--ap-bg); }
@@ -92,8 +95,7 @@ button { font: 400 1em/1.2 var(--display); letter-spacing: .03em; color: inherit
 #account-action:disabled { opacity: 0.5; cursor: default; }
 #account-action:focus-visible { outline: 2px solid var(--ap-lime); outline-offset: 2px; }
 /* a short landscape phone: a smaller badge, above the jackpot panel */
-.who.is-tight #account { height: 34px; gap: 5px; }
-.who.is-tight #account .ap-mark { width: 24px; height: 24px; border-radius: 8px; }
+.who.is-tight #account { height: 34px; gap: 6px; padding-right: 8px; }
 .who.is-tight #account .ap-av { width: 26px; height: 26px; }
 
 #loading { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; padding: 24px;

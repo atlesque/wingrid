@@ -61,6 +61,7 @@ function renderAccount() {
   const a = state.account;
   $('#account').setAttribute('aria-label', a ? `Account: ${a.email}` : 'Account: playing as guest');
   $('#sync').textContent = a ? a.email : 'Playing as guest';
+  $('.ap-state').textContent = a ? 'Logged in' : 'Guest';
   $('.ap-sub').textContent = a ? 'Saved to Atlesque Play' : 'Sign in to keep your progress';
   // signed in, the avatars show the email's first letter, as on Atlesque Play; a guest gets the user icon
   for (const av of document.querySelectorAll('.who .ap-av')) { av.classList.toggle('has-letter', !!a); av.dataset.letter = a ? a.email[0] : ''; }

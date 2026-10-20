@@ -72,8 +72,9 @@
     <!-- the Atlesque Play account, as a small badge in Atlesque Play's own look; it opens a card with the player,
          a link to Atlesque Play and sign in or out -->
     <button id="account" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="account-card" aria-label="Account: playing as guest">
-      <span class="ap-mark" aria-hidden="true"></span>
       <span class="ap-av" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="currentColor"/><path d="M4.5 20.5c.8-4 3.8-6.2 7.5-6.2s6.7 2.2 7.5 6.2z" fill="currentColor"/></svg></span>
+      <span class="ap-state">Guest</span>
+      <svg class="ap-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div id="account-card" role="dialog" aria-label="Account" hidden>
       <div class="ap-who">
