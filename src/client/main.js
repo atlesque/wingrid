@@ -130,6 +130,8 @@ async function playSpin() {
 async function run() {
   if (running || busy || !state) return;
   if (state.jackpot) { await bonuses.reveal(); return; }
+  // out of credits while signed in: an admin may have added some on Atlesque Play, so look before the free top-up
+  if (state.canTopUp && state.account) { try { state = await api.refresh(); render(); } catch (e) {} }
   if (state.canTopUp) return topUp();
   running = true;
   try {
@@ -137,7 +139,7 @@ async function run() {
     for (;;) {
       if (state.feature) { await scene.wait(450); if (!(await playSpin())) break; continue; }
       if (auto <= 0) break;
-      if (state.credits < betAmount()) { auto = 0; break; }
+      if (state.credits < betAmount() && !state.account) { auto = 0; break; } // signed in, the spin checks Atlesque Play first
       auto--; render();
       await scene.wait(autoSettings.quick || autoSettings.turbo ? 150 : 400);
       if (auto < 0 || !(await playSpin())) break;

@@ -40,6 +40,8 @@ export async function start() {
   if (!token) return newGuest();
   return (await authed('/api/state')).state;
 }
+// signed in, this also picks up credits an admin added on Atlesque Play
+export const refresh = () => authed('/api/state').then(r => r.state);
 export const spin = () => authed('/api/spin', { method: 'POST', body: {} });
 export const pickJackpot = (id, index) => authed('/api/jackpot/pick', { method: 'POST', body: { id, index } });
 export const setBet = b => authed('/api/bet', { method: 'POST', body: b }).then(r => r.state);
