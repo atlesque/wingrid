@@ -196,11 +196,15 @@ function renderSound() {
   scene.setSoundIcon(!st.muted && st.volume > 0);
   $('#setting-sound').checked = !st.muted; $('#setting-volume').value = Math.round(st.volume * 100);
 }
-// the menu and sound buttons open the audio settings; the info button opens the bonus rules
+// the menu button opens the settings; the info button opens the bonus rules
 const rules = () => $('#bonus-hud button').click();
-const openSettings = () => { sound.play(sound.CLIPS.click); renderSound(); $('#settings').showModal(); };
-scene.on('menu', openSettings);
-scene.on('sound', openSettings);
+scene.on('menu', () => { sound.play(sound.CLIPS.click); renderSound(); $('#settings').showModal(); });
+// the sound button switches the sound off and on; unmuting at zero volume brings it back to half
+scene.on('sound', () => {
+  const st = sound.getSettings(), on = !st.muted && st.volume > 0;
+  sound.setSettings(on ? { muted: true } : { muted: false, volume: st.volume || 0.5 });
+  renderSound(); sound.play(sound.CLIPS.click);
+});
 scene.on('info', () => { sound.play(sound.CLIPS.click); rules(); });
 $('#setting-sound').onchange = e => { sound.setSettings({ muted: !e.target.checked }); renderSound(); };
 $('#setting-volume').oninput = e => { sound.setSettings({ volume: e.target.value / 100, muted: false }); renderSound(); };
