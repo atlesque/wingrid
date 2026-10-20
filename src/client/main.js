@@ -158,22 +158,33 @@ async function topUp() {
 const bet = async b => { if (busy || state.feature) return; try { state = await api.setBet(b); render(); } catch (e) { toast(e.message, 2000); } };
 
 scene.on('spin', () => { sound.play(sound.CLIPS.spinButton); if (auto > 0) stopAutoplay(); else run(); });
-scene.on('autoplay', () => { sound.play(sound.CLIPS.click); if (auto > 0) stopAutoplay(); else if (!busy) scene.showOverlay('autoplay'); });
-scene.on('startAutoplay', set => { sound.play(sound.CLIPS.click); startAutoplay(set); });
-scene.on('sound', () => { sound.play(sound.CLIPS.click); scene.overlayOpen('volume') ? scene.hideOverlay('volume') : (scene.showOverlay('volume'), renderSound()); });
-scene.on('volume', s => { sound.setSettings(s); renderSound(); });
+// the autoplay window keeps its choices for the next time it opens
+const AUTOPLAY_STEPS = [10, 20, 30, 50, 70, 100, 500, 1000];
+const autoplaySpins = () => AUTOPLAY_STEPS[$('#autoplay .autoplay-spins').value];
+const showAutoplaySpins = () => { $('#autoplay .autoplay-count').value = autoplaySpins(); $('#autoplay .autoplay-start').textContent = `Start (${autoplaySpins()})`; };
+showAutoplaySpins();
+$('#autoplay .autoplay-spins').oninput = showAutoplaySpins;
+$('#autoplay .autoplay-close').onclick = () => $('#autoplay').close();
+$('#autoplay .autoplay-start').onclick = () => {
+  const on = name => $(`#autoplay [name=${name}]`).checked;
+  $('#autoplay').close(); sound.play(sound.CLIPS.click);
+  startAutoplay({ turbo: on('turbo'), quick: on('quick'), skip: on('skip'), spins: autoplaySpins() });
+};
+scene.on('autoplay', () => { sound.play(sound.CLIPS.click); if (auto > 0) stopAutoplay(); else if (!busy) $('#autoplay').showModal(); });
 scene.on('columnLanded', ({ col, first }) => first ? sound.play(sound.CLIPS.reelStop[col]) : sound.play(sound.CLIPS.fill));
 scene.on('scatterLanded', () => sound.playNth(sound.CLIPS.scatter, scattersThisSpin++));
 scene.on('anticipation', () => sound.anticipate());
 scene.on('vanish', () => { sound.playNth(sound.CLIPS.vanish, tumbleNo++); scene.wait(350).then(() => sound.play(sound.CLIPS.tumble)); });
 function renderSound() {
   const st = sound.getSettings();
-  scene.renderVolume({ volume: st.volume, muted: st.muted }); scene.setSoundIcon(!st.muted && st.volume > 0);
+  scene.setSoundIcon(!st.muted && st.volume > 0);
   $('#setting-sound').checked = !st.muted; $('#setting-volume').value = Math.round(st.volume * 100);
 }
-// the menu button opens the settings; the info button and the settings' rules button open the bonus rules
+// the menu and sound buttons open the settings; the info button and the settings' rules button open the bonus rules
 const rules = () => $('#bonus-hud button').click();
-scene.on('menu', () => { sound.play(sound.CLIPS.click); scene.hideOverlay('volume'); renderSound(); $('#settings').showModal(); });
+const openSettings = () => { sound.play(sound.CLIPS.click); renderSound(); $('#settings').showModal(); };
+scene.on('menu', openSettings);
+scene.on('sound', openSettings);
 scene.on('info', () => { sound.play(sound.CLIPS.click); rules(); });
 $('#setting-sound').onchange = e => { sound.setSettings({ muted: !e.target.checked }); renderSound(); };
 $('#setting-volume').oninput = e => { sound.setSettings({ volume: e.target.value / 100, muted: false }); renderSound(); };
@@ -218,6 +229,9 @@ function openBets() {
 }
 scene.on('betMenu', () => { sound.play(sound.CLIPS.click); if (!busy && !state.feature && !state.jackpot) openBets(); });
 $('#bets .bets-close').onclick = () => $('#bets').close();
+// a tap outside the autoplay, settings or bet window closes it
+const outside = (e, r) => e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+for (const d of document.querySelectorAll('#autoplay, #settings, #bets')) d.onclick = e => { if (e.target === d && outside(e, d.getBoundingClientRect())) d.close(); };
 scene.on('betDown', () => bet({ bet: state.bet - 1 }));
 scene.on('betUp', () => bet({ bet: state.bet + 1 }));
 scene.on('rebuilt', () => state && render());

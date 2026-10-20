@@ -637,7 +637,6 @@ async function layout(onProgress = () => {}) {
     // cherry petals drift over the backdrop, behind the game
     ambience ||= createAmbience({ free: freeMode });
     app.stage.addChild(ambience.layer, world);
-    await ensureOverlays();
     hookButtons();
     sprites.clear();
     if (lastGrid) await show(lastGrid, { instant: true });
@@ -656,7 +655,6 @@ async function layout(onProgress = () => {}) {
     world.position.set((sw - c.w * k) / 2 - c.x * k, ACCOUNT_LINE + (room - c.h * k) / 2 - c.y * k);
   }
   world.scale.set(k);
-  placeOverlays();
   touchTargets();
   ambience.resize(sw, sh);
   let panel = world.children.find(o => SIDE_PANEL.test(o.item?.path || ''))?.bounds;
@@ -1018,171 +1016,6 @@ export function capturedGrid() {
 // what the message line said in the captured layout, for when nothing is happening
 export const idleMessage = () => ui.message?.item?.text || '';
 
-// ================= DIALOGS =================
-// The autoplay settings window and the volume popover, drawn from frames captured with them open in the
-// original (layout/autoplay-landscape.json, layout/sound-landscape.json). They sit above the game; on a phone
-// they are centred and scaled to fit.
-const OVERLAYS = {
-  autoplay: { layout: 'autoplay-landscape', match: /AutoplayWindow\// },
-  volume: { layout: 'sound-landscape', match: /BottomBar\/SoundSlider\// },
-};
-const overlays = {};
-export const AUTOPLAY_STEPS = [10, 20, 30, 50, 70, 100, 500, 1000];
-
-async function buildOverlay(name) {
-  const def = OVERLAYS[name], L = await json(`${ART}/layout/${def.layout}.json`);
-  const box = new PIXI.Container(), parts = {};
-  // a tap outside closes it
-  const catcher = new PIXI.Graphics().beginFill(0x000000, 0.001).drawRect(-5000, -5000, 10000, 10000).endFill();
-  catcher.eventMode = 'static';
-  catcher.on('pointertap', () => hideOverlay(name));
-  box.addChild(catcher);
-  for (const it of L.items) {
-    if (!def.match.test(it.path) || /Volatility\//.test(it.path)) continue;
-    const obj = await makeItem(it);
-    if (!obj) continue;
-    const key = it.path.replace(/^.*?(AutoplaySimpleWindow\/Content\/|SoundSlider\/Content\/|SoundSlider\/)/, '');
-    parts[key] = obj;
-    box.addChild(obj);
-  }
-  // everything but the catcher swallows taps, so taps inside don't close it
-  const inner = new PIXI.Container();
-  for (const ch of box.children.slice(1)) inner.addChild(ch);
-  const bnds = inner.getLocalBounds();
-  const blocker = new PIXI.Graphics().beginFill(0x000000, 0.001).drawRect(bnds.x, bnds.y, bnds.width, bnds.height).endFill();
-  blocker.eventMode = 'static';
-  inner.addChildAt(blocker, 0);
-  box.addChild(inner);
-  box.visible = false;
-  box.parts = parts;
-  box.area = bnds;
-  box.canvas = L.canvas;
-  return box;
-}
-
-const press = (obj, fn) => { if (!obj) return; obj.eventMode = 'static'; obj.cursor = 'pointer'; obj.on('pointertap', e => { e.stopPropagation(); fn(e); }); };
-// a horizontal slider: dragging along `bar` gives 0..1
-function slider(bar, onChange) {
-  if (!bar) return;
-  bar.eventMode = 'static'; bar.cursor = 'pointer';
-  const b = bar.bounds;
-  bar.hitArea = new PIXI.Rectangle(b.x - 20, b.y - 30, b.w + 40, b.h + 60);
-  let dragging = false;
-  const at = e => { const p = bar.parent.toLocal(e.global); onChange(Math.max(0, Math.min(1, (p.x - b.x) / b.w))); };
-  bar.on('pointerdown', e => { e.stopPropagation(); dragging = true; at(e); });
-  bar.on('globalpointermove', e => { if (dragging) at(e); });
-  bar.on('pointerup', () => { dragging = false; });
-  bar.on('pointerupoutside', () => { dragging = false; });
-}
-
-// ---- autoplay settings ----
-async function setupAutoplay(box) {
-  const p = box.parts, state = { turbo: false, quick: false, skip: true, step: 5 };
-  press(p['XButton/CloseButton'], () => hideOverlay('autoplay'));
-  press(p['XButton/Background'], () => hideOverlay('autoplay'));
-  // checkboxes: the original shows SkipScreens ticked; its tick is copied onto the others
-  const tick = p['Checkboxes/SkipScreens/ToOff/Icon'];
-  const on = await spriteTexture('GUI_v11', 'checkbox_1'), off = await spriteTexture('GUI_v11', 'checkbox_0');
-  // ticked and unticked boxes look as the captured SkipScreens (ticked) and TurboSpin (unticked) boxes did
-  const look = path => { const b = p[`Checkboxes/${path}/Box`]?.children[0]; return b ? { tint: b.tint, alpha: b.alpha } : { tint: 0xffffff, alpha: 1 }; };
-  const onLook = look('SkipScreens/ToOff'), offLook = look('TurboSpin/ToOn');
-  const checks = { turbo: 'TurboSpin/ToOn', quick: 'FastPlay/ToOn', skip: 'SkipScreens/ToOff' };
-  const ticks = {};
-  for (const [k, path] of Object.entries(checks)) {
-    const boxSprite = p[`Checkboxes/${path}/Box`];
-    if (!boxSprite) continue;
-    let t = k === 'skip' ? tick : null;
-    if (!t && tick) {
-      t = new PIXI.Container();
-      const src = tick.children[0], s2 = new PIXI.Sprite(src.texture);
-      s2.anchor.set(0.5); s2.width = src.width; s2.height = src.height;
-      s2.position.set(boxSprite.bounds.x + boxSprite.bounds.w / 2, boxSprite.bounds.y + boxSprite.bounds.h / 2);
-      t.addChild(s2); tick.parent.addChild(t);
-    }
-    ticks[k] = t;
-    const render = () => { const sp = boxSprite.children[0], l = state[k] ? onLook : offLook; sp.texture = state[k] ? on : off; sp.tint = l.tint; sp.alpha = l.alpha; if (t) t.visible = state[k]; };
-    render();
-    const toggle = () => { state[k] = !state[k]; render(); listeners.autoplaySettings?.({ ...state, spins: AUTOPLAY_STEPS[state.step] }); };
-    press(p[`Checkboxes/${path}/Button`], toggle);
-    press(boxSprite, toggle);
-  }
-  // number of spins
-  const bar = p['NumberOfSpins/Slider/Bar'], fill = p['NumberOfSpins/Slider/ValueBar'];
-  const thumbs = Object.entries(p).filter(([k]) => k.startsWith('NumberOfSpins/Slider/ThumbVisual/')).map(([, v]) => v);
-  const value = p['NumberOfSpins/Slider/ValueDisplayer'];
-  // the button's label is one line here, centred on the button
-  for (const k of ['SubmitButton/MLA/Brace_0', 'SubmitButton/MLA/Brace_1', 'SubmitButton/MLA/NumberOfSpins']) if (p[k]) p[k].visible = false;
-  const label = p['SubmitButton/MLA/StartAutoplayLabel'], button = p['SubmitButton/StartAutoplayButton'];
-  if (label && button) label.position.x = button.bounds.x + button.bounds.w / 2, label.children.forEach(t => t.anchor.x = 0.5);
-  const thumbX0 = thumbs.map(t => t.x), fillB = fill?.bounds;
-  const setStep = i => {
-    state.step = i;
-    const f = i / (AUTOPLAY_STEPS.length - 1), n = AUTOPLAY_STEPS[i];
-    if (fill && fillB && bar) { const w = bar.bounds.w * f; fill.children[0].width = Math.max(1, w); fill.children[0].x = fillB.x + w / 2; }
-    if (bar && fillB) thumbs.forEach((t, j) => { t.x = thumbX0[j] + (bar.bounds.x + bar.bounds.w * f) - (fillB.x + fillB.w); });
-    value?.setText(String(n));
-    label?.setText(`START AUTOPLAY (${n})`);
-  };
-  slider(bar, f => setStep(Math.round(f * (AUTOPLAY_STEPS.length - 1))));
-  setStep(state.step);
-  press(button, () => { hideOverlay('autoplay'); listeners.startAutoplay?.({ ...state, spins: AUTOPLAY_STEPS[state.step] }); });
-  press(label, () => { hideOverlay('autoplay'); listeners.startAutoplay?.({ ...state, spins: AUTOPLAY_STEPS[state.step] }); });
-  box.getSettings = () => ({ ...state, spins: AUTOPLAY_STEPS[state.step] });
-}
-
-// ---- volume popover ----
-async function setupVolume(box) {
-  const p = box.parts;
-  const bar = p['Content/Bar'] || p.Bar, fill = p['Content/Muted/Volume'] || p['Muted/Volume'], thumb = p['Content/Thumb/Thumb_Muted'] || p['Thumb/Thumb_Muted'];
-  const label = p['Content/Label'] || p.Label;
-  const iconOff = p['Content/Muted/Icon/Sprite_0'] || p['Muted/Icon/Sprite_0'], iconOn = p['Content/Muted/Icon/Sprite_1'] || p['Muted/Icon/Sprite_1'];
-  const fillB = fill?.bounds, thumbX0 = thumb?.x;
-  box.showVolume = ({ volume, muted }) => {
-    const f = muted ? 0 : volume;
-    if (fill && bar) { const w = bar.bounds.w * volume; fill.children[0].width = Math.max(1, w); fill.children[0].x = fillB.x + w / 2; fill.children[0].tint = muted ? 0xc30a0a : 0xffffff; }
-    if (thumb && bar) { thumb.x = thumbX0 + bar.bounds.w * volume - (fillB.w); thumb.children[0].tint = muted ? 0xc30a0a : 0xffffff; }
-    label?.setText(String(Math.round(volume * 100)));
-    if (iconOff) iconOff.visible = !!muted;
-    if (iconOn) iconOn.visible = !muted;
-    return f;
-  };
-  slider(bar, f => listeners.volume?.({ volume: f, muted: false }));
-  press(iconOff, () => listeners.volume?.({ muted: false }));
-  press(iconOn, () => listeners.volume?.({ muted: true }));
-}
-
-async function ensureOverlays() {
-  for (const name of Object.keys(OVERLAYS)) {
-    if (overlays[name]) continue;
-    overlays[name] = await buildOverlay(name);
-    if (name === 'autoplay') await setupAutoplay(overlays[name]);
-    if (name === 'volume') await setupVolume(overlays[name]);
-  }
-  for (const o of Object.values(overlays)) app.stage.addChild(o);
-}
-
-function placeOverlays() {
-  const sw = app.screen.width, sh = app.screen.height;
-  for (const o of Object.values(overlays)) {
-    const [cw, ch] = o.canvas;
-    if (current === 'landscape') {
-      const k = Math.min(sw / cw, sh / ch);
-      o.scale.set(k); o.position.set((sw - cw * k) / 2, (sh - ch * k) / 2);
-    } else {
-      // centred over the game, as wide as the screen allows
-      const a = o.area, k = Math.min((sw * 0.94) / a.width, (sh * 0.8) / a.height, (sw / 1920) * 3);
-      o.scale.set(k); o.position.set(sw / 2 - (a.x + a.width / 2) * k, sh / 2 - (a.y + a.height / 2) * k);
-    }
-  }
-}
-
-export function showOverlay(name) {
-  for (const [n, o] of Object.entries(overlays)) o.visible = n === name;
-  listeners.overlay?.(name);
-}
-export function hideOverlay(name) { if (overlays[name]) overlays[name].visible = false; listeners.overlay?.(null); }
-export const overlayOpen = name => !!overlays[name]?.visible;
-export function renderVolume(s) { overlays.volume?.showVolume?.(s); }
 export async function setSoundIcon(on) {
   const o = ui.sound;
   if (!o || !o.item || o.item.atlas !== 'GUI') return;

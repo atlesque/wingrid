@@ -220,7 +220,7 @@ gradient with a deep purple outline.
 
 Audio starts on the first tap or key, as browsers require.
 
-The autoplay settings window (turbo, quick spin, skip screens, number of spins) and the volume popover are drawn from frames captured with them open in the original (`layout/autoplay-landscape.json`, `layout/sound-landscape.json`). On a phone they open centred. The original's own mobile versions of these aren't captured yet.
+Every window (autoplay, settings, bet, rules, jackpot, celebrations) is a page `<dialog>` opened with `showModal()`, so it sits in the browser's top layer above the game canvas and the jackpot panel. They share one style in `src/client/style.css`, in the game's Lilita One and Nunito lettering, and are smaller on a phone (shorter side under 600px). The sound button opens the settings window, which has the sound switch and volume. The captured original autoplay and volume frames (`layout/autoplay-landscape.json`, `layout/sound-landscape.json`) are kept for reference but no longer drawn.
 
 ## API
 

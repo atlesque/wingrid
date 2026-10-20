@@ -86,23 +86,45 @@ button { font: 400 1em/1.2 var(--display); letter-spacing: .03em; color: inherit
   padding: 10px 18px; border-radius: 14px; text-align: center; pointer-events: none; font-size: 16px; }
 #toast b { color: var(--gold); }
 
-dialog { background: var(--panel); color: var(--ink); border: 2px solid var(--gold); border-radius: 18px; padding: 22px 26px; text-align: center; max-width: min(420px, calc(100vw - 32px)); }
+/* Every window (autoplay, settings, bet, rules, jackpot, celebrations) is a <dialog> opened with showModal(), so it
+   sits in the browser's top layer, over the game canvas and the jackpot panel alike. They share one look and one
+   set of controls; on a phone they are smaller. */
+dialog { background: var(--panel); color: var(--ink); border: 2px solid var(--gold); border-radius: 18px; padding: 22px 26px;
+  text-align: center; width: min(360px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); overflow: auto;
+  box-shadow: 0 18px 60px #08031fcc; }
 dialog::backdrop { background: rgba(5, 2, 25, 0.6); }
-dialog h2 { margin: 0 0 8px; }
+dialog h2 { margin: 0 0 8px; font-size: 28px; }
 dialog p { color: var(--muted); font-weight: 500; }
-dialog .actions { display: flex; gap: 10px; justify-content: center; }
-#settings { width: min(340px, calc(100vw - 32px)); }
-#settings .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 14px 0;
-  font: 400 18px/1.2 var(--display); letter-spacing: .03em; }
-#settings input[type="checkbox"] { width: 26px; height: 26px; accent-color: var(--gold); }
-#settings input[type="range"] { flex: 1; max-width: 190px; height: 32px; accent-color: var(--gold); }
-#settings .actions { margin-top: 20px; }
-#settings .actions button { min-height: 44px; padding: 8px 18px; }
-#bets { width: min(380px, calc(100vw - 32px)); max-height: 90dvh; }
+dialog .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 14px 0;
+  font: 400 18px/1.2 var(--display); letter-spacing: .03em; text-align: left; }
+dialog input[type="checkbox"] { width: 26px; height: 26px; margin: 0; accent-color: var(--gold); }
+dialog input[type="range"] { flex: 1; max-width: 190px; height: 32px; accent-color: var(--gold); }
+dialog output { font: 400 20px/1 var(--display); color: #ffe6a4; font-variant-numeric: tabular-nums; }
+dialog .actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+dialog .actions button { min-height: 44px; padding: 8px 18px; }
+dialog .is-primary, .celebration-panel button, .jackpot-close { background: linear-gradient(#ffe9a3, #db9e3d); color: #331440; text-transform: uppercase;
+  box-shadow: 0 4px 18px #0a001e88, inset 0 -3px 0 #a8641c; }
+#autoplay .autoplay-spins { display: block; width: 100%; max-width: none; margin: 0; }
+#autoplay .setting:has(output) { margin-bottom: 4px; }
+#bets { width: min(380px, calc(100vw - 32px)); }
 #bets .bet-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 18px; }
 #bets .bet-list button { min-height: 44px; padding: 8px 4px; font-size: 16px; }
 #bets .bet-list button[aria-pressed="true"] { background: linear-gradient(#ffe9a3, #db9e3d); color: #331440; border-color: #fff4c0; }
-#bets .actions button { min-height: 44px; padding: 8px 18px; }
+#bets .actions { margin-top: 0; }
+.is-phone dialog:not(#celebration) { width: min(300px, calc(100vw - 40px)); max-height: calc(100dvh - 120px); padding: 14px 16px; border-radius: 14px; }
+.is-phone dialog:not(#celebration) h2 { font-size: 20px; }
+.is-phone dialog .setting { margin: 8px 0; font-size: 15px; }
+.is-phone dialog input[type="checkbox"] { width: 22px; height: 22px; }
+.is-phone dialog .actions { margin-top: 12px; }
+.is-phone dialog .actions button { padding: 8px 14px; }
+.is-phone #bets .bet-list { gap: 6px; margin: 10px 0 12px; }
+.is-phone #bets .bet-list button { font-size: 14px; }
+.is-phone dialog#jackpot { width: calc(100vw - 32px); }
+.is-phone #jackpot .jackpot-logo { height: 56px; }
+.is-phone #jackpot .jackpot-gems { gap: 6px; margin: 10px 0; }
+.is-phone #jackpot .jackpot-gems button { height: 60px; }
+.is-phone .bonus-rules { font-size: 12px; line-height: 1.45; }
+.is-phone .jackpot-close { font-size: 15px; padding: 10px 22px; }
 /* a phone keeps only the jackpot panel's multiplier meter and free-spins line, over the game in portrait */
 .is-phone #bonus-hud .jackpot-pools, .is-phone #bonus-hud > button, .is-phone #bonus-hud:not(.is-free) .feature-status { display: none; }
 @media (orientation: landscape) { .is-phone #bonus-hud { display: none; } }
@@ -139,11 +161,11 @@ dialog .actions { display: flex; gap: 10px; justify-content: center; }
 .celebration-panel output[hidden] { display: none; }
 #celebration[data-event="big-win"] output, #celebration[data-event="max-win"] output { margin-top: 64px; }
 .celebration-panel .actions { margin-top: 24px; }
-.celebration-panel button, .jackpot-close { background: linear-gradient(#ffe9a3, #db9e3d); color: #331440; font-size: 18px; padding: 12px 28px; text-transform: uppercase; box-shadow: 0 4px 18px #0a001e88, inset 0 -3px 0 #a8641c; }
+.celebration-panel button, .jackpot-close { font-size: 18px; padding: 12px 28px; }
 .event-stars { display: block; color: #ffdf8d; letter-spacing: 12px; margin-bottom: 12px; }
 #celebration[data-event="max-win"] .event-stars { font-size: 32px; animation: max-win-glow 1.5s infinite alternate; }
 @keyframes max-win-glow { to { text-shadow: 0 0 25px #fff, 0 0 50px #ffda6b; } }
-#jackpot { width: min(560px, calc(100vw - 24px)); max-width: none; max-height: 90dvh; }
+#jackpot { width: min(560px, calc(100vw - 24px)); }
 .jackpot-logo { height: 85px; }
 #jackpot > :not(.jackpot-art) { position: relative; }
 #jackpot:has(.bonus-rules:not([hidden])) .jackpot-logo { display: none; }
