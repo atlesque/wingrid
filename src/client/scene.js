@@ -33,6 +33,12 @@ let app, atlases, rigs, layouts, world, ambience, symbolLayer, effectsLayer, cur
 const characters = new Set();
 let freeMode = false;
 const baseOnly = []; // drawn in the base game only: the buy and bet panels, the blue reel back
+// left off on a phone: the buy and double-chance panels, and the empty side panel the jackpots sit in elsewhere
+const PHONE_HIDDEN = /BuyBetFeatures\/|BuyButtons\/|TumbleHistory\//;
+const phoneHidden = [];
+let phone = false;
+const shown = obj => !(phone && phoneHidden.includes(obj)) && !(freeMode && baseOnly.includes(obj));
+const speedArrows = {};
 let freeHud = null;  // the free-spins column that takes their place
 const textures = new Map();
 const ui = {};            // named widgets the page updates or listens to
@@ -382,10 +388,13 @@ const NAMED = {
   autoplayLabel: /AutoplayOpen\/Text\/AutoplayOpenLabel$/,
   sound: /SoundButtons\/Sound(On|Off)\/Button\/Sprite$/,
   menu: /LeftContent\/Settings\/ButtonOpen\/ButtonOpen\/Sprite$|MenuOpenClose\/ButtonOpen\/ButtonOpen\/icon$/,
+  speed: /ButtonGroup\/GameSpeed\/Normal\/Background$/,
+  speedArrows: /ButtonGroup\/GameSpeed\/Normal\/(Left|Middle|Right)Arrow$/,
+  betMenu: /ButtonGroup\/BetButtons\/Buttons\/Open\/Background$/,
   info: /Paytable\/Paytable_Button_Open\/Sprite$|PaytableButton\/PaytableButtonOpen$/,
 };
 // the buttons the player presses
-const BUTTONS = ['spin', 'betUp', 'betDown', 'buy', 'ante', 'anteArrow', 'autoplay', 'sound', 'menu', 'info'];
+const BUTTONS = ['spin', 'betUp', 'betDown', 'buy', 'ante', 'anteArrow', 'autoplay', 'sound', 'menu', 'info', 'speed', 'betMenu'];
 
 async function makeItem(it) {
   const b = drawnBounds(it);
@@ -436,6 +445,8 @@ async function build(name, onProgress = () => {}) {
   const root = new PIXI.Container();
   for (const k of Object.keys(ui)) delete ui[k];
   baseOnly.length = 0;
+  phoneHidden.length = 0;
+  for (const k of Object.keys(speedArrows)) delete speedArrows[k];
   characters.clear();
   let symbolsAt = -1;
   for (const [index, it] of L.items.entries()) {
@@ -468,6 +479,8 @@ async function build(name, onProgress = () => {}) {
     obj.item = it;
     root.addChild(obj);
     for (const [key, re] of Object.entries(NAMED)) if (!ui[key] && re.test(it.path)) ui[key] = obj;
+    if (NAMED.speedArrows.test(it.path)) (speedArrows[it.path.match(/(Left|Middle|Right)Arrow$/)[1]] = obj);
+    if (PHONE_HIDDEN.test(it.path)) phoneHidden.push(obj);
   }
   symbolLayer = new PIXI.Container();
   root.addChildAt(symbolLayer, symbolsAt < 0 ? root.children.length : symbolsAt);
@@ -633,6 +646,8 @@ async function layout(onProgress = () => {}) {
     if (lastGrid) await show(lastGrid, { instant: true });
     listeners.rebuilt?.();
   }
+  phone = Math.min(sw, sh) < 600;
+  for (const obj of phoneHidden) obj.visible = shown(obj);
   let k;
   if (name === 'landscape') {
     k = Math.min(sw / cw, sh / ch);
@@ -651,7 +666,7 @@ async function layout(onProgress = () => {}) {
   // in portrait the bet + button overlaps the panel's left edge: keep clear of it
   const plus = ui.betUp?.bounds, clear = plus && plus.x + plus.w + 4 - panel?.x;
   if (panel && name === 'portrait' && clear > 0) panel = { ...panel, x: panel.x + clear, w: panel.w - clear };
-  listeners.layout?.({ name, k, world: { x: world.x, y: world.y }, panel: panel && { x: world.x + panel.x * k, y: world.y + panel.y * k, w: panel.w * k, h: panel.h * k } });
+  listeners.layout?.({ name, k, phone, world: { x: world.x, y: world.y }, panel: panel && { x: world.x + panel.x * k, y: world.y + panel.y * k, w: panel.w * k, h: panel.h * k } });
 }
 
 // Small buttons get a fingertip-sized hit area, trimmed where it would reach into a neighbour's.
@@ -667,7 +682,7 @@ function touchTargets() {
     const b = o.getBounds(), grow = Math.min(1.8, Math.max(1, SMALLEST / Math.min(b.width, b.height)));
     o.pivot.set(cx, cy); o.position.set(h.x + cx * h.sx, h.y + cy * h.sy); o.scale.set(h.sx * grow, h.sy * grow);
   }
-  const hits = BUTTONS.filter(key => ui[key] && key !== 'anteArrow').map(key => {
+  const hits = BUTTONS.filter(key => ui[key]?.worldVisible && key !== 'anteArrow').map(key => {
     const o = ui[key]; o.hitArea = null;
     const b = o.getBounds(), px = Math.max(0, (TOUCH - b.width) / 2), py = Math.max(0, (TOUCH - b.height) / 2);
     return { o, b, r: { x0: b.left - px, y0: b.top - py, x1: b.right + px, y1: b.bottom + py } };
@@ -762,6 +777,15 @@ const cellPos = (c, r) => ({ x: grid.xs[c], y: grid.ys[r] });
 
 // ---- tweens on the Pixi ticker ----
 export let speed = 1;
+// the speed button lights one, two or three of its arrows for normal, quick and turbo
+export function showSpeed(level) {
+  ['Left', 'Middle', 'Right'].forEach((k, i) => {
+    const sprite = speedArrows[k]?.children[0];
+    if (!sprite) return;
+    sprite.drawn ??= { tint: sprite.tint, alpha: sprite.alpha }; // as captured: only the first arrow lit
+    Object.assign(sprite, i <= level ? { tint: 0xffffff, alpha: 1 } : sprite.drawn);
+  });
+}
 export function setSpeed(s) { motion.setSpeed(s); speed = motion.speed; document.documentElement.style.setProperty('--motion-speed', speed); }
 export const wait = (ms, options) => motion.wait(ms, options);
 function tween(obj, to, ms, ease = t => 1 - (1 - t) ** 3) {
@@ -976,7 +1000,7 @@ export async function setFree(on) {
   const changed = freeMode !== !!on;
   freeMode = !!on;
   if (!changed) return;
-  for (const obj of baseOnly) obj.visible = !freeMode;
+  for (const obj of baseOnly) obj.visible = shown(obj);
   if (freeHud) freeHud.visible = freeMode;
   // the backdrop crossfades to the night festival (style.css), and fireflies join the petals
   document.documentElement.dataset.mode = freeMode ? 'free' : 'base';
