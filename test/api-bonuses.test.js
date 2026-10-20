@@ -111,13 +111,12 @@ test('jackpot prizes in the state follow the bet', async () => {
   assert.equal((await call('config')).jackpots.tiers[0].amount, 10);
 });
 
-test('bought feature starts 15 free spins and never triggers a jackpot', async () => {
+test('free spins can no longer be bought: a buy request plays a normal spin at the bet', async () => {
   const { call } = await game();
   const response = await withSeed(3, () => call('spin', { buy: true }));
   assert.equal(response.status, 200);
-  assert.equal(response.spin.cost, 100);
-  assert.equal(response.state.feature.left, 15);
-  assert.equal(response.state.jackpot, null);
+  assert.equal(response.spin.kind, 'base');
+  assert.equal(response.spin.cost, 1);
 });
 
 test('simultaneous final gem picks award a reserved jackpot only once', async () => {

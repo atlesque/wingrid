@@ -65,12 +65,6 @@ test('API win is in credits at non-unit bets; result multipliers stay in bets', 
   assert.equal(spinView(out).tumbleWin, out.result.tumbleWin);
 });
 
-test('buy free spins is prohibited while double chance is on', () => {
-  const save = fresh(); save.ante = true;
-  assert.throws(() => playSpin(save, seeded(1), { buy: true }), { code: 'ante_buy' });
-  assert.equal(save.credits, 1000);
-});
-
 test('each jackpot tier has exactly one possible match-three result and hides unpicked cards', () => {
   for (const winner of JACKPOTS) for (let seed = 1; seed <= 50; seed++) {
     const pending = { id: 'test', tier: winner.id, amount: winner.x, picks: [], deck: jackpotDeck(seeded(seed), winner.id) };
