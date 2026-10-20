@@ -1,9 +1,9 @@
 # Works out the princess's mouth shapes for each of her voice lines (public/characters/princess-v2/character-v2-lipsync.json).
 #
 # Each line is written below as a rough phonetic spelling of what she says (the words came from a speech-to-text pass
-# over the clips and were checked by ear and against spectrograms). A forced aligner (torchaudio's MMS_FA) places
-# each sound of that spelling on the recording, and each sound maps to a mouth shape (a viseme, defined in
-# character-v2-face.json). Laughs follow their bursts of sound instead, and two sung, stretched words over music
+# over the clips and were checked against spectrograms). A forced aligner (torchaudio's MMS_FA) places
+# each sound of that spelling on the recording, and each sound maps to one of her painted mouth frames (the "mouths"
+# in character-v2-face.json). Laughs follow their bursts of sound instead, and two sung, stretched words over music
 # that the aligner can't follow are placed by hand. She rests her mouth wherever the line goes quiet.
 #
 # Usage: python3 scripts/align-voice-lines.py [audio dir, default public/starlight/audio]

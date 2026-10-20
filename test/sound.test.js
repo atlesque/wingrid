@@ -79,12 +79,12 @@ test('a voice line she cannot be heard saying still tells voice listeners', asyn
 test('every voice line has mouth shapes for its sounds, in order, ending at rest', async () => {
   const a = await audio();
   const { lines } = JSON.parse(await readFile(new URL('../public/characters/princess-v2/character-v2-lipsync.json', import.meta.url), 'utf8'));
-  const { visemes } = JSON.parse(await readFile(new URL('../public/characters/princess-v2/character-v2-face.json', import.meta.url), 'utf8'));
+  const { mouths } = JSON.parse(await readFile(new URL('../public/characters/princess-v2/character-v2-face.json', import.meta.url), 'utf8'));
   const { scatterVoice, multVoice, winVoices } = a.module.CLIPS;
   for (const clip of [scatterVoice, multVoice, Object.values(winVoices)].flat(2)) {
     const keys = lines[clip]?.keys;
     assert.ok(keys?.length, `${clip} has mouth shapes`);
-    assert.ok(keys.every(([time, name], i) => name in visemes && (i === 0 || time > keys[i - 1][0])), `${clip} keys in order`);
+    assert.ok(keys.every(([time, name], i) => mouths.frames.includes(name) && (i === 0 || time > keys[i - 1][0])), `${clip} keys in order`);
     assert.equal(keys.at(-1)[1], 'X');
   }
 });

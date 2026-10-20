@@ -109,25 +109,6 @@ rig.bones = BONES.map(([name, parent, x, y]) => {
   const [px, py] = pivot.get(parent);
   return { name, parent, ...bone, x: x - px, y: -(y - py) };
 });
-// Her lower face is its own piece (character-v2-jaw.png, cut by scripts/build-character-jaw.py) drawn over the head,
-// so her jaw can drop as one when she speaks. Its mesh is a fine grid over the piece, weighted like the head below it.
-const JAW = { box: [464, 192, 592, 258], step: 3 };
-if (!rig.slots.some(slot => slot.name === 'jaw')) rig.slots.push({ name: 'jaw', bone: 'body', attachment: 'jaw' });
-{
-  const [x0, y0, x1, y1] = JAW.box, columns = Math.round((x1 - x0) / JAW.step), rows = Math.round((y1 - y0) / JAW.step);
-  const uvs = [], triangles = [];
-  for (let r = 0; r <= rows; r++) for (let c = 0; c <= columns; c++) {
-    uvs.push(+((x0 + c * JAW.step) / W).toFixed(6), +((y0 + r * JAW.step) / H).toFixed(6));
-    if (r < rows && c < columns) {
-      const i = r * (columns + 1) + c, below = i + columns + 1;
-      triangles.push(i, i + 1, below, i + 1, below + 1, below);
-    }
-  }
-  rig.skins.default.jaw = { jaw: { type: 'mesh', path: 'jaw', width: W, height: H, uvs, triangles, vertices: [], hull: 0 } };
-  const ATLAS = 'public/characters/princess-v2/character-v2-atlas.json', atlas = JSON.parse(readFileSync(ATLAS, 'utf8'));
-  atlas.sprites.jaw = { image: 'character-v2-jaw.png', x: 0, y: 0, width: W, height: H, rotate: false };
-  writeFileSync(ATLAS, JSON.stringify(atlas, null, 2) + '\n');
-}
 for (const [slot, attachments] of Object.entries(rig.skins.default)) {
   const mesh = attachments[slot];
   const vertices = [];
