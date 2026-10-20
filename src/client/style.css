@@ -128,6 +128,17 @@ dialog .is-primary, .celebration-panel button, .jackpot-close { background: line
   box-shadow: 0 4px 18px #0a001e88, inset 0 -3px 0 #a8641c; }
 #autoplay .autoplay-spins { display: block; width: 100%; max-width: none; margin: 0; }
 #autoplay .setting:has(output) { margin-bottom: 4px; }
+#autoplay #autoplay-speed-label { margin-bottom: 8px; }
+/* one of three, as a row of joined buttons: the chosen one is gold */
+.segmented { display: flex; border: 1px solid var(--edge); border-radius: 999px; overflow: hidden; margin-bottom: 14px; }
+.segmented label { flex: 1; position: relative; cursor: pointer; }
+.segmented label + label { border-left: 1px solid var(--edge); }
+.segmented input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.segmented span { display: block; min-height: 44px; padding: 12px 4px; font: 400 16px/1.2 var(--display); letter-spacing: .03em; }
+.segmented input:checked + span { background: linear-gradient(#ffe9a3, #db9e3d); color: #331440; }
+.segmented input:focus-visible + span { outline: 2px solid #fff; outline-offset: -4px; border-radius: 999px; }
+.is-phone .segmented { margin-bottom: 8px; }
+.is-phone .segmented span { padding: 12px 2px; font-size: 14px; }
 #bets { width: min(380px, calc(100vw - 32px)); }
 #bets .bet-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 18px; }
 #bets .bet-list button { min-height: 44px; padding: 8px 4px; font-size: 16px; }
