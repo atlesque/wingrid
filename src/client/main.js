@@ -46,14 +46,27 @@ function render() {
   scene.setEnabled('autoplay', !f && !state.jackpot);
   scene.setText('autoplayLabel', auto > 0 ? `STOP (${auto})` : 'AUTOPLAY');
   if (!busy) message(f ? `FREE SPINS LEFT ${f.left}` : state.jackpot ? 'JACKPOT WAITING: PRESS SPIN TO REVEAL' : auto > 0 ? `AUTOPLAY SPINS LEFT ${auto}` : state.canTopUp ? 'OUT OF CREDITS: PRESS SPIN FOR 1,000 FREE' : scene.idleMessage());
-  const a = state.account;
-  $('#account').textContent = a ? 'Sign out' : 'Sign in';
-  $('#sync').textContent = a ? `Saved to Atlesque Play as ${a.email}` : 'Playing as guest';
-  $('#account').disabled = busy || !!state.jackpot;
+  renderAccount();
   bonuses.render(state, cfg);
   if (f) scene.setFreeHud({ left: f.left, mult: f.totalMult });
   $('#bonus-hud').hidden = false;
   fitHud();
+}
+
+// the account badge's card: who is playing, a link to Atlesque Play, and sign in or out
+function renderAccount() {
+  const a = state.account, play = `<a href="${cfg.playUrl || 'https://play.atlesque.dev'}" target="_blank" rel="noopener">Atlesque Play</a>`;
+  $('#account').setAttribute('aria-label', a ? `Account: ${a.email}` : 'Account: playing as guest');
+  $('#sync').textContent = a ? a.email : 'Playing as guest';
+  $('.ap-av').textContent = a ? a.email[0] : '?';
+  $('.ap-note').innerHTML = a ? `Your credits and progress are saved to ${play}.` : `Sign in with ${play} to keep your credits and progress.`;
+  $('#account-action').textContent = a ? 'Sign out' : 'Sign in';
+  $('#account-action').classList.toggle('is-out', !!a);
+  $('#account-action').disabled = busy || !!state.jackpot;
+}
+function showAccount(open) {
+  $('#account-card').hidden = !open;
+  $('#account').setAttribute('aria-expanded', open);
 }
 
 async function playSpin() {
@@ -249,10 +262,14 @@ for (const d of document.querySelectorAll('#autoplay, #settings, #bets')) d.oncl
 scene.on('betDown', () => bet({ bet: state.bet - 1 }));
 scene.on('betUp', () => bet({ bet: state.bet + 1 }));
 scene.on('rebuilt', () => state && render());
-$('#account').onclick = async () => {
-  if (state.account) { state = await api.signOut(); render(); toast('Signed out. Playing as a new guest.', 2000); }
+$('#account').onclick = () => { sound.play(sound.CLIPS.click); showAccount($('#account-card').hidden); };
+$('#account-action').onclick = async () => {
+  if (state.account) { showAccount(false); state = await api.signOut(); render(); toast('Signed out. Playing as a new guest.', 2000); }
   else api.beginSignIn(cfg);
 };
+// a tap anywhere else, or Escape, closes the account card
+addEventListener('pointerdown', e => { if (!$('#account-card').hidden && !e.target.closest('.who')) showAccount(false); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#account-card').hidden) { showAccount(false); $('#account').focus(); } });
 addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat && !document.querySelector('dialog[open]')) { e.preventDefault(); if (auto > 0) stopAutoplay(); else run(); } });
 // browsers only allow sound after the player does something
 const unlock = () => { sound.unlock(); sound.preload(); };
