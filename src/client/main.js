@@ -53,6 +53,7 @@ function render() {
   bonuses.render(state, cfg);
   if (f) scene.setFreeHud({ left: f.left, mult: f.totalMult });
   $('#bonus-hud').hidden = false;
+  fitHud();
 }
 
 async function playSpin() {
@@ -193,13 +194,25 @@ $('#settings .setting-rules').onclick = () => { $('#settings').close(); rules();
 // The bonus panel sits in the empty panel by the bet controls, its lettering sized to it; when the panel is
 // small it keeps to the jackpots and the rules button. The account line keeps clear of the game's left column.
 // On a phone the jackpot panel is left off (the i button still opens the rules).
+let hudFont = 12;
+function fitHud(hud = $('#bonus-hud'), font = hudFont) {
+  hud.style.fontSize = `${font}px`;
+  if (hud.hidden) return;
+  for (let i = 0; i < 4 && hud.scrollHeight > hud.clientHeight + 1 && font > 9; i++) {
+    font = Math.max(9, font * hud.clientHeight / hud.scrollHeight * .98);
+    hud.style.fontSize = `${font}px`;
+  }
+}
 scene.on('layout', ({ name, k, phone, world, panel }) => {
   document.documentElement.classList.toggle('is-phone', phone);
   const hud = $('#bonus-hud');
   if (panel) {
-    const font = Math.max(9, Math.min(16, panel.h / 10, panel.w / 9.5));
+    const font = Math.max(9, Math.min(22, panel.w / 10.5));
     Object.assign(hud.style, { left: `${panel.x}px`, top: `${panel.y}px`, width: `${panel.w}px`, height: `${panel.h}px`, fontSize: `${font}px` });
-    hud.classList.toggle('is-compact', panel.h / font < 14);
+    hud.classList.toggle('is-compact', panel.h / font < 12);
+    // then down to what fits the frame's height, if the lettering at that width would overflow it
+    hudFont = font;
+    fitHud(hud);
   }
   // (the left column ends at x 276 of the 1920 layout; its first panel starts 125 down)
   $('.who').classList.toggle('is-tight', name === 'landscape' && world.x + 276 * k < 190 && world.y + 125 * k < 60);

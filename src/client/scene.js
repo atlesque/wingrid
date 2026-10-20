@@ -30,7 +30,7 @@ const multLook = v => MULT.find(([min]) => v >= min);
 // how far (layout pixels) the landscape princess reaches over the reel frame's right edge
 const CHARACTER_OVERLAP = 72;
 
-let app, atlases, rigs, layouts, world, ambience, symbolLayer, effectsLayer, current;
+let app, atlases, rigs, layouts, world, controls, ambience, symbolLayer, effectsLayer, current;
 const characters = new Set();
 let freeMode = false;
 const baseOnly = []; // drawn in the base game only: the blue reel back
@@ -440,6 +440,7 @@ function extendBar(box, portrait) {
 async function build(name, onProgress = () => {}) {
   const L = layouts[name];
   const root = new PIXI.Container();
+  controls = null;
   for (const k of Object.keys(ui)) delete ui[k];
   baseOnly.length = 0;
   phoneHidden.length = 0;
@@ -479,6 +480,7 @@ async function build(name, onProgress = () => {}) {
     if (NAMED.speedArrows.test(it.path)) (speedArrows[it.path.match(/(Left|Middle|Right)Arrow$/)[1]] = obj);
     if (PHONE_HIDDEN.test(it.path)) phoneHidden.push(obj);
   }
+  if (L.canvas[1] > L.canvas[0]) dockControls(root);
   symbolLayer = new PIXI.Container();
   // MBP (scatter) symbols always draw in front of the rest, even while they drop, tumble and animate
   symbolLayer.sortableChildren = true;
@@ -496,6 +498,24 @@ async function build(name, onProgress = () => {}) {
   effectsLayer = new PIXI.Container();
   root.addChild(effectsLayer);
   return root;
+}
+
+// In portrait the controls (the jackpot panel, the spin button and the bottom bar) move as one group, so layout()
+// can keep the board as wide as the screen and fit the controls into the height that is left. Their order among
+// themselves is kept; nothing else is drawn over them.
+const DOCKED = /TumbleHistory\/|BottomBar\/|SpinButtons\//;
+// how far the jackpot panel moves right, clear of the bet + button that the original let overlap its frame
+const PANEL_NUDGE = 36;
+function dockControls(root) {
+  const docked = root.children.filter(o => DOCKED.test(o.item?.path || ''));
+  if (!docked.length) return;
+  controls = new PIXI.Container();
+  controls.label = 'Controls';
+  root.addChildAt(controls, root.getChildIndex(docked[0]));
+  for (const o of docked) {
+    if (/TumbleHistory\//.test(o.item.path)) { o.x += PANEL_NUDGE; o.bounds = o.bounds && { ...o.bounds, x: o.bounds.x + PANEL_NUDGE }; }
+    controls.addChild(o);
+  }
 }
 
 // In free spins the original swaps its buy and bet panels (which Wingrid leaves out) for a total-multiplier panel and a spins-left
@@ -619,10 +639,16 @@ let grid = null, lastGrid = null;
 const listeners = {};
 export function on(name, fn) { listeners[name] = fn; }
 
-// The part of the portrait layout the player needs: the princess and logo down to the credit line, with the
-// bottom bar's buttons that the original anchored to the screen's edges (measured from layout/portrait.json).
-const PORTRAIT_CONTENT = { x: -10, y: 150, w: 770, h: 1325 };
+// The portrait layout in two parts (measured from layout/portrait.json): the logo and princess, the board and the
+// message line under it; then the controls, from the jackpot panel down to the credit line, with the bottom bar's
+// buttons that the original anchored to the screen's edges.
+const PORTRAIT_TOP = { x: -24, y: 150, w: 798, h: 785 }; // as wide as the board's frame
+const PORTRAIT_DOCK = { x: -10, y: 1074, w: 770, h: 401 };
 const ACCOUNT_LINE = 44; // room the page keeps over the portrait game for the account line
+const DOCK_GAP = 12;     // the least room between the message line and the controls (screen pixels)
+const DOCK_MIN = .72;    // how small the controls may get next to the board, when the screen is short for both
+// the largest the game grows, so a big monitor shows it at a comfortable size with the backdrop round it
+const MAX_SCALE = { landscape: 1.5, portrait: 1.45 };
 // the empty tumble-history panel by the bet controls, where the page puts its bonus panel
 const SIDE_PANEL = /TumbleHistory\/RA\/Content\/Back\/S$/;
 
@@ -648,22 +674,39 @@ async function layout(onProgress = () => {}) {
   for (const obj of phoneHidden) obj.visible = shown(obj);
   let k;
   if (name === 'landscape') {
-    k = Math.min(sw / cw, sh / ch);
+    k = Math.min(sw / cw, sh / ch, MAX_SCALE.landscape);
     world.position.set((sw - cw * k) / 2, (sh - ch * k) / 2);
   } else {
-    // every control on screen, the buttons at the bar's ends included
-    const c = PORTRAIT_CONTENT, room = sh - ACCOUNT_LINE;
-    k = Math.min(sw / c.w, room / c.h);
-    world.position.set((sw - c.w * k) / 2 - c.x * k, ACCOUNT_LINE + (room - c.h * k) / 2 - c.y * k);
+    // The board fills the screen's width. When the screen is too short for the board and the controls at that
+    // size, the controls shrink first (down to DOCK_MIN of the board's size), then both together; every size in
+    // between is a smooth step, with no breakpoints. Spare height goes mostly between the board and the controls,
+    // which keeps the spin button low, in reach of a thumb.
+    const T = PORTRAIT_TOP, D = PORTRAIT_DOCK, room = sh - ACCOUNT_LINE - DOCK_GAP;
+    k = Math.min(sw / T.w, MAX_SCALE.portrait);
+    let kc = k;
+    if (T.h * k + D.h * kc > room) kc = Math.max(k * DOCK_MIN, (room - T.h * k) / D.h);
+    if (T.h * k + D.h * kc > room) { k = room / (T.h + D.h * DOCK_MIN); kc = k * DOCK_MIN; }
+    const spare = Math.max(0, room - T.h * k - D.h * kc);
+    world.position.set((sw - T.w * k) / 2 - T.x * k, ACCOUNT_LINE + spare * .2 - T.y * k);
+    if (controls) {
+      controls.scale.set(kc / k);
+      controls.position.set((sw / 2 - kc * (D.x + D.w / 2) - world.x) / k, (sh - spare * .2 - kc * (D.y + D.h) - world.y) / k);
+    }
   }
   world.scale.set(k);
   touchTargets();
   ambience.resize(sw, sh);
-  let panel = world.children.find(o => SIDE_PANEL.test(o.item?.path || ''))?.bounds;
-  // in portrait the bet + button overlaps the panel's left edge: keep clear of it
+  const panelObj = [...world.children, ...(controls?.children || [])].find(o => SIDE_PANEL.test(o.item?.path || ''));
+  let panel = panelObj?.bounds;
+  // in portrait the bet + button may still reach the panel's left edge: keep clear of it
   const plus = ui.betUp?.bounds, clear = plus && plus.x + plus.w + 4 - panel?.x;
   if (panel && name === 'portrait' && clear > 0) panel = { ...panel, x: panel.x + clear, w: panel.w - clear };
-  listeners.layout?.({ name, k, phone, world: { x: world.x, y: world.y }, panel: panel && { x: world.x + panel.x * k, y: world.y + panel.y * k, w: panel.w * k, h: panel.h * k } });
+  let screenPanel = null;
+  if (panel) {
+    const at = panelObj.parent.toGlobal(new PIXI.Point(panel.x, panel.y)), s = panelObj.parent.worldTransform.a;
+    screenPanel = { x: at.x, y: at.y, w: panel.w * s, h: panel.h * s };
+  }
+  listeners.layout?.({ name, k, phone, world: { x: world.x, y: world.y }, panel: screenPanel });
 }
 
 // Small buttons get a fingertip-sized hit area, trimmed where it would reach into a neighbour's.
