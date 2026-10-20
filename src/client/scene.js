@@ -483,6 +483,8 @@ async function build(name, onProgress = () => {}) {
     if (PHONE_HIDDEN.test(it.path)) phoneHidden.push(obj);
   }
   symbolLayer = new PIXI.Container();
+  // MBP (scatter) symbols always draw in front of the rest, even while they drop, tumble and animate
+  symbolLayer.sortableChildren = true;
   root.addChildAt(symbolLayer, symbolsAt < 0 ? root.children.length : symbolsAt);
   // symbols are clipped to the reels, between the two clipping anchors the original keeps for that
   const anchor = n => { const it = L.items.find(x => x.path.endsWith(`Reels/ClippingAnchors/${n}`)); const l = it?.leaves?.[0]; return l && [l.b[0] + l.b[2] / 2, l.b[1] + l.b[3] / 2]; };
@@ -826,6 +828,7 @@ export async function show(g, { instant = false, first = false, scatterTarget = 
         b = await makeSymbol(cell);
         b.cell.c = c;
         b.scale.set(grid.k);
+        b.zIndex = cell.s === 'scatter' ? 1 : 0;
         b.position.set(p.x, instant ? p.y : p.y - fresh * grid.dy - grid.dy);
         symbolLayer.addChild(b);
         sprites.set(cell.id, b);
