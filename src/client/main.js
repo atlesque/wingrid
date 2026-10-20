@@ -181,7 +181,7 @@ function renderSound() {
   scene.setSoundIcon(!st.muted && st.volume > 0);
   $('#setting-sound').checked = !st.muted; $('#setting-volume').value = Math.round(st.volume * 100);
 }
-// the menu and sound buttons open the settings; the info button and the settings' rules button open the bonus rules
+// the menu and sound buttons open the audio settings; the info button opens the bonus rules
 const rules = () => $('#bonus-hud button').click();
 const openSettings = () => { sound.play(sound.CLIPS.click); renderSound(); $('#settings').showModal(); };
 scene.on('menu', openSettings);
@@ -190,7 +190,6 @@ scene.on('info', () => { sound.play(sound.CLIPS.click); rules(); });
 $('#setting-sound').onchange = e => { sound.setSettings({ muted: !e.target.checked }); renderSound(); };
 $('#setting-volume').oninput = e => { sound.setSettings({ volume: e.target.value / 100, muted: false }); renderSound(); };
 $('#settings .settings-close').onclick = () => $('#settings').close();
-$('#settings .setting-rules').onclick = () => { $('#settings').close(); rules(); };
 // The bonus panel sits in the empty panel by the bet controls, its lettering sized to it; when the panel is
 // small it keeps to the jackpots and the rules button. The account line keeps clear of the game's left column.
 // On a phone the jackpot panel is left off (the i button still opens the rules).

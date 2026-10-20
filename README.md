@@ -220,7 +220,7 @@ gradient with a deep purple outline.
 
 Audio starts on the first tap or key, as browsers require.
 
-Every window (autoplay, settings, bet, rules, jackpot, celebrations) is a page `<dialog>` opened with `showModal()`, so it sits in the browser's top layer above the game canvas and the jackpot panel. They share one style in `src/client/style.css`, in the game's Lilita One and Nunito lettering, and are smaller on a phone (shorter side under 600px). The sound button opens the settings window, which has the sound switch and volume. The captured original autoplay and volume frames (`layout/autoplay-landscape.json`, `layout/sound-landscape.json`) are kept for reference but no longer drawn.
+Every window (autoplay, settings, bet, rules, jackpot, celebrations) is a page `<dialog>` opened with `showModal()`, so it sits in the browser's top layer above the game canvas and the jackpot panel. They share one style in `src/client/style.css`, in the game's Lilita One and Nunito lettering, and are smaller on a phone (shorter side under 600px). The menu and sound buttons open the audio settings window (sound switch and volume); the i button opens the rules. The captured original autoplay and volume frames (`layout/autoplay-landscape.json`, `layout/sound-landscape.json`) are kept for reference but no longer drawn.
 
 ## API
 
