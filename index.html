@@ -50,8 +50,12 @@
 
   <dialog id="autoplay" aria-labelledby="autoplay-title">
     <h2 id="autoplay-title">Autoplay</h2>
-    <label class="setting"><span>Turbo spin</span><input name="turbo" type="checkbox" role="switch"></label>
-    <label class="setting"><span>Quick spin</span><input name="quick" type="checkbox" role="switch"></label>
+    <div class="setting" id="autoplay-speed-label">Spin speed</div>
+    <div class="segmented" role="radiogroup" aria-labelledby="autoplay-speed-label">
+      <label><input name="speed" type="radio" value="0"><span>Normal</span></label>
+      <label><input name="speed" type="radio" value="1"><span>Quick</span></label>
+      <label><input name="speed" type="radio" value="2"><span>Turbo</span></label>
+    </div>
     <label class="setting"><span>Skip screens</span><input name="skip" type="checkbox" role="switch" checked></label>
     <label class="setting"><span>Spins</span><output class="autoplay-count">100</output></label>
     <input class="autoplay-spins" type="range" min="0" max="7" step="1" value="5" aria-label="Number of autospins">

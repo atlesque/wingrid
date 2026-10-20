@@ -23,8 +23,8 @@ const presentation = createPresentation({ react: scene.react });
 sound.onVoice(scene.speak);
 if (import.meta.env.DEV) globalThis.__wingrid = { scene, presentation, bonuses, get state() { return structuredClone(state); } };
 if (import.meta.env.DEV) globalThis.__sound = sound; // await __sound.status() in the console
-// autoplay: spins left, and the settings it was started with (turbo, quick spin, skip screens)
-let auto = 0, autoSettings = { turbo: false, quick: false, skip: true };
+// autoplay: spins left, and the settings it was started with (skip screens); it spins at the speed button's speed
+let auto = 0, autoSettings = { skip: true };
 let idleTimer = null, tumbleNo = 0, scattersThisSpin = 0, lastWin = '';
 
 function toast(html, ms = 1200) {
@@ -168,7 +168,7 @@ async function run() {
       if (auto <= 0) break;
       if (state.credits < betAmount() && !state.account) { auto = 0; break; } // signed in, the spin checks Atlesque Play first
       auto--; render();
-      await scene.wait(autoSettings.quick || autoSettings.turbo ? 150 : 400);
+      await scene.wait(speedLevel > 0 ? 150 : 400);
       if (auto < 0 || !(await playSpin())) break;
     }
     auto = Math.max(0, auto);
@@ -176,12 +176,11 @@ async function run() {
 }
 function startAutoplay(set) {
   autoSettings = set;
-  scene.setSpeed(Math.max(SPEEDS[speedLevel], set.turbo ? 2.2 : set.quick ? 1.5 : 1));
   auto = set.spins - 1; // this press is the first
   render();
   run();
 }
-function stopAutoplay() { auto = 0; scene.setSpeed(SPEEDS[speedLevel]); render(); }
+function stopAutoplay() { auto = 0; render(); }
 async function topUp() {
   try { state = await api.topUp(); render(); toast(`+${fmt(cfg.startCredits)} free credits`); } catch (e) { toast(e.message, 2000); }
 }
@@ -209,7 +208,8 @@ async function syncBet() {
 }
 
 scene.on('spin', () => { sound.play(sound.CLIPS.spinButton); if (auto > 0) stopAutoplay(); else run(); });
-// the autoplay window keeps its choices for the next time it opens
+// the autoplay window keeps its choices for the next time it opens; its spin speed is the speed button's, one of
+// normal, quick or turbo, and changing either changes both
 const AUTOPLAY_STEPS = [10, 20, 30, 50, 70, 100, 500, 1000];
 const autoplaySpins = () => AUTOPLAY_STEPS[$('#autoplay .autoplay-spins').value];
 const showAutoplaySpins = () => { $('#autoplay .autoplay-count').value = autoplaySpins(); $('#autoplay .autoplay-start').textContent = `Start (${autoplaySpins()})`; };
@@ -217,11 +217,17 @@ showAutoplaySpins();
 $('#autoplay .autoplay-spins').oninput = showAutoplaySpins;
 $('#autoplay .autoplay-close').onclick = () => $('#autoplay').close();
 $('#autoplay .autoplay-start').onclick = () => {
-  const on = name => $(`#autoplay [name=${name}]`).checked;
   $('#autoplay').close(); sound.play(sound.CLIPS.click);
-  startAutoplay({ turbo: on('turbo'), quick: on('quick'), skip: on('skip'), spins: autoplaySpins() });
+  startAutoplay({ skip: $('#autoplay [name=skip]').checked, spins: autoplaySpins() });
 };
-scene.on('autoplay', () => { sound.play(sound.CLIPS.click); if (auto > 0) stopAutoplay(); else if (!busy) $('#autoplay').showModal(); });
+for (const r of document.querySelectorAll('#autoplay [name=speed]')) r.onchange = () => { sound.play(sound.CLIPS.click); setSpeedLevel(+r.value); };
+scene.on('autoplay', () => {
+  sound.play(sound.CLIPS.click);
+  if (auto > 0) return stopAutoplay();
+  if (busy) return;
+  $(`#autoplay [name=speed][value="${speedLevel}"]`).checked = true;
+  $('#autoplay').showModal();
+});
 scene.on('columnLanded', ({ col, first }) => first ? sound.play(sound.CLIPS.reelStop[col]) : sound.play(sound.CLIPS.fill));
 scene.on('scatterLanded', () => sound.playNth(sound.CLIPS.scatter, scattersThisSpin++));
 scene.on('anticipation', () => sound.anticipate());
@@ -278,7 +284,7 @@ function setSpeedLevel(level) {
   speedLevel = level;
   try { localStorage.setItem('wingrid.speed', level); } catch {}
   scene.showSpeed(level);
-  if (auto <= 0) scene.setSpeed(SPEEDS[level]);
+  scene.setSpeed(SPEEDS[level]);
 }
 scene.on('speed', () => { sound.play(sound.CLIPS.click); setSpeedLevel((speedLevel + 1) % SPEEDS.length); toast(SPEED_NAMES[speedLevel]); });
 // the coin-stack button lists every bet to pick from
