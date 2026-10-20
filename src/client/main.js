@@ -1,4 +1,6 @@
 import '@fontsource/lilita-one/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
 import '@fontsource/nunito/700.css';
 import '@fontsource/nunito/800.css';
 import * as api from './api.js';
@@ -56,11 +58,14 @@ function render() {
 
 // the account badge's card: who is playing, a link to Atlesque Play, and sign in or out
 function renderAccount() {
-  const a = state.account, play = `<a href="${cfg.playUrl || 'https://play.atlesque.dev'}" target="_blank" rel="noopener">Atlesque Play</a>`;
+  const a = state.account;
   $('#account').setAttribute('aria-label', a ? `Account: ${a.email}` : 'Account: playing as guest');
   $('#sync').textContent = a ? a.email : 'Playing as guest';
-  $('.ap-av').textContent = a ? a.email[0] : '?';
-  $('.ap-note').innerHTML = a ? `Your credits and progress are saved to ${play}.` : `Sign in with ${play} to keep your credits and progress.`;
+  $('.ap-state').textContent = a ? 'Logged in' : 'Guest';
+  $('.ap-sub').textContent = a ? 'Saved to Atlesque Play' : 'Sign in to keep your progress';
+  // signed in, the avatars show the email's first letter, as on Atlesque Play; a guest gets the user icon
+  for (const av of document.querySelectorAll('.who .ap-av')) { av.classList.toggle('has-letter', !!a); av.dataset.letter = a ? a.email[0] : ''; }
+  $('.ap-link').href = cfg.playUrl || 'https://play.atlesque.dev';
   $('#account-action').textContent = a ? 'Sign out' : 'Sign in';
   $('#account-action').classList.toggle('is-out', !!a);
   $('#account-action').disabled = busy || !!state.jackpot;
