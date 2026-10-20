@@ -10,8 +10,8 @@ import { JACKPOTS, JACKPOT_MIN_BET, JACKPOT_CHANCE_PER_CREDIT, JACKPOT_MAX_CHANC
 //
 //   POST /api/guest                       → { token, state }
 //   GET  /api/state                       → { state }
-//   POST /api/spin     { buy? }           → { spin, state }
-//   POST /api/bet      { bet?, ante? }    → { state }
+//   POST /api/spin                        → { spin, state }
+//   POST /api/bet      { bet? }           → { state }
 //   POST /api/topup                       → { state }
 //   POST /api/signin   { code, code_verifier, redirect_uri } → { state }
 //   POST /api/signout                     → {}
@@ -78,17 +78,16 @@ async function route(req, env, url, ctx) {
     return json({ state: await view(env, session) });
   }
   if (p === '/api/spin' && m === 'POST') {
-    const { buy = false } = await body(req);
     let out;
     await change(env, session, async (save, player) => {
       const rng = secureRandom();
-      out = playSpin(save, rng, { buy: !!buy });
+      out = playSpin(save, rng);
       const statements = [env.DB.prepare('INSERT INTO spins (player_id, kind, bet, cost, win, created_at) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(player.id, out.kind, out.bet, out.cost, out.win, Date.now())];
       // Optional jackpots are separate from the 5,000x slot-feature cap and only
-      // trigger at the end of paid base/ante spins which do not start free spins,
+      // trigger at the end of paid spins which do not start free spins,
       // and never again until the player has played JACKPOT_COOLDOWN_SPINS more paid spins.
-      const tier = ['base', 'ante'].includes(out.kind) && !save.feature && jackpotReady(save.stats) ? jackpotTier(rng, out.cost) : null;
+      const tier = out.kind === 'base' && !save.feature && jackpotReady(save.stats) ? jackpotTier(rng, out.cost) : null;
       if (tier) {
         const definition = JACKPOTS.find(t => t.id === tier);
         const pool = await env.DB.prepare('SELECT * FROM jackpot_pools WHERE tier = ?').bind(tier).first();
@@ -154,7 +153,8 @@ async function newGuest(env) {
   const s = fresh();
   await env.DB.batch([
     env.DB.prepare('INSERT INTO players (id, credits, bet, ante, stats, feature, last_top_up, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NULL, 0, ?, ?)')
-      .bind(id, s.credits, s.bet, s.ante ? 1 : 0, JSON.stringify(s.stats), now, now),
+      // the ante column is left from double chance, which is gone
+      .bind(id, s.credits, s.bet, 0, JSON.stringify(s.stats), now, now),
     env.DB.prepare('INSERT INTO sessions (token_hash, player_id, created_at, last_seen) VALUES (?, ?, ?, ?)').bind(await sha256(token), id, now, now),
   ]);
   return json({ token, state: await view(env, { player_id: id }) });
@@ -172,13 +172,13 @@ async function auth(req, env) {
 
 // ---- saves ----
 const toSave = row => ({ ...normalize({
-  v: 1, credits: row.credits, bet: row.bet, ante: !!row.ante, stats: JSON.parse(row.stats),
+  v: 1, credits: row.credits, bet: row.bet, stats: JSON.parse(row.stats),
   feature: row.feature ? JSON.parse(row.feature) : null, lastTopUp: row.last_top_up,
 }), jackpot: row.jackpot ? JSON.parse(row.jackpot) : null });
 const player = (env, id) => env.DB.prepare('SELECT * FROM players WHERE id = ?').bind(id).first();
 
 function writeSave(env, row, save, extra = {}) {
-  const sets = { credits: save.credits, bet: save.bet, ante: save.ante ? 1 : 0, stats: JSON.stringify(save.stats),
+  const sets = { credits: save.credits, bet: save.bet, ante: 0, stats: JSON.stringify(save.stats),
     feature: save.feature ? JSON.stringify(save.feature) : null, jackpot: save.jackpot ? JSON.stringify(save.jackpot) : null,
     last_top_up: save.lastTopUp, updated_at: Date.now(), ...extra };
   const cols = Object.keys(sets);

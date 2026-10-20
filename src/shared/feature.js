@@ -17,8 +17,8 @@ export function playFeature(rng, { already = 0 } = {}) {
 }
 
 // One paid round: a spin and, if it triggers, the free spins after it. Returns the win in bets.
-export function playRound(rng, { ante = false, buy = false } = {}) {
-  const r = spin(rng, { mode: ante ? 'ante' : 'base', buy });
+export function playRound(rng) {
+  const r = spin(rng);
   let win = r.win;
   if (r.freeSpins) win += playFeature(rng, { already: win }).won;
   return { win: Math.min(win, MAX_WIN), triggered: r.freeSpins > 0 };

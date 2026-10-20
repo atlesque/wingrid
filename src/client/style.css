@@ -157,10 +157,6 @@ dialog .actions { display: flex; gap: 10px; justify-content: center; }
 #celebration[data-event="big-win"] output, #celebration[data-event="max-win"] output { margin-top: 64px; }
 .celebration-panel .actions { margin-top: 24px; }
 .celebration-panel button, .jackpot-close { background: linear-gradient(#ffe9a3, #db9e3d); color: #331440; font-size: 18px; padding: 12px 28px; text-transform: uppercase; box-shadow: 0 4px 18px #0a001e88, inset 0 -3px 0 #a8641c; }
-#celebration[data-choice="yes"] .event-continue { animation: purchase-yes calc(.4s / var(--motion-speed, 1)) ease; }
-#celebration[data-choice="no"] .event-cancel { animation: purchase-no calc(.4s / var(--motion-speed, 1)) ease; }
-@keyframes purchase-yes { 50% { transform: scale(1.15); box-shadow: 0 0 30px #ffe8a4; } }
-@keyframes purchase-no { 25%, 75% { transform: translateX(-6px); } 50% { transform: translateX(6px); } }
 .event-stars { display: block; color: #ffdf8d; letter-spacing: 12px; margin-bottom: 12px; }
 #celebration[data-event="max-win"] .event-stars { font-size: 32px; animation: max-win-glow 1.5s infinite alternate; }
 @keyframes max-win-glow { to { text-shadow: 0 0 25px #fff, 0 0 50px #ffda6b; } }
@@ -199,5 +195,5 @@ dialog .actions { display: flex; gap: 10px; justify-content: center; }
 @media (prefers-reduced-motion: reduce) {
   #backdrop > div { transition: none; }
   .multiplier-meter.is-collecting, .jackpot-gems button.is-flipping, .jackpot-gems button.is-anticipating,
-  #celebration[data-event="max-win"] .event-stars, #celebration[data-choice] button { animation: none; }
+  #celebration[data-event="max-win"] .event-stars { animation: none; }
 }

@@ -12,20 +12,29 @@ test('a paid spin costs the bet and adds the win', () => {
   assert.equal(save.stats.spins, 1);
 });
 
-test('ante costs 1.25x and buying costs 100x', () => {
-  const a = fresh(); a.ante = true;
-  assert.equal(playSpin(a, seeded(2)).cost, BETS[a.bet] * 1.25);
-  const b = fresh();
-  const r = playSpin(b, seeded(3), { buy: true });
-  assert.equal(r.cost, BETS[b.bet] * 100);
-  assert.ok(b.feature, 'a bought spin starts free spins');
+// a save whose last paid spin started free spins, from the first seed at or after `from` that does
+function inFeature(from = 1) {
+  for (let seed = from; ; seed++) {
+    const save = fresh(), r = playSpin(save, seeded(seed));
+    if (save.feature) return { save, r, seed };
+  }
+}
+
+test('free spins start from MBP gems on a paid spin that costs the bet', () => {
+  const { save, r } = inFeature();
+  assert.equal(r.cost, BETS[save.bet]);
   assert.equal(r.event.type, 'feature-start');
 });
 
+test('an old save with double chance on plays at the plain bet', () => {
+  const save = normalize({ ...fresh(), ante: true });
+  assert.equal(save.ante, undefined);
+  assert.equal(playSpin(save, seeded(2)).cost, BETS[save.bet]);
+});
+
 test('free spins cost nothing, run to the end and are capped', () => {
-  for (let seed = 1; seed <= 30; seed++) {
-    const save = fresh();
-    playSpin(save, seeded(seed), { buy: true });
+  for (let i = 0, from = 1; i < 30; i++) {
+    const { save, seed } = inFeature(from); from = seed + 1;
     const bet = save.feature.bet;
     let last, n = 0;
     while (save.feature) { last = playSpin(save, seeded(seed * 1000 + n++)); assert.equal(last.cost, 0); }
@@ -34,11 +43,10 @@ test('free spins cost nothing, run to the end and are capped', () => {
   }
 });
 
-test('no spin without the credits for it, and no buying mid-feature', () => {
+test('no spin without the credits for it, and no bet changes mid-feature', () => {
   const save = fresh(); save.credits = 0.1;
   assert.throws(() => playSpin(save, seeded(4)), RoundError);
-  const f = fresh(); playSpin(f, seeded(5), { buy: true });
-  assert.throws(() => playSpin(f, seeded(6), { buy: true }), RoundError);
+  const { save: f } = inFeature(5);
   assert.throws(() => setBet(f, { bet: 0 }), RoundError);
 });
 
@@ -58,7 +66,7 @@ test('bets stay on the list; foreign saves are cleaned up', () => {
   const save = fresh();
   assert.throws(() => setBet(save, { bet: BETS.length }), RoundError);
   setBet(save, { bet: 0, ante: 1 });
-  assert.deepEqual([save.bet, save.ante], [0, true]);
+  assert.deepEqual([save.bet, save.ante], [0, undefined]);
   assert.deepEqual(normalize({ credits: -5 }), fresh());
   assert.equal(normalize({ credits: 12, bet: 99 }).bet, fresh().bet);
 });

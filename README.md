@@ -12,11 +12,11 @@ None of Pragmatic's engine code is used. The archive is only a source of art.
 
 Wingrid runs its own rules in `src/shared/engine.js` and `round.js`; `/api/spin`
 does not use the archive's emulator or its recorded response subset. Natural
-4+ SCATTERs and the 100x buy start 15 free spins; 3+ SCATTERs within the feature
+4+ SCATTERs start 15 free spins (there is no feature buy or double chance); 3+ SCATTERs within the feature
 add five more. Base-game orbs add together at the end of a winning tumble sequence.
 In free spins, winning orbs add to a persistent multiplier, used whenever new orbs
 land with a symbol win. Scatter pays remain separate. The triggering spin and the
-entire free-spin feature share a 5,000x base-bet cap. Buying is disabled during ante.
+entire free-spin feature share a 5,000x bet cap.
 
 `npm run rtp` simulates the math (`node scripts/rtp.mjs 4000000` for tighter figures). Over 4 million
 spins: about 96.5% RTP with a 27.8% hit rate, free spins once in about 255 spins (about 150 with double
@@ -33,8 +33,8 @@ in `src/shared/jackpot.js`, with explicit rates and seeds shown under **Jackpots
 bonus rules**. These rules and probabilities are Wingrid's, not Pragmatic's proprietary
 jackpot mathematics or a claim of matching the original RTP.
 
-Four shared D1 pools receive 1% of paid spin cost. Eligible base/ante spins can
-reserve a pool; bought and free spins cannot trigger jackpots. The server stores
+Four shared D1 pools receive 1% of paid spin cost. Eligible paid spins can
+reserve a pool; free spins cannot trigger jackpots. The server stores
 the hidden match-three reveal and reserves the prize atomically, resets the pool
 to its seed, and credits the player exactly once on completion. Reloading resumes
 unopened gems. Pending prizes are local to the Wingrid database and are never
@@ -46,7 +46,7 @@ Tests cover fixed-seed natural/bought/retrigger and multiplier results, cap acco
 API credit units, hidden-deck reveals, replay rejection and competing transactions.
 
 Presentation uses the archived symbol landing/win/exit poses, feature banners,
-buy confirmation, screen wipe, multiplier-meter effects and all four big-win tiers.
+screen wipe, multiplier-meter effects and all four big-win tiers.
 The approved brown-haired character has mesh-based anticipation, win, spell and bonus
 reactions. SCATTER uses its approved emblem with orbiting stars, shimmer and anticipation
 effects; it never plays the old red-haired portrait rig. Winning orbs fly to the multiplier
@@ -66,7 +66,7 @@ A new browser gets a guest session (`POST /api/guest`) and plays straight away. 
 - a new account takes the guest's progress, unless Atlesque Play already holds a save for it (for example from Wingrid), in which case that save wins;
 - every change goes up to Atlesque Play as the game's progress, with its revision. If the account's copy moved on without us (another device, an admin reset), the account's copy replaces ours.
 
-The save uses Wingrid's format (`{ credits, bet, ante, stats, feature, lastTopUp }`), and `PLAY_GAME_ID` is `wingrid` for now. This Wingrid deployment intentionally uses its existing game id.
+The save uses Wingrid's format (`{ credits, bet, stats, feature, lastTopUp }`), and `PLAY_GAME_ID` is `wingrid` for now. This Wingrid deployment intentionally uses its existing game id.
 
 ## Running it
 
@@ -150,9 +150,9 @@ under the logo and her feet stay clear of the bottom bar. In both layouts she dr
 stars twinkling round her. When a multiplier orb lands she flashes and raises her wand, and lightning
 strikes the orb from above the board, as in the original.
 
-In free spins the board turns purple and, in landscape, the buy and bet panels give way to a
-total-multiplier panel and a free-spins-left panel with the winged cat perched on top, as in the
-original. Collected orbs fly to that panel (`buildFreeHud` and `setFreeHud` in `scene.js`).
+In free spins the board turns purple and, in landscape, a
+total-multiplier panel and a free-spins-left panel with the winged cat perched on top appear where the
+original had its buy and bet panels. Collected orbs fly to that panel (`buildFreeHud` and `setFreeHud` in `scene.js`).
 
 Its source image, rig, atlas metadata, and source checksum live in
 `public/characters/princess-v2/` and are included in the deployment. To import
@@ -228,8 +228,8 @@ The autoplay settings window (turbo, quick spin, skip screens, number of spins) 
 |------|------|
 | `POST /api/guest` | new guest → `{ token, state }` |
 | `GET /api/state` | the player's state (pulls from Atlesque Play when signed in) |
-| `POST /api/spin { buy? }` | the next paid or free spin → `{ spin, state }`, where `spin.steps` holds every tumble |
-| `POST /api/bet { bet?, ante? }` | bet index and ante |
+| `POST /api/spin` | the next paid or free spin → `{ spin, state }`, where `spin.steps` holds every tumble |
+| `POST /api/bet { bet? }` | bet index |
 | `POST /api/topup` | 1,000 free credits when broke, once an hour |
 | `POST /api/signin { code, code_verifier, redirect_uri }` | finishes the Atlesque Play sign-in |
 | `POST /api/signout` | ends the session; the page starts a new guest |
