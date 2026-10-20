@@ -104,7 +104,7 @@ dialog .actions { display: flex; gap: 10px; justify-content: center; }
 #bets .bet-list button[aria-pressed="true"] { background: linear-gradient(#ffe9a3, #db9e3d); color: #331440; border-color: #fff4c0; }
 #bets .actions button { min-height: 44px; padding: 8px 18px; }
 /* a phone keeps only the jackpot panel's multiplier meter and free-spins line, over the game in portrait */
-.is-phone #bonus-hud .jackpot-pools, .is-phone #bonus-hud > button, .is-phone #bonus-hud:not(.is-free) .feature-status { display: none; }
+.is-phone #bonus-hud .jackpot-pools, .is-phone #bonus-hud .jackpot-title, .is-phone #bonus-hud > button, .is-phone #bonus-hud:not(.is-free) .feature-status { display: none; }
 @media (orientation: landscape) { .is-phone #bonus-hud { display: none; } }
 
 /* placed by main.js inside the game's empty side panel, whose frame it shares */
@@ -112,16 +112,33 @@ dialog .actions { display: flex; gap: 10px; justify-content: center; }
   display: flex; flex-direction: column; justify-content: center; font-size: 12px; }
 #bonus-hud.is-compact { padding: .5em .45em; }
 #bonus-hud.is-compact .feature-status, #bonus-hud.is-compact .multiplier-meter { display: none; }
-#bonus-hud.is-compact .jackpot-pools > div { margin: .2em 0; }
-#bonus-hud.is-compact .jackpot-pools span { letter-spacing: 0; }
+#bonus-hud.is-compact > * { font-size: .8em; }
+#bonus-hud.is-compact .jackpot-pools { gap: .25em; }
+#bonus-hud.is-compact .jackpot-pools > div { padding: .2em .5em; }
+#bonus-hud.is-compact .jackpot-title { margin-bottom: .35em; }
+#bonus-hud.is-compact button { margin-top: .4em; padding: .2em 1.2em; }
+/* the base game's pay hint lives in the rules, and in landscape the free-spins column already shows spins left and
+   the total multiplier, so the panel keeps to the jackpots */
+#bonus-hud:not(.is-free) .feature-status { display: none; }
+@media (orientation: landscape) { #bonus-hud .feature-status { display: none; } }
 #bonus-hud[hidden], .jackpot-gems[hidden], .bonus-rules[hidden] { display: none; }
 .feature-status { margin: 0 0 8px; color: var(--gold); line-height: 1.35; font-family: var(--display); font-weight: 400; letter-spacing: .03em;
   text-shadow: 0 2px 0 #3e0f5c, 0 0 8px #12002a; }
-.jackpot-pools > div { display: flex; gap: 6px; justify-content: space-between; margin: 5px 0; }
-.jackpot-pools span { font-family: var(--display); font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
-.jackpot-pools strong { color: #ffe6a4; font-family: var(--display); font-weight: 400; font-variant-numeric: tabular-nums; text-shadow: 0 2px 0 #3e0f5c; }
-#bonus-hud button { pointer-events: auto; width: 100%; padding: .4em .2em; border-radius: .5em; font-size: inherit; margin-top: .4em; }
-.multiplier-meter { display: block; width: fit-content; min-width: 3.4em; margin: .4em auto .6em; padding: .25em .6em; border-radius: 50%; border: 2px solid var(--gold);
+/* the jackpots read as a stack of small row plates: tier name on the left, amount on the right */
+.jackpot-title { margin: 0 0 .35em; font: 400 1em/1 var(--display); letter-spacing: .12em; text-transform: uppercase; text-align: center;
+  color: var(--gold); text-shadow: 0 2px 0 #3e0f5c; }
+.jackpot-pools { display: flex; flex-direction: column; gap: .3em; }
+.jackpot-pools > div { display: flex; align-items: baseline; justify-content: space-between; gap: .5em; padding: .22em .6em;
+  border: 1px solid #ffd67840; border-radius: .4em; background: linear-gradient(#3a1656e6, #1c0a34e6); box-shadow: inset 0 1px 0 #ffffff14; }
+.jackpot-pools span { font-family: var(--display); font-weight: 400; letter-spacing: .04em; text-transform: uppercase; color: var(--tier, #fff); }
+.jackpot-pools strong { color: #fff3cf; font-family: var(--display); font-weight: 400; font-variant-numeric: tabular-nums; text-shadow: 0 2px 0 #3e0f5c; }
+.jackpot-pools [data-tier="minor"] { --tier: #9fe8c4; }
+.jackpot-pools [data-tier="major"] { --tier: #9fd0ff; }
+.jackpot-pools [data-tier="mega"] { --tier: #f5a8ff; }
+.jackpot-pools [data-tier="grand"] { --tier: var(--gold); border-color: #ffd678a0; background: linear-gradient(#5a2366e6, #2a0c3ee6); }
+#bonus-hud button { pointer-events: auto; align-self: center; min-width: 60%; padding: .3em 1.2em; font-size: inherit; margin-top: .45em; }
+#bonus-hud button.is-pending { width: 100%; background: linear-gradient(#ffe9a3, #db9e3d); color: #331440; border-color: #fff4c0; }
+.multiplier-meter { display: block; width: fit-content; min-width: 3.4em; margin: 0 auto .5em; padding: .25em .6em; border-radius: 50%; border: 2px solid var(--gold);
   font-family: var(--display); color: #fff2bd; text-shadow: 0 2px 0 #3e0f5c, 0 0 12px #fb8cff;
   background: radial-gradient(ellipse, #75448b, #24103a); font-size: 1.6em; text-align: center; }
 .multiplier-meter.is-collecting { animation: meter-hit .4s ease-out; }
