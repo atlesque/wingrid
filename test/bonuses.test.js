@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { seeded, spin, countScatters, scatterPay, MAX_WIN } from '../src/shared/engine.js';
 import { fresh, playSpin, spinView, setBet } from '../src/shared/round.js';
-import { JACKPOTS, JACKPOT_COOLDOWN_SPINS, jackpotReady, jackpotTier, jackpotDeck, revealJackpot, publicJackpot } from '../src/shared/jackpot.js';
+import { JACKPOTS, JACKPOT_CHANCE, jackpotTier, jackpotPrizes, jackpotDeck, revealJackpot, publicJackpot } from '../src/shared/jackpot.js';
 
 test('natural SCATTERs pay and start 15 free spins', () => {
   const save = fresh();
@@ -73,7 +73,7 @@ test('buy free spins is prohibited while double chance is on', () => {
 
 test('each jackpot tier has exactly one possible match-three result and hides unpicked cards', () => {
   for (const winner of JACKPOTS) for (let seed = 1; seed <= 50; seed++) {
-    const pending = { id: 'test', tier: winner.id, amount: winner.seed, picks: [], deck: jackpotDeck(seeded(seed), winner.id) };
+    const pending = { id: 'test', tier: winner.id, amount: winner.x, picks: [], deck: jackpotDeck(seeded(seed), winner.id) };
     assert.deepEqual(Object.keys(publicJackpot(pending)).sort(), ['id', 'picks', 'size']);
     let won = false;
     for (let i = 0; i < 9 && !won; i++) won = revealJackpot(pending, 8 - i);
@@ -83,19 +83,16 @@ test('each jackpot tier has exactly one possible match-three result and hides un
   }
 });
 
-test('all four tiers can trigger and the jackpot eligibility threshold is enforced', () => {
-  for (const [roll, expected] of [[0, 'minor'], [0.81, 'major'], [0.98, 'mega'], [0.999, 'grand']]) {
+test('all four tiers can trigger at the same chance for every bet', () => {
+  for (const [roll, expected] of [[0, 'minor'], [0.83, 'major'], [0.97, 'mega'], [0.999, 'grand']]) {
     const sequence = [0, roll];
-    assert.equal(jackpotTier(() => sequence.shift(), 1), expected);
+    assert.equal(jackpotTier(() => sequence.shift()), expected);
   }
-  assert.equal(jackpotTier(() => 0, 0.19), null);
-  assert.equal(jackpotTier(() => 0.9, 1), null);
-  assert.equal(jackpotTier(() => 0.019, 100), 'minor');
-  assert.equal(jackpotTier(() => 0.02, 100), null); // even the biggest bet is capped at a 2% chance
+  assert.equal(jackpotTier(() => JACKPOT_CHANCE), null);
+  assert.equal(jackpotTier(() => 0.9), null);
 });
 
-test('a jackpot cannot trigger again until the cooldown has passed', () => {
-  assert.equal(jackpotReady({ spins: 3 }), true);
-  assert.equal(jackpotReady({ spins: JACKPOT_COOLDOWN_SPINS - 1, lastJackpotSpin: 0 }), false);
-  assert.equal(jackpotReady({ spins: JACKPOT_COOLDOWN_SPINS, lastJackpotSpin: 0 }), true);
+test('jackpot prizes are fixed multiples of the bet', () => {
+  assert.deepEqual(jackpotPrizes(0.2).map(t => t.amount), [2, 5, 20, 200]);
+  assert.deepEqual(jackpotPrizes(2).map(t => [t.name, t.amount]), [['Minor', 20], ['Major', 50], ['Mega', 200], ['Grand', 2000]]);
 });

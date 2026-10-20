@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import worker from '../src/worker/index.js';
 import { seeded } from '../src/shared/engine.js';
 import { database } from './helpers/database.js';
-import { JACKPOT_COOLDOWN_SPINS } from '../src/shared/jackpot.js';
 
 async function withSeed(seed, action) {
   const rng = seeded(seed);
@@ -67,10 +66,11 @@ test('jackpot reservation, reload, hidden deck, match-three payment and replay p
   const award = DB.sqlite.prepare('SELECT * FROM jackpot_awards').get();
   assert.equal(award.amount, last.result.won);
   assert.ok(award.claimed_at);
-  assert.equal(DB.sqlite.prepare("SELECT amount FROM jackpot_pools WHERE tier='minor'").get().amount, 25);
+  // the prize is the tier's multiple of the 1-credit bet the spin was played at
+  assert.equal(last.result.won, { minor: 10, major: 25, mega: 100, grand: 1000 }[last.result.tier]);
 });
 
-test('concurrent spins cannot double debit, append a phantom log or contribute twice', async () => {
+test('concurrent spins cannot double debit or append a phantom log', async () => {
   const { DB, call } = await game();
   const prepare = DB.prepare.bind(DB);
   let readers = 0, release;
@@ -90,7 +90,6 @@ test('concurrent spins cannot double debit, append a phantom log or contribute t
   const responses = await withSeed(2, () => Promise.all([call('spin', {}), call('spin', {})]));
   assert.deepEqual(responses.map(r => r.status).sort(), [200, 409]);
   assert.equal(DB.sqlite.prepare('SELECT COUNT(*) AS n FROM spins').get().n, 1);
-  assert.equal(DB.sqlite.prepare("SELECT amount FROM jackpot_pools WHERE tier='minor'").get().amount, 25.004);
 });
 
 test('natural free-spin events and retriggers survive the actual API and persist', async () => {
@@ -105,17 +104,11 @@ test('natural free-spin events and retriggers survive the actual API and persist
   assert.equal(retrigger.state.feature.left, 19);
 });
 
-test('a player who just won a jackpot cannot trigger another until the cooldown has passed', async () => {
-  const { DB, call } = await game();
-  const stats = spins => DB.sqlite.prepare('UPDATE players SET stats = ?').run(JSON.stringify({ spins, lastJackpotSpin: 0 }));
-  stats(JACKPOT_COOLDOWN_SPINS - 2);
-  const blocked = await withSeed(1013, () => call('spin', {}));
-  assert.equal(blocked.status, 200);
-  assert.equal(blocked.state.jackpot, null);
-  stats(JACKPOT_COOLDOWN_SPINS - 1);
-  const ready = await withSeed(1013, () => call('spin', {}));
-  assert.equal(ready.spin.event.type, 'jackpot-start');
-  assert.equal(ready.state.stats.lastJackpotSpin, JACKPOT_COOLDOWN_SPINS);
+test('jackpot prizes in the state follow the bet', async () => {
+  const { call } = await game();
+  assert.deepEqual((await call('state')).state.jackpots.map(t => t.amount), [10, 25, 100, 1000]);
+  assert.deepEqual((await call('bet', { bet: 3 })).state.jackpots.map(t => t.amount), [20, 50, 200, 2000]);
+  assert.equal((await call('config')).jackpots.tiers[0].amount, 10);
 });
 
 test('bought feature starts 15 free spins and never triggers a jackpot', async () => {
@@ -125,22 +118,6 @@ test('bought feature starts 15 free spins and never triggers a jackpot', async (
   assert.equal(response.spin.cost, 100);
   assert.equal(response.state.feature.left, 15);
   assert.equal(response.state.jackpot, null);
-});
-
-test('a competing jackpot pool reservation rolls back the spin and its log', async () => {
-  const { DB, call } = await game();
-  const batch = DB.batch.bind(DB);
-  DB.batch = statements => {
-    DB.batch = batch;
-    // Another player changes this pool after it was read, before our transaction.
-    DB.sqlite.exec("UPDATE jackpot_pools SET version=version+1 WHERE tier='minor'");
-    return batch(statements);
-  };
-  const response = await withSeed(1013, () => call('spin', {}));
-  assert.equal(response.status, 409);
-  assert.equal(DB.sqlite.prepare('SELECT credits FROM players').get().credits, 1000);
-  assert.equal(DB.sqlite.prepare('SELECT COUNT(*) AS n FROM spins').get().n, 0);
-  assert.equal(DB.sqlite.prepare('SELECT COUNT(*) AS n FROM jackpot_awards').get().n, 0);
 });
 
 test('simultaneous final gem picks award a reserved jackpot only once', async () => {

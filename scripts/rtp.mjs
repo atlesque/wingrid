@@ -1,7 +1,9 @@
 // Simulates the game math: node scripts/rtp.mjs [spins] [seed]
-// Prints RTP, hit rate and how often free spins start for normal spins, double chance and a bought feature.
+// Prints RTP, hit rate and how often free spins start for normal spins, double chance and a bought feature,
+// and what the jackpot adds on top.
 import { spin, seeded, spinCost } from '../src/shared/engine.js';
 import { playFeature } from '../src/shared/feature.js';
+import { JACKPOTS, JACKPOT_CHANCE } from '../src/shared/jackpot.js';
 
 const N = +process.argv[2] || 1e6;
 const rng = seeded(+process.argv[3] || 1);
@@ -25,3 +27,8 @@ const buys = Math.ceil(N / 20), cost = spinCost({ buy: true });
 let won = 0;
 for (let i = 0; i < buys; i++) { const r = spin(rng, { buy: true }); won += r.win + playFeature(rng, { already: r.win }).won; }
 console.log(`buy: RTP ${pct(won / (buys * cost))} over ${buys} features`);
+
+const weights = JACKPOTS.reduce((sum, tier) => sum + tier.weight, 0);
+const average = JACKPOTS.reduce((sum, tier) => sum + tier.x * tier.weight, 0) / weights;
+console.log(`jackpot: 1 in ${1 / JACKPOT_CHANCE} paid spins, average prize ${average.toFixed(1)}x, adds about ${pct(JACKPOT_CHANCE * average)} to a normal spin's RTP`,
+  `(${JACKPOTS.map(t => `${t.name} ${t.x}x 1 in ${Math.round(weights / t.weight / JACKPOT_CHANCE).toLocaleString('en-US')}`).join(', ')})`);

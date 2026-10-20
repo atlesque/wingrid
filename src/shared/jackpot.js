@@ -1,23 +1,22 @@
-// Wingrid's optional play-credit jackpots. These are our own transparent rules,
-// not a claim to reproduce an operator's proprietary jackpot service or RTP.
+// Wingrid's play-credit jackpots: four fixed prizes, each a multiple of the bet. Any paid spin that does not
+// start free spins has the same small chance to open the jackpot, whatever the bet, and the player then picks
+// gems until three names match. Tuned with scripts/rtp.mjs to add about 2% on top of the slot's return.
 export const JACKPOTS = [
-  { id: 'minor', name: 'Minor', seed: 25, cap: 100, contribution: 0.004, weight: 800 },
-  { id: 'major', name: 'Major', seed: 100, cap: 500, contribution: 0.003, weight: 170 },
-  { id: 'mega', name: 'Mega', seed: 500, cap: 2500, contribution: 0.002, weight: 28 },
-  { id: 'grand', name: 'Grand', seed: 2500, cap: 10000, contribution: 0.001, weight: 2 },
+  { id: 'minor', name: 'Minor', x: 10, weight: 82 },
+  { id: 'major', name: 'Major', x: 25, weight: 14 },
+  { id: 'mega', name: 'Mega', x: 100, weight: 3.6 },
+  { id: 'grand', name: 'Grand', x: 1000, weight: 0.4 },
 ];
-export const JACKPOT_MIN_BET = 0.2;
-export const JACKPOT_CHANCE_PER_CREDIT = 0.001;
-export const JACKPOT_MAX_CHANCE = 0.02;
-// paid spins a player must play after one jackpot before the next can trigger
-export const JACKPOT_COOLDOWN_SPINS = 150;
+export const JACKPOT_CHANCE = 1 / 1000;
 
-export const jackpotReady = stats => stats.lastJackpotSpin == null || stats.spins - stats.lastJackpotSpin >= JACKPOT_COOLDOWN_SPINS;
+const round2 = n => Math.round(n * 100) / 100;
+// every tier with its prize in credits at this bet, as the page shows it
+export const jackpotPrizes = bet => JACKPOTS.map(({ id, name, x }) => ({ id, name, x, amount: round2(x * bet) }));
 
-export function jackpotTier(rng, bet) {
-  if (bet < JACKPOT_MIN_BET || rng() >= Math.min(JACKPOT_MAX_CHANCE, bet * JACKPOT_CHANCE_PER_CREDIT)) return null;
+export function jackpotTier(rng) {
+  if (rng() >= JACKPOT_CHANCE) return null;
   let pick = rng() * JACKPOTS.reduce((sum, tier) => sum + tier.weight, 0);
-  return JACKPOTS.find(tier => (pick -= tier.weight) < 0).id;
+  return JACKPOTS.find(tier => (pick -= tier.weight) < 0)?.id ?? JACKPOTS.at(-1).id;
 }
 
 export function jackpotDeck(rng, winner) {

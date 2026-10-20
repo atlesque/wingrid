@@ -28,18 +28,18 @@ and the multiplier total, announces retriggers and celebrates 20x/35x/50x/100x w
 `spin.win` is the actual credited amount; `tumbleWin` and `scatterWin` are in base bets.
 
 The archived `MDL_Jackpot` is an optional operator service, with no jackpot outcome
-in the captured mock API. Wingrid now has its own **play-credit** progressive system
-in `src/shared/jackpot.js`, with explicit rates and seeds shown under **Jackpots &
-bonus rules**. These rules and probabilities are Wingrid's, not Pragmatic's proprietary
-jackpot mathematics or a claim of matching the original RTP.
+in the captured mock API. Wingrid has its own simple **play-credit** jackpot in
+`src/shared/jackpot.js`, explained on the **How to win** screen. These rules are Wingrid's,
+not Pragmatic's proprietary jackpot mathematics.
 
-Four shared D1 pools receive 1% of paid spin cost. Eligible base/ante spins can
-reserve a pool; bought and free spins cannot trigger jackpots. The server stores
-the hidden match-three reveal and reserves the prize atomically, resets the pool
-to its seed, and credits the player exactly once on completion. Reloading resumes
-unopened gems. Pending prizes are local to the Wingrid database and are never
-accepted from an imported account save. Optimistic-write guards roll back a stale
-spin, its log and pool changes together.
+Four fixed prizes are multiples of the bet: Minor 10x, Major 25x, Mega 100x, Grand 1,000x.
+Any paid spin that does not start free spins opens the jackpot with a 1 in 1,000 chance,
+whatever the bet; tier weights 82 / 14 / 3.6 / 0.4 add about 1.9% on top of the slot's
+RTP (`npm run rtp` prints it). The server stores the hidden match-three reveal, logs the
+award in `jackpot_awards`, and credits the player exactly once on completion. Reloading
+resumes unopened gems. Pending prizes are local to the Wingrid database and are never
+accepted from an imported account save. The `jackpot_pools` table from the earlier
+progressive pools is no longer used.
 
 Apply `0002_jackpots.sql` before deploying this version (`npm run db:migrate:remote`).
 Tests cover fixed-seed natural/bought/retrigger and multiplier results, cap accounting,
