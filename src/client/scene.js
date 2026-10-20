@@ -1048,9 +1048,12 @@ export async function collectMultipliers(onCollect) {
   react('spell');
   const meter = document.querySelector('.multiplier-meter').getBoundingClientRect();
   const canvas = app.view.getBoundingClientRect();
-  // in free spins the orbs fly to the total-multiplier panel, as in the original
+  const line = ui.message?.getBounds();
+  // In free spins the orbs fly to the total-multiplier panel, as in the original. In the base game they fly to the
+  // win on the message line, which they multiply; the side panel's meter is only there in free spins.
   const target = freeMode && freeHud ? freeHud.multiplier.center
-    : world.toLocal(new PIXI.Point(meter.left + meter.width / 2 - canvas.left, meter.top + meter.height / 2 - canvas.top));
+    : freeMode || !line ? world.toLocal(new PIXI.Point(meter.left + meter.width / 2 - canvas.left, meter.top + meter.height / 2 - canvas.top))
+    : world.toLocal(new PIXI.Point(line.x + line.width / 2, line.y + line.height / 2));
   for (const [i, b] of boxes.entries()) {
     if (b.destroyed) continue;
     const orb = await makeSymbol(b.cell);

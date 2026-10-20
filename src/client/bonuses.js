@@ -8,7 +8,7 @@ const FACES = { minor: 'j', major: 'q', mega: 'k', grand: 'a' };
 
 export function createBonuses({ pick, onState, onError, react }) {
   const hud = document.querySelector('#bonus-hud');
-  const meter = document.createElement('output'); meter.className = 'multiplier-meter'; meter.setAttribute('aria-label', 'Total multiplier');
+  const meter = document.createElement('output'); meter.className = 'multiplier-meter is-idle'; meter.dataset.label = 'TOTAL'; meter.setAttribute('aria-label', 'Total multiplier');
   hud.querySelector('.feature-status').after(meter);
   const dialog = document.querySelector('#jackpot');
   const gems = dialog.querySelector('.jackpot-gems'), title = dialog.querySelector('h2');
@@ -17,10 +17,16 @@ export function createBonuses({ pick, onState, onError, react }) {
   const cards = new Map();
   const surface = () => art ||= createArt(dialog.querySelector('.jackpot-art'));
 
+  // The meter is the free spins' total multiplier, so it only shows during free spins. In the base game an orb only
+  // multiplies the win of the spin it lands on; that sum is shown on the message line instead.
+  function showMultiplier(value) {
+    meter.textContent = `${value}×`;
+    meter.classList.toggle('is-idle', !state?.feature);
+  }
   function setMultiplier(value) {
     displayMult = value;
-    meter.textContent = `${value}×`;
-    meter.classList.remove('is-collecting'); void meter.offsetWidth; meter.classList.add('is-collecting');
+    showMultiplier(value);
+    if (value) { meter.classList.remove('is-collecting'); void meter.offsetWidth; meter.classList.add('is-collecting'); }
   }
   function render(next, cfg = config) {
     state = next; config = cfg;
@@ -29,7 +35,7 @@ export function createBonuses({ pick, onState, onError, react }) {
     hud.querySelector('.feature-status').textContent = f
       ? `${f.left} FREE SPINS LEFT · TOTAL ${f.totalMult}x · WON ${money(f.won)}`
       : 'MULTIPLIERS 2x–500x · 4 MBP = 15 FREE SPINS';
-    meter.textContent = `${f?.totalMult ?? displayMult}×`;
+    showMultiplier(f?.totalMult ?? displayMult);
     // one plate per pool, biggest on top, like a prize ladder
     hud.querySelector('.jackpot-pools').replaceChildren(...[...(state.jackpots || cfg.jackpots.tiers)].reverse().map(tier => {
       const row = document.createElement('div'), name = document.createElement('span'), amount = document.createElement('strong');

@@ -70,3 +70,27 @@ test('bets stay on the list; foreign saves are cleaned up', () => {
   assert.deepEqual(normalize({ credits: -5 }), fresh());
   assert.equal(normalize({ credits: 12, bet: 99 }).bet, fresh().bet);
 });
+
+test('orbs multiply only a winning spin: per spin in the base game, as a running total in free spins', () => {
+  const save = fresh(), rng = seeded(7);
+  save.credits = 1e9;
+  let base = 0, idle = 0, free = 0;
+  for (let i = 0; i < 100000 && (base < 20 || idle < 20 || free < 20); i++) {
+    save.jackpot = null;
+    const before = save.feature ? save.feature.totalMult : 0, credits = save.credits;
+    const out = playSpin(save, rng), r = out.result, hit = r.tumbleWin > 0 && r.multSum > 0;
+    assert.ok(Math.abs(save.credits - credits - out.win + out.cost) < .005);
+    if (out.maxWin) continue;
+    if (out.kind === 'base') {
+      // an orb on a losing base spin does nothing, and nothing carries to the next spin
+      assert.equal(r.appliedMult, hit ? r.multSum : 1);
+      assert.ok(Math.abs(r.win - (r.tumbleWin * r.appliedMult + r.scatterWin)) < 1e-9);
+      if (hit) base++; else if (r.multSum) idle++;
+    } else {
+      assert.equal(r.totalMult, hit ? before + r.multSum : before);
+      assert.ok(Math.abs(r.win - (r.tumbleWin * (hit ? r.totalMult : 1) + r.scatterWin)) < 1e-9);
+      if (hit) free++;
+    }
+  }
+  assert.ok(base >= 20 && idle >= 20 && free >= 20);
+});
