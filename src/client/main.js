@@ -25,7 +25,7 @@ if (import.meta.env.DEV) globalThis.__wingrid = { scene, presentation, bonuses, 
 if (import.meta.env.DEV) globalThis.__sound = sound; // await __sound.status() in the console
 // autoplay: spins left, and the settings it was started with (turbo, quick spin, skip screens)
 let auto = 0, autoSettings = { turbo: false, quick: false, skip: true };
-let idleTimer = null, tumbleNo = 0, scattersThisSpin = 0;
+let idleTimer = null, tumbleNo = 0, scattersThisSpin = 0, lastWin = '';
 
 function toast(html, ms = 1200) {
   const t = $('#toast');
@@ -46,7 +46,7 @@ function render() {
   scene.setEnabled('betMenu', !locked);
   scene.setEnabled('autoplay', !f && !state.jackpot);
   scene.setText('autoplayLabel', auto > 0 ? `STOP (${auto})` : 'AUTOPLAY');
-  if (!busy) message(f ? `FREE SPINS LEFT ${f.left}` : state.jackpot ? 'JACKPOT WAITING: PRESS SPIN TO REVEAL' : auto > 0 ? `AUTOPLAY SPINS LEFT ${auto}` : state.canTopUp ? 'OUT OF CREDITS: PRESS SPIN FOR 1,000 FREE' : scene.idleMessage());
+  if (!busy) message(f ? `FREE SPINS LEFT ${f.left}` : state.jackpot ? 'JACKPOT WAITING: PRESS SPIN TO REVEAL' : auto > 0 ? `AUTOPLAY SPINS LEFT ${auto}` : state.canTopUp ? 'OUT OF CREDITS: PRESS SPIN FOR 1,000 FREE' : lastWin || scene.idleMessage());
   renderAccount();
   bonuses.render(state, cfg);
   if (f) scene.setFreeHud({ left: f.left, mult: f.totalMult });
@@ -75,6 +75,7 @@ async function playSpin() {
   let r;
   try { await betSync; r = await api.spin(); } catch (e) { busy = false; render(); toast(e.message, 2200); return false; }
   const s = r.spin, inFeature = s.kind === 'free';
+  lastWin = '';
   bonuses.setMultiplier(inFeature ? state.feature?.totalMult || 0 : 0);
   // the spins-left count ticks down as the spin starts; a retrigger adds its spins when it is announced
   if (inFeature) scene.setFreeHud({ left: s.feature.left - (s.event?.type === 'feature-retrigger' ? s.event.spins : 0), mult: state.feature?.totalMult || 0 });
@@ -97,8 +98,11 @@ async function playSpin() {
     sound.play(sound.CLIPS.showWin);
     await scene.pop(grid, wins);
   }
+  // the base game's sum, for a win that orbs multiplied: the line the orbs fly to, counted up to the total
+  const multiplied = !inFeature && s.tumbleWin > 0 && s.multSum > 0 && !s.scatterWin && !s.maxWin;
+  const sum = to => `WIN ${fmt(s.tumbleWin * s.bet)} × ${s.appliedMult}${to == null ? '' : ` = ${fmt(to)}`}`;
   if (s.tumbleWin > 0 && s.multSum > 0) {
-    message(`${fmt(s.tumbleWin * s.bet)} × ${s.appliedMult} = ${fmt(s.tumbleWin * s.bet * s.appliedMult)}`);
+    message(multiplied ? sum() : `${fmt(s.tumbleWin * s.bet)} × ${s.appliedMult} = ${fmt(s.tumbleWin * s.bet * s.appliedMult)}`);
     sound.play(sound.CLIPS.multVoice);
     await scene.highlight('mult');
     let collected = inFeature ? s.totalMult - s.multSum : 0;
@@ -110,14 +114,22 @@ async function playSpin() {
   if (won > 0 && won < s.bet * 20 && !s.maxWin) {
     const end = inFeature ? s.feature.won : won;
     sound.counting(true);
-    await motion.animate(Math.min(1500, 400 + won / s.bet * 40), p => message(`${inFeature ? 'FREE SPINS WIN' : 'WIN'} ${fmt(shown + (end - shown) * p)}`));
+    await motion.animate(Math.min(1500, 400 + won / s.bet * 40), p => {
+      const at = shown + (end - shown) * p;
+      message(multiplied ? sum(at) : `${inFeature ? 'FREE SPINS WIN' : 'WIN'} ${fmt(at)}`);
+    });
     sound.counting(false, { free: inFeature });
   }
 
   state = r.state;
   render();
   const total = inFeature ? s.feature.won : s.win;
-  if (total > 0) message(`${inFeature ? 'FREE SPINS WIN' : 'WIN'} ${fmt(total)}`);
+  // A multiplied base win keeps its sum on screen, so it is clear the orbs were paid. The last win stays on the
+  // message line until the next spin, instead of the line going back to its idle text as soon as play stops.
+  const winLine = multiplied ? sum(total)
+    : total > 0 ? `${inFeature ? 'FREE SPINS WIN' : 'WIN'} ${fmt(total)}` : '';
+  if (winLine) message(winLine);
+  if (!state.feature) lastWin = winLine;
   const skip = autoSettings.skip && auto > 0, pause = skip ? 900 : 0;
   if (s.maxWin || s.win >= s.bet * 20) await presentation.win(s.maxWin?.won ?? s.win, s.bet, { capped: !!s.maxWin, skip });
   if (s.event?.type === 'feature-start') {
@@ -133,6 +145,7 @@ async function playSpin() {
     await presentation.feature('FREE SPINS COMPLETE', `${s.event.played} free spins${s.event.totalMult ? ` · ${s.event.totalMult}× total multiplier` : ''}`,
       { kind: 'feature-end', amount: s.event.won, auto: pause || 5000 });
     await scene.transition(() => scene.setFree(false)); sound.setMood('idle');
+    bonuses.setMultiplier(0); // the feature's total ends with it
   }
   if (state.jackpot) await bonuses.reveal();
   // the music settles back to its idle layer a few seconds after play stops

@@ -186,6 +186,9 @@ dialog .is-primary, .celebration-panel button, .jackpot-close { background: line
 .multiplier-meter { display: block; width: fit-content; min-width: 3.4em; margin: 0 auto .5em; padding: .25em .6em; border-radius: 50%; border: 2px solid var(--gold);
   font-family: var(--display); color: #fff2bd; text-shadow: 0 2px 0 #3e0f5c, 0 0 12px #fb8cff;
   background: radial-gradient(ellipse, #75448b, #24103a); font-size: 1.6em; text-align: center; }
+.multiplier-meter::before { content: attr(data-label); display: block; font-size: .4em; letter-spacing: .06em; line-height: 1.1; color: var(--gold); }
+/* hidden, not removed: the orbs still fly to where it sits */
+.multiplier-meter.is-idle { visibility: hidden; }
 .multiplier-meter.is-collecting { animation: meter-hit .4s ease-out; }
 @keyframes meter-hit { 40% { transform: scale(1.16); box-shadow: 0 0 24px #ffd36b; } }
 #celebration { padding: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none; border: 0; border-radius: 0;
