@@ -38,17 +38,11 @@ const message = s => scene.setText('message', s);
 function render() {
   const f = state.feature;
   scene.setText('credit', fmt(state.credits));
-  scene.setText('bet', fmt(betAmount() * (state.ante && !f ? 1.25 : 1)));
-  scene.setText('buyCost', fmt(betAmount() * 100));
-  scene.setText('anteValue', fmt(betAmount() * 1.25));
-  scene.setAnte(state.ante);
+  scene.setText('bet', fmt(betAmount()));
   const locked = busy || !!f || !!state.jackpot;
   scene.setEnabled('betDown', !locked && state.bet > 0);
   scene.setEnabled('betUp', !locked && state.bet < cfg.bets.length - 1);
   scene.setEnabled('betMenu', !locked);
-  scene.setEnabled('buy', !locked && !state.ante && state.credits >= betAmount() * 100);
-  scene.setEnabled('ante', !locked);
-  scene.setEnabled('anteArrow', !locked);
   scene.setEnabled('autoplay', !f && !state.jackpot);
   scene.setText('autoplayLabel', auto > 0 ? `STOP (${auto})` : 'AUTOPLAY');
   if (!busy) message(f ? `FREE SPINS LEFT ${f.left}` : state.jackpot ? 'JACKPOT WAITING: PRESS SPIN TO REVEAL' : auto > 0 ? `AUTOPLAY SPINS LEFT ${auto}` : state.canTopUp ? 'OUT OF CREDITS: PRESS SPIN FOR 1,000 FREE' : scene.idleMessage());
@@ -61,10 +55,10 @@ function render() {
   $('#bonus-hud').hidden = false;
 }
 
-async function playSpin(buy = false) {
+async function playSpin() {
   busy = true; render();
   let r;
-  try { r = await api.spin(buy); } catch (e) { busy = false; render(); toast(e.message, 2200); return false; }
+  try { r = await api.spin(); } catch (e) { busy = false; render(); toast(e.message, 2200); return false; }
   const s = r.spin, inFeature = s.kind === 'free';
   bonuses.setMultiplier(inFeature ? state.feature?.totalMult || 0 : 0);
   // the spins-left count ticks down as the spin starts; a retrigger adds its spins when it is announced
@@ -132,17 +126,17 @@ async function playSpin(buy = false) {
 }
 
 // free spins play on by themselves, and so does autoplay until its spins run out or it is stopped
-async function run(buy) {
+async function run() {
   if (running || busy || !state) return;
   if (state.jackpot) { await bonuses.reveal(); return; }
-  if (!buy && state.canTopUp) return topUp();
+  if (state.canTopUp) return topUp();
   running = true;
   try {
-    if (!(await playSpin(buy))) { auto = 0; render(); return; }
+    if (!(await playSpin())) { auto = 0; render(); return; }
     for (;;) {
       if (state.feature) { await scene.wait(450); if (!(await playSpin())) break; continue; }
       if (auto <= 0) break;
-      if (state.credits < betAmount() * (state.ante ? 1.25 : 1)) { auto = 0; break; }
+      if (state.credits < betAmount()) { auto = 0; break; }
       auto--; render();
       await scene.wait(autoSettings.quick || autoSettings.turbo ? 150 : 400);
       if (auto < 0 || !(await playSpin())) break;
@@ -187,21 +181,16 @@ $('#settings .settings-close').onclick = () => $('#settings').close();
 $('#settings .setting-rules').onclick = () => { $('#settings').close(); rules(); };
 // The bonus panel sits in the empty panel by the bet controls, its lettering sized to it; when the panel is
 // small it keeps to the jackpots and the rules button. The account line keeps clear of the game's left column.
-// On a phone the buy and double-chance panels and the jackpot panel are left off (the i button still opens the
-// rules). Double chance can't be switched off there, so it is switched off.
-let phone = false;
-const phoneAnteOff = () => { if (phone && state?.ante && !busy && !state.feature) bet({ ante: false }); };
-scene.on('layout', ({ name, k, phone: isPhone, world, panel }) => {
-  phone = isPhone;
+// On a phone the jackpot panel is left off (the i button still opens the rules).
+scene.on('layout', ({ name, k, phone, world, panel }) => {
   document.documentElement.classList.toggle('is-phone', phone);
-  phoneAnteOff();
   const hud = $('#bonus-hud');
   if (panel) {
     const font = Math.max(9, Math.min(16, panel.h / 10, panel.w / 9.5));
     Object.assign(hud.style, { left: `${panel.x}px`, top: `${panel.y}px`, width: `${panel.w}px`, height: `${panel.h}px`, fontSize: `${font}px` });
     hud.classList.toggle('is-compact', panel.h / font < 14);
   }
-  // (the column ends at x 276 of the 1920 layout; the buy panel starts 125 down)
+  // (the left column ends at x 276 of the 1920 layout; its first panel starts 125 down)
   $('.who').classList.toggle('is-tight', name === 'landscape' && world.x + 276 * k < 190 && world.y + 125 * k < 60);
 });
 // the speed button steps through normal, quick and turbo spins; the choice is remembered on this device
@@ -231,15 +220,6 @@ scene.on('betMenu', () => { sound.play(sound.CLIPS.click); if (!busy && !state.f
 $('#bets .bets-close').onclick = () => $('#bets').close();
 scene.on('betDown', () => bet({ bet: state.bet - 1 }));
 scene.on('betUp', () => bet({ bet: state.bet + 1 }));
-scene.on('ante', () => bet({ ante: !state.ante }));
-scene.on('anteArrow', () => bet({ ante: !state.ante }));
-scene.on('buy', async () => {
-  if (busy || running || state.feature || state.ante || state.jackpot) return;
-  busy = true; render();
-  const accepted = await presentation.buy(betAmount() * 100);
-  busy = false;
-  if (accepted) run(true); else render();
-});
 scene.on('rebuilt', () => state && render());
 $('#account').onclick = async () => {
   if (state.account) { state = await api.signOut(); render(); toast('Signed out. Playing as a new guest.', 2000); }
@@ -281,7 +261,6 @@ try {
 render();
 renderSound();
 scene.showSpeed(speedLevel); scene.setSpeed(SPEEDS[speedLevel]);
-phoneAnteOff();
 scene.setText('banner', BANNERS[0]);
 loadingProgress(100, 'Ready to play');
 await new Promise(resolve => setTimeout(resolve, 250));

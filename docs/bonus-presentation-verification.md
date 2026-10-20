@@ -26,7 +26,7 @@ and a read-only copy of the current state for targeted visual checks. These are 
 | Multiplier collection | Winning orb copies follow curved trails to the HUD. 2/12/50/250x orbs produce 314x and green/blue/pink/yellow meter effects. Values remain above orb animations. |
 | Win tiers | 20/35/50/100x select Nice/Big, Superb, Mega and Sensational. Larger awards progress through every reached tier, with entry, loop, exit, counter and sound. |
 | Maximum win | A capped feature whose last spin pays 0.01 still celebrates its full 5,000x total. The server supplies `maxWin`, independently of `feature-end`. |
-| Feature presentation | Natural and bought starts, +5 retriggers and results use animated banners. Entry and exit play the screen wipe and change backgrounds. Buy supports affirmative and negative animations. |
+| Feature presentation | Starts, +5 retriggers and results use animated banners. Entry and exit play the screen wipe and change backgrounds. |
 | Jackpot presentation | All four tiers complete: logo/reel in and loops, all four face flips, anticipation at two matches, three matching win frames, tier in/loop/out, payout counter and sound, reel/logo exit. |
 | Standard symbols | All nine symbols play their individual landing, win and exit poses alongside common win frames and disappearance effects. |
 | Speed | Changing speed updates active Spine states and the remainder of tweens/counters using one clock. CSS flips use the same speed. |

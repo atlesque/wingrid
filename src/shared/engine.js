@@ -9,8 +9,6 @@ export const MIN_COUNT = 8;
 export const MAX_WIN = 5000; // times the bet, for one spin or one whole free spins feature
 export const FREE_SPINS = 15, RETRIGGER_SPINS = 5;
 export const TRIGGER_SCATTERS = 4, RETRIGGER_SCATTERS = 3;
-export const BUY_COST = 100;  // times the bet
-export const ANTE_COST = 1.25; // times the bet, for increased natural feature chances
 export const BETS = [0.2, 0.4, 1, 2, 4, 10, 20, 50, 100];
 export const START_CREDITS = 1000;
 
@@ -33,10 +31,9 @@ export const SCATTER_PAYS = { 4: 3, 5: 5, 6: 100 };
 // How often each symbol lands in a cell. Free spins use their own weights with more orbs.
 const BASE_WEIGHTS = { crown: 4, chalice: 6, hourglass: 7, ring: 8, amethyst: 10, topaz: 11, emerald: 12, sapphire: 13, ruby: 15 };
 const FREE_WEIGHTS = { crown: 5, chalice: 6, hourglass: 7, ring: 8, amethyst: 10, topaz: 11, emerald: 12, sapphire: 13, ruby: 14 };
-// chance per cell, on top of the weights above. Tuned with scripts/rtp.mjs to about 96.5% RTP in the base
-// game, with double chance and for a bought feature, and free spins about once in 255 spins (150 with
-// double chance). Base-game orbs are rarer so that more of the return comes from free spins.
-const SCATTER_CHANCE = { base: 0.0195, ante: 0.0228, free: 0.0125 };
+// chance per cell, on top of the weights above. Tuned with scripts/rtp.mjs to about 96.5% RTP, with free
+// spins about once in 255 spins. Base-game orbs are rarer so that more of the return comes from free spins.
+const SCATTER_CHANCE = { base: 0.0195, free: 0.0125 };
 const MULT_CHANCE = { base: 0.002, free: 0.04 };
 export const MULTIPLIERS = [
   [2, 300], [3, 220], [4, 160], [5, 130], [6, 90], [8, 70], [10, 50], [12, 30], [15, 22],
@@ -118,27 +115,13 @@ export const countScatters = grid => grid.reduce((n, col) => n + col.filter(c =>
 export const multipliersOn = grid => grid.flatMap(col => col.filter(c => c.s === 'mult').map(c => c.v));
 export function scatterPay(n) { return n >= 6 ? SCATTER_PAYS[6] : SCATTER_PAYS[n] || 0; }
 
-// Put wish stars into random cells until the grid has `n` of them (a bought feature).
-function forceScatters(grid, rng, n) {
-  const g = cloneGrid(grid);
-  const free = [];
-  g.forEach((col, c) => col.forEach((cell, r) => { if (cell.s !== 'scatter') free.push([c, r]); }));
-  for (let have = countScatters(g); have < n && free.length; have++) {
-    const [c, r] = free.splice(Math.floor(rng() * free.length), 1)[0];
-    g[c][r] = { id: nextId++, s: 'scatter' };
-  }
-  return g;
-}
-
 // One spin, start to finish. Amounts in the result are in bets (multiply by the bet for credits).
-//   mode: 'base' | 'ante' | 'free';  totalMult: the free spins total multiplier coming into this spin
-//   buy: a bought feature, so the first grid gets 4 to 6 wish stars
+//   mode: 'base' | 'free';  totalMult: the free spins total multiplier coming into this spin
 // Returns { steps, tumbleWin, mults, multSum, appliedMult, totalMult, scatters, scatterWin, win, freeSpins }
 // where steps[i] = { grid, wins } is each tumble in order (the last has no wins), and freeSpins is how many
 // free spins this spin awards (0 when none).
-export function spin(rng, { mode = 'base', totalMult = 0, buy = false } = {}) {
+export function spin(rng, { mode = 'base', totalMult = 0 } = {}) {
   let grid = fillGrid(rng, mode);
-  if (buy) grid = forceScatters(grid, rng, pickWeighted(rng, [[4, 80], [5, 16], [6, 4]]));
   const steps = [];
   let tumbleWin = 0;
   for (;;) {
@@ -166,5 +149,3 @@ export function spin(rng, { mode = 'base', totalMult = 0, buy = false } = {}) {
   };
 }
 
-// What a spin costs, in bets
-export const spinCost = ({ ante = false, buy = false } = {}) => buy ? BUY_COST : ante ? ANTE_COST : 1;
