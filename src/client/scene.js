@@ -4,6 +4,7 @@ import { createPrincessV2 } from './character-v2.js';
 import { skeleton } from './art.js';
 import { motion, playAnimation } from './motion.js';
 import { createAmbience } from './ambience.js';
+import { GEM_ART, gemAsset } from './gems.js';
 
 // ================= SCENE =================
 // Draws the game exactly as the original lays it out. layout/<name>.json is one captured frame of the original
@@ -76,9 +77,10 @@ async function spriteTexture(atlasName, name, { trimmed = false } = {}) {
   if (!s) return null;
   // Wingrid's mascot stays outside the imported archive so asset refreshes and
   // CI restoration cannot bring the original SCATTER portrait back.
-  if ((atlasName === 'S01' && name === 'S01') ||
+  const gem = gemAsset(atlasName, name);
+  if (gem || (atlasName === 'S01' && name === 'S01') ||
       (atlasName === 'thumbs' && ['S01', 'S01M'].includes(name))) {
-    const source = await PIXI.Assets.load('/characters/princess-v2/scatter.png');
+    const source = await PIXI.Assets.load(gem || '/characters/princess-v2/scatter.png');
     const base = source.baseTexture;
     const [pl, pt, pr, pb] = trimmed ? [0, 0, 0, 0] : s.pad;
     const [w, h] = s.rotate ? [s.h, s.w] : [s.w, s.h];
@@ -715,6 +717,19 @@ export function setEnabled(key, on) { if (ui[key]) { ui[key].alpha = on ? 1 : 0.
 async function makeSymbol(cell) {
   const rig = rigs[PREFAB[cell.s]];
   const box = new PIXI.Container();
+  if (GEM_ART[cell.s]) {
+    const texture = await PIXI.Assets.load(`/symbols/vlaanderen/${GEM_ART[cell.s]}.png`);
+    const idle = new PIXI.Sprite(texture);
+    idle.anchor.set(.5);
+    // Fit the new square cutouts to the actual cell, independently of the
+    // archive's heavily padded and differently sized symbol widgets.
+    const size = Math.min(grid.dy, grid.xs[1] - grid.xs[0]) / grid.k;
+    idle.scale.set(size / Math.max(texture.width, texture.height));
+    box.addChild(idle);
+    box.idle = idle;
+    box.cell = cell;
+    return box;
+  }
   let idleRig = rig.idle;
   if (cell.s === 'mult') idleRig = rig[`Mult${multLook(cell.v)[1]}`] || rig.idle;
   const idle = await makeSprite({ atlas: idleRig.atlas, sprite: idleRig.sprite, w: idleRig.w, h: idleRig.h, ax: 0.5, ay: 0.5, type: 0 });
@@ -733,8 +748,36 @@ async function makeSymbol(cell) {
   return box;
 }
 
+// Animate the approved cutout itself, using the same speed/reduced-motion clock.
+function animateGem(box, match) {
+  if (box.destroyed) return 0;
+  const exiting = match.test('gem_out') || match.test('gem_disappear');
+  const winning = match.test('gem_win');
+  const ms = exiting ? 300 : winning ? 900 : 260;
+  const idle = box.idle;
+  const { sx, sy } = box.gemRest ||= { sx: idle.scale.x, sy: idle.scale.y };
+  const token = box.gemAnimation = (box.gemAnimation || 0) + 1;
+  idle.visible = true;
+  motion.animate(ms, p => {
+    if (box.destroyed || token !== box.gemAnimation) return;
+    const scale = exiting ? 1 - p * .65 : 1 + Math.sin(p * Math.PI * (winning ? 3 : 1)) * (winning ? .1 : .06);
+    idle.scale.set(sx * scale, sy * scale);
+    idle.alpha = exiting ? 1 - p : 1;
+  }).then(() => {
+    if (box.destroyed || token !== box.gemAnimation) return;
+    idle.scale.set(sx, sy);
+    if (!exiting) idle.alpha = 1;
+  });
+  return ms;
+}
+
 // a one-off Spine animation from the symbol's rig, drawn over the idle sprite
 async function playRig(box, match, { hideIdle = true, loop = false } = {}) {
+  // Keep the new artwork visible throughout landing, wins and exits. The old
+  // symbol Spine poses contain the retired sun/heart/star textures.
+  if (GEM_ART[box.cell.s] && !match.test('stpr_winframe') && !match.test('stpr_symbol_all_fx_disappearance')) {
+    return animateGem(box, match);
+  }
   const rig = rigs[PREFAB[box.cell.s]];
   let a = rig.anims.find(x => match.test(x.anim) && (box.cell.s !== 'mult' || !/multiplier/.test(x.anim) || x.anim.includes(multLook(box.cell.v)[2])));
   // The captured prefab lists only its active win pose. Other poses live in that same skeleton.

@@ -1,0 +1,9 @@
+# Vlaanderen gems
+
+The approved embossed designs replace all nine paying symbols. Stable symbol IDs, payout values and selection weights are unchanged, including saved grids. Mapping: crown → Vlaanderen, chalice → ruby Mijn Burgerprofiel, hourglass → LBK, ring → blue Mijn Burgerprofiel, amethyst → ruby Vlaanderen, topaz → blue gem, emerald → AJH, sapphire → DCH, ruby → Pini. The three unused plain green/teal/yellow variants are retained alongside the active assets.
+
+Transparent 384×384 PNG cutouts live in `public/symbols/vlaanderen/`, outside the imported archive. `gems.js` maps both board and thumbnail textures; the adapter preserves archived padding and aspect ratio. Landing, win and exit animate the replacement artwork using the shared speed/reduced-motion clock, while generic win frames and disappearance effects remain. MBP scatter and multiplier orbs keep their existing artwork and behavior.
+
+Approval sheets v1–v3 and the generated transparent source are in `design/gems/`. Built-in ImageGen was used to create and refine the artwork. Final prompt: preserve the approved twelve designs, embossed logos and exact LBK/AJH/DCH/Pini lettering; remove the background, shrink sprites within a regular 3×4 grid to provide transparent gutters, and retain the approved order. Run `python3 scripts/extract-gems.py` with Pillow installed to extract complete connected jewel silhouettes; this avoids clipping ornaments at generated grid boundaries. The source is sliced and normalized to equal transparent canvases for runtime use.
+
+Verified locally at http://127.0.0.1:8797/: initial grid, spins with landing/win/tumble playback, desktop (1280×720), phone (390×844), and no browser console errors. Screenshots: `design/gems/in-game-desktop.png` and `design/gems/in-game-mobile.png`. All 37 tests and the production build pass.

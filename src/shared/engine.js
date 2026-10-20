@@ -14,15 +14,15 @@ export const START_CREDITS = 1000;
 
 // Paying symbols, best first. pays[i] is the win in bets for 8-9, 10-11 and 12+ of it.
 export const SYMBOLS = [
-  { id: 'crown',     name: 'Crown',     pays: [15, 40, 80] },
-  { id: 'chalice',   name: 'Chalice',   pays: [5, 15, 40] },
-  { id: 'hourglass', name: 'Hourglass', pays: [4, 10, 25] },
-  { id: 'ring',      name: 'Ring',      pays: [3, 5, 20] },
-  { id: 'amethyst',  name: 'Amethyst',  pays: [2, 3, 15] },
-  { id: 'topaz',     name: 'Topaz',     pays: [1.5, 2.5, 12] },
-  { id: 'emerald',   name: 'Emerald',   pays: [1, 2, 8] },
-  { id: 'sapphire',  name: 'Sapphire',  pays: [0.8, 1.5, 6] },
-  { id: 'ruby',      name: 'Ruby',      pays: [0.5, 1, 4] },
+  { id: 'crown',     name: 'Vlaanderen',                 pays: [15, 40, 80] },
+  { id: 'chalice',   name: 'Mijn Burgerprofiel Ruby',    pays: [5, 15, 40] },
+  { id: 'hourglass', name: 'LBK',                        pays: [4, 10, 25] },
+  { id: 'ring',      name: 'Mijn Burgerprofiel Blue',    pays: [3, 5, 20] },
+  { id: 'amethyst',  name: 'Vlaanderen Ruby',            pays: [2, 3, 15] },
+  { id: 'topaz',     name: 'Blue Gem',                   pays: [1.5, 2.5, 12] },
+  { id: 'emerald',   name: 'AJH',                        pays: [1, 2, 8] },
+  { id: 'sapphire',  name: 'DCH',                        pays: [0.8, 1.5, 6] },
+  { id: 'ruby',      name: 'Pini',                       pays: [0.5, 1, 4] },
 ];
 export const SYMBOL = Object.fromEntries(SYMBOLS.map(s => [s.id, s]));
 // wish stars pay for 4, 5 and 6 or more of them anywhere, in bets
