@@ -7,6 +7,7 @@ import * as sound from './sound.js';
 import { createBonuses } from './bonuses.js';
 import { createPresentation } from './presentation.js';
 import { motion } from './motion.js';
+import { jackpotPrizes } from '../shared/jackpot.js';
 
 // ================= PAGE =================
 // The spin loop. Each spin is one request; the Worker answers with every tumble of it and the new state, and
@@ -72,7 +73,7 @@ function showAccount(open) {
 async function playSpin() {
   busy = true; render();
   let r;
-  try { r = await api.spin(); } catch (e) { busy = false; render(); toast(e.message, 2200); return false; }
+  try { await betSync; r = await api.spin(); } catch (e) { busy = false; render(); toast(e.message, 2200); return false; }
   const s = r.spin, inFeature = s.kind === 'free';
   bonuses.setMultiplier(inFeature ? state.feature?.totalMult || 0 : 0);
   // the spins-left count ticks down as the spin starts; a retrigger adds its spins when it is announced
@@ -144,7 +145,7 @@ async function run() {
   if (running || busy || !state) return;
   if (state.jackpot) { await bonuses.reveal(); return; }
   // out of credits while signed in: an admin may have added some on Atlesque Play, so look before the free top-up
-  if (state.canTopUp && state.account) { try { state = await api.refresh(); render(); } catch (e) {} }
+  if (state.canTopUp && state.account) { try { await betSync; state = await api.refresh(); render(); } catch (e) {} }
   if (state.canTopUp) return topUp();
   running = true;
   try {
@@ -171,7 +172,28 @@ function stopAutoplay() { auto = 0; scene.setSpeed(SPEEDS[speedLevel]); render()
 async function topUp() {
   try { state = await api.topUp(); render(); toast(`+${fmt(cfg.startCredits)} free credits`); } catch (e) { toast(e.message, 2000); }
 }
-const bet = async b => { if (busy || state.feature) return; try { state = await api.setBet(b); render(); } catch (e) { toast(e.message, 2000); } };
+// A bet change shows at once (the jackpots are fixed multiples of the bet); the Worker hears about it in the
+// background, only the latest bet when several presses land during one request, and a spin waits for it.
+let betWanted = null, betSync = null;
+function bet({ bet: i }) {
+  if (busy || state.feature || state.jackpot || i === state.bet || !(i >= 0 && i < cfg.bets.length)) return;
+  state = { ...state, bet: i, betAmount: cfg.bets[i], jackpots: jackpotPrizes(cfg.bets[i]) };
+  render();
+  betWanted = i;
+  betSync ??= syncBet().finally(() => { betSync = null; });
+}
+async function syncBet() {
+  while (betWanted != null) {
+    const i = betWanted; betWanted = null;
+    try {
+      const next = await api.setBet({ bet: i });
+      if (betWanted == null) { state = next; render(); }
+    } catch (e) {
+      betWanted = null; toast(e.message, 2000);
+      try { state = await api.refresh(); render(); } catch (e) {}
+    }
+  }
+}
 
 scene.on('spin', () => { sound.play(sound.CLIPS.spinButton); if (auto > 0) stopAutoplay(); else run(); });
 // the autoplay window keeps its choices for the next time it opens
