@@ -757,6 +757,9 @@ export function setText(key, s) { ui[key]?.setText?.(s); }
 export function setEnabled(key, on) { if (ui[key]) { ui[key].alpha = on ? 1 : 0.5; ui[key].eventMode = on ? 'static' : 'none'; } }
 
 // ---- symbols ----
+// how much of its cell a gem fills: the cutouts carry clear margins, so they are drawn larger than the cell to sit
+// close together with little empty board between (MBP and the orbs keep the original rigs' size)
+const GEM_ZOOM = 1.3;
 async function makeSymbol(cell) {
   const rig = rigs[PREFAB[cell.s]];
   const box = new PIXI.Container();
@@ -766,7 +769,7 @@ async function makeSymbol(cell) {
     idle.anchor.set(.5);
     // Fit the new square cutouts to the actual cell, independently of the
     // archive's heavily padded and differently sized symbol widgets.
-    const size = Math.min(grid.dy, grid.xs[1] - grid.xs[0]) / grid.k;
+    const size = Math.min(grid.dy, grid.xs[1] - grid.xs[0]) / grid.k * GEM_ZOOM;
     idle.scale.set(size / Math.max(texture.width, texture.height));
     box.addChild(idle);
     box.idle = idle;
