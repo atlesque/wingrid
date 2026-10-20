@@ -32,9 +32,9 @@ const CHARACTER_OVERLAP = 72;
 let app, atlases, rigs, layouts, world, ambience, symbolLayer, effectsLayer, current;
 const characters = new Set();
 let freeMode = false;
-const baseOnly = []; // drawn in the base game only: the buy and bet panels, the blue reel back
-// left off on a phone: the buy and double-chance panels, and the empty side panel the jackpots sit in elsewhere
-const PHONE_HIDDEN = /BuyBetFeatures\/|BuyButtons\/|TumbleHistory\//;
+const baseOnly = []; // drawn in the base game only: the blue reel back
+// left off on a phone: the empty side panel the jackpots sit in elsewhere
+const PHONE_HIDDEN = /TumbleHistory\//;
 const phoneHidden = [];
 let phone = false;
 const shown = obj => !(phone && phoneHidden.includes(obj)) && !(freeMode && baseOnly.includes(obj));
@@ -367,6 +367,7 @@ async function castAt(box) {
 const DYNAMIC = /ReelsManager\//;
 const SKIP = it => it.k === 'UISprite' && it.atlas === 'common' && /BlackBands|ClippingAnchors|\/Mask\/|GUIArranger/.test(it.path) // letterbox bands and clipping helpers
   || /^Game\/Background\//.test(it.path) // the backdrop is the page's, behind the canvas
+  || /BuyBetFeatures\/|BuyButtons\//.test(it.path) // the buy and double-chance panels: Wingrid has neither
   || /Volatility\//.test(it.path) || /AggregatedInfoLabel$/.test(it.path) || it.k === 'UITexture';
 // widgets the page drives, by a piece of their path
 const NAMED = {
@@ -374,15 +375,9 @@ const NAMED = {
   bet: /TotalBet\/ValueParent\/TotalBetValue$|Credits\/TotalBetValue$/,
   message: /MsgResultTeaser\/MsgLabel$/,
   banner: /RA\/Messages\/M_\d\/L$/,
-  buyCost: /costTotalLabel$/,
-  anteValue: /BetLevel\/.*Texts\/(Bet\/)?Value$/,
-  anteOff: /Slider\/Texts\/Off$/,
   spin: /StartSpin_Button\/Background\/Icon\/IconSpin$|StartSpin_Button\/Background\/icon\/icon$/,
   betUp: /BetUp_Button\/Background\/Sprite$|SmartBetPlus\/Button\/Background$/,
   betDown: /BetDown_Button\/Background\/Sprite$|SmartBetMinus\/Button\/Background$/,
-  buy: /BuyButtons\/AT\/Option_0\/Content\/Buy\/(Land|Port)\/Back\/S_0$/,
-  ante: /BetLevel\/.*(Land|Port)\/Back\/S_0$/,
-  anteArrow: /Slider\/Button\/Off$/,
   clock: /AggregatedInfoLabel$/,
   autoplay: /AutoplayOpen\/AutoplayOpenButton$|ButtonGroup\/AutoplayButton\/Buttons\/Open\/Background$/,
   autoplayLabel: /AutoplayOpen\/Text\/AutoplayOpenLabel$/,
@@ -394,7 +389,7 @@ const NAMED = {
   info: /Paytable\/Paytable_Button_Open\/Sprite$|PaytableButton\/PaytableButtonOpen$/,
 };
 // the buttons the player presses
-const BUTTONS = ['spin', 'betUp', 'betDown', 'buy', 'ante', 'anteArrow', 'autoplay', 'sound', 'menu', 'info', 'speed', 'betMenu'];
+const BUTTONS = ['spin', 'betUp', 'betDown', 'autoplay', 'sound', 'menu', 'info', 'speed', 'betMenu'];
 
 async function makeItem(it) {
   const b = drawnBounds(it);
@@ -499,9 +494,9 @@ async function build(name, onProgress = () => {}) {
   return root;
 }
 
-// In free spins the original swaps its buy and bet panels for a total-multiplier panel and a spins-left
+// In free spins the original swaps its buy and bet panels (which Wingrid leaves out) for a total-multiplier panel and a spins-left
 // panel, with the winged cat perched on top. Built from the captured panels' places and the bet label's lettering.
-const BASE_ONLY = /BuyBetFeatures\/|Reels\/Reels\/Base\/Back\//;
+const BASE_ONLY = /Reels\/Reels\/Base\/Back\//;
 async function buildFreeHud(L) {
   const find = re => L.items.find(it => re.test(it.path));
   const buyIt = find(/BuyButtons\/AT\/Option_0\/Content\/Buy\/(Land|Port)\/Back\/S_0$/);
@@ -680,7 +675,7 @@ function touchTargets() {
     const b = o.getBounds(), grow = Math.min(1.8, Math.max(1, SMALLEST / Math.min(b.width, b.height)));
     o.pivot.set(cx, cy); o.position.set(h.x + cx * h.sx, h.y + cy * h.sy); o.scale.set(h.sx * grow, h.sy * grow);
   }
-  const hits = BUTTONS.filter(key => ui[key]?.worldVisible && key !== 'anteArrow').map(key => {
+  const hits = BUTTONS.filter(key => ui[key]?.worldVisible).map(key => {
     const o = ui[key]; o.hitArea = null;
     const b = o.getBounds(), px = Math.max(0, (TOUCH - b.width) / 2), py = Math.max(0, (TOUCH - b.height) / 2);
     return { o, b, r: { x0: b.left - px, y0: b.top - py, x1: b.right + px, y1: b.bottom + py } };
@@ -713,7 +708,6 @@ function hookButtons() {
 // ---- what the page changes ----
 export function setText(key, s) { ui[key]?.setText?.(s); }
 export function setEnabled(key, on) { if (ui[key]) { ui[key].alpha = on ? 1 : 0.5; ui[key].eventMode = on ? 'static' : 'none'; } }
-export function setAnte(on) { if (ui.anteArrow) ui.anteArrow.scale.x = Math.abs(ui.anteArrow.scale.x) * (on ? -1 : 1); setText('anteOff', on ? 'ON' : 'OFF'); }
 
 // ---- symbols ----
 async function makeSymbol(cell) {

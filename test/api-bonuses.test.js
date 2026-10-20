@@ -118,13 +118,12 @@ test('a player who just won a jackpot cannot trigger another until the cooldown 
   assert.equal(ready.state.stats.lastJackpotSpin, JACKPOT_COOLDOWN_SPINS);
 });
 
-test('bought feature starts 15 free spins and never triggers a jackpot', async () => {
+test('free spins can no longer be bought: a buy request plays a normal spin at the bet', async () => {
   const { call } = await game();
   const response = await withSeed(3, () => call('spin', { buy: true }));
   assert.equal(response.status, 200);
-  assert.equal(response.spin.cost, 100);
-  assert.equal(response.state.feature.left, 15);
-  assert.equal(response.state.jackpot, null);
+  assert.equal(response.spin.kind, 'base');
+  assert.equal(response.spin.cost, 1);
 });
 
 test('a competing jackpot pool reservation rolls back the spin and its log', async () => {
