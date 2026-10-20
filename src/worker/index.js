@@ -77,6 +77,12 @@ async function route(req, env, url, ctx) {
     return json({ state: await view(env, session) });
   }
   if (p === '/api/spin' && m === 'POST') {
+    // Too little credit for a paid spin: an admin may have added credits on Atlesque Play, so fetch the
+    // account's copy first. Only then, so a normal spin makes no extra call.
+    if (session.play_token) {
+      const save = toSave(await player(env, session.player_id));
+      if (!save.feature && !save.jackpot && save.credits < BETS[save.bet]) await pullFromPlay(env, session);
+    }
     let out;
     await change(env, session, async (save, player) => {
       const rng = secureRandom();
@@ -177,7 +183,7 @@ function writeSave(env, row, save, extra = {}) {
 // Read the save, let `fn` change it, and write it back unless another request changed it first.
 async function change(env, session, fn, { push = true } = {}) {
   const row = await player(env, session.player_id);
-  const save = toSave(row);
+  const save = toSave(row), base = toSave(row);
   const more = await fn(save, row) || [];
   let res;
   try { [res] = await env.DB.batch([writeSave(env, row, save), mutationGuard(env), ...more]); }
@@ -186,7 +192,7 @@ async function change(env, session, fn, { push = true } = {}) {
     throw error;
   }
   if (!res.meta.changes) throw new HttpError(409, 'busy', 'Another spin is still being played. Try again.');
-  if (push && session.play_token) await pushToPlay(env, session);
+  if (push && session.play_token) await pushToPlay(env, session, base);
   return save;
 }
 
@@ -202,6 +208,8 @@ async function view(env, session) {
 // ---- Atlesque Play ----
 // The save goes up as the game's progress, with the revision it builds on. When the account's copy moved on
 // without us (Wingrid on another device, an admin reset), the account's copy wins and replaces the save here.
+// The one exception is an admin adding credits: then the account's copy is the save this change started
+// from with only the credits raised, so the change is kept and the added credits go on top of it.
 async function play(env, session, path, opts = {}) {
   const res = await fetch(env.PLAY_URL + path, { ...opts, headers: { 'content-type': 'application/json', authorization: `Bearer ${session.play_token}`, ...opts.headers }, signal: AbortSignal.timeout(4000) });
   const b = await res.json().catch(() => ({}));
@@ -219,15 +227,30 @@ async function adopt(env, session, data, rev) {
   await writeSave(env, row, data ? normalize(data) : fresh(), { play_rev: rev }).run();
 }
 
-async function pushToPlay(env, session) {
+async function pushToPlay(env, session, base) {
   try {
     const row = await player(env, session.player_id);
     if (row.jackpot) return; // reserve/reveal remains local until its award is claimed
-    const r = await play(env, session, `/api/games/${env.PLAY_GAME_ID}/progress`, { method: 'PUT', body: JSON.stringify({ data: toSave(row), rev: row.play_rev || 0 }) });
+    const path = `/api/games/${env.PLAY_GAME_ID}/progress`, save = toSave(row);
+    const r = await play(env, session, path, { method: 'PUT', body: JSON.stringify({ data: save, rev: row.play_rev || 0 }) });
     if (r.status === 200) await env.DB.prepare('UPDATE players SET play_rev = ? WHERE id = ?').bind(r.body.rev, row.id).run();
-    else if (r.status === 409) await adopt(env, session, r.body.data, r.body.rev);
+    else if (r.status === 409 && base && creditsAdded(base, r.body.data)) {
+      save.credits = round2(save.credits + r.body.data.credits - base.credits);
+      const again = await play(env, session, path, { method: 'PUT', body: JSON.stringify({ data: save, rev: r.body.rev }) });
+      if (again.status === 200) await writeSave(env, row, save, { play_rev: again.body.rev }).run();
+      else if (again.status === 409) await adopt(env, session, again.body.data, again.body.rev);
+    } else if (r.status === 409) await adopt(env, session, r.body.data, r.body.rev);
   } catch (e) { console.warn('Atlesque Play push failed', e.message); } // tried again after the next change
 }
+
+// true when the account's copy is `base` with more credits and nothing else changed
+function creditsAdded(base, data) {
+  if (!data || typeof data.credits !== 'number' || !(data.credits > base.credits)) return false;
+  const key = d => stable({ ...normalize(d), credits: 0, jackpot: null });
+  return key(data) === key(base);
+}
+const stable = v => v && typeof v === 'object' && !Array.isArray(v)
+  ? `{${Object.keys(v).sort().map(k => `${JSON.stringify(k)}:${stable(v[k])}`).join(',')}}` : JSON.stringify(v);
 
 async function pullFromPlay(env, session) {
   try {

@@ -64,7 +64,8 @@ A new browser gets a guest session (`POST /api/guest`) and plays straight away. 
 
 - an account the game already knows takes over the session, so the same credits show up on every device;
 - a new account takes the guest's progress, unless Atlesque Play already holds a save for it (for example from Wingrid), in which case that save wins;
-- every change goes up to Atlesque Play as the game's progress, with its revision. If the account's copy moved on without us (another device, an admin reset), the account's copy replaces ours.
+- every change goes up to Atlesque Play as the game's progress, with its revision. If the account's copy moved on without us (another device, an admin reset), the account's copy replaces ours. Credits an admin added on Atlesque Play are the exception: they are added on top of our change instead;
+- a spin with too little credit for the bet first fetches the account's balance from Atlesque Play (an admin may have added credits) and spins if it is now enough. Spins with enough credit make no extra call. Out of credits, the free top-up checks the account first too.
 
 The save uses Wingrid's format (`{ credits, bet, stats, feature, lastTopUp }`), and `PLAY_GAME_ID` is `wingrid` for now. This Wingrid deployment intentionally uses its existing game id.
 
