@@ -758,8 +758,8 @@ export function setEnabled(key, on) { if (ui[key]) { ui[key].alpha = on ? 1 : 0.
 
 // ---- symbols ----
 // how much of its cell a gem fills: the cutouts carry clear margins, so they are drawn larger than the cell to sit
-// close together with little empty board between (MBP and the orbs keep the original rigs' size)
-const GEM_ZOOM = 1.3;
+// close together with little empty board between. MBP and the heart orbs come a little under the original rigs' size.
+const GEM_ZOOM = 1.38, RIG_ZOOM = .88;
 async function makeSymbol(cell) {
   const rig = rigs[PREFAB[cell.s]];
   const box = new PIXI.Container();
@@ -908,7 +908,7 @@ export async function show(g, { instant = false, first = false, scatterTarget = 
       if (!b) {
         b = await makeSymbol(cell);
         b.cell.c = c;
-        b.scale.set(grid.k);
+        b.scale.set(grid.k * (GEM_ART[cell.s] ? 1 : RIG_ZOOM));
         b.zIndex = cell.s === 'scatter' ? 1 : 0;
         b.position.set(p.x, instant ? p.y : p.y - fresh * grid.dy - grid.dy);
         symbolLayer.addChild(b);
