@@ -103,9 +103,10 @@ export async function createPrincessV2() {
     return points.at(-1)[1];
   };
   // how far the lips part at x for an oval of the given half width; it widens further down so the chin drops as one
+  // (in a U, so the lower lip drops as a curve, not a point)
   const parting = (halfWidth, x, depth = 0) => {
-    const u = (x - mouth.centre) / (halfWidth + depth * .5);
-    return Math.abs(u) >= 1 ? 0 : Math.pow(1 - u*u, .75);
+    const u = Math.abs(x - mouth.centre) / (halfWidth + depth * .5);
+    return u >= 1 ? 0 : Math.pow(1 - Math.pow(u, 3), .6);
   };
   const jawField = (halfWidth, drop) => field((x, y) => {
     const depth = y - seam(x);

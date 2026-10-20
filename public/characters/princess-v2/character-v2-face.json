@@ -1,14 +1,14 @@
 {
   "mouth": {
     "seam": [[493, 214.5], [505, 214.5], [512, 213.5], [518, 211], [525, 208.5], [530, 206], [535, 203], [540, 200]],
-    "open": 4.5,
+    "open": 16,
     "centre": 515,
     "halfWidth": 13,
-    "lift": 0.2,
-    "jaw": [10, 46],
-    "roundHalfWidth": 8,
-    "roundOpen": 6,
-    "corner": 2.5
+    "lift": 0.25,
+    "jaw": [24, 95],
+    "roundHalfWidth": 10,
+    "roundOpen": 15,
+    "corner": 5
   },
   "brows": [
     {
@@ -32,13 +32,13 @@
     "X": {"open": 0, "round": 0, "spread": 0, "teeth": 0},
     "M": {"open": 0, "round": 0.1, "spread": -0.2, "teeth": 0},
     "A": {"open": 1, "round": 0, "spread": 0.1, "teeth": 0.3},
-    "E": {"open": 0.6, "round": 0, "spread": 0.55, "teeth": 0.6},
-    "I": {"open": 0.35, "round": 0, "spread": 1, "teeth": 0.9},
+    "E": {"open": 0.7, "round": 0, "spread": 0.55, "teeth": 0.6},
+    "I": {"open": 0.45, "round": 0, "spread": 1, "teeth": 0.9},
     "O": {"open": 0.85, "round": 0.8, "spread": 0, "teeth": 0.1},
-    "U": {"open": 0.35, "round": 1, "spread": 0, "teeth": 0},
-    "F": {"open": 0.18, "round": 0, "spread": 0.2, "teeth": 1},
-    "S": {"open": 0.2, "round": 0, "spread": 0.5, "teeth": 1},
-    "L": {"open": 0.45, "round": 0, "spread": 0.2, "teeth": 0.6},
-    "K": {"open": 0.4, "round": 0, "spread": 0.2, "teeth": 0.4}
+    "U": {"open": 0.5, "round": 1, "spread": 0, "teeth": 0},
+    "F": {"open": 0.25, "round": 0, "spread": 0.2, "teeth": 1},
+    "S": {"open": 0.28, "round": 0, "spread": 0.5, "teeth": 1},
+    "L": {"open": 0.55, "round": 0, "spread": 0.2, "teeth": 0.6},
+    "K": {"open": 0.5, "round": 0, "spread": 0.2, "teeth": 0.4}
   }
 }
