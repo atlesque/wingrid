@@ -380,8 +380,12 @@ const NAMED = {
   clock: /AggregatedInfoLabel$/,
   autoplay: /AutoplayOpen\/AutoplayOpenButton$|ButtonGroup\/AutoplayButton\/Buttons\/Open\/Background$/,
   autoplayLabel: /AutoplayOpen\/Text\/AutoplayOpenLabel$/,
-  sound: /SoundButtons\/Sound(On|Off)\/Button\/Sprite$|MenuOpenClose\/ButtonOpen\/ButtonOpen\/icon$/,
+  sound: /SoundButtons\/Sound(On|Off)\/Button\/Sprite$/,
+  menu: /LeftContent\/Settings\/ButtonOpen\/ButtonOpen\/Sprite$|MenuOpenClose\/ButtonOpen\/ButtonOpen\/icon$/,
+  info: /Paytable\/Paytable_Button_Open\/Sprite$|PaytableButton\/PaytableButtonOpen$/,
 };
+// the buttons the player presses
+const BUTTONS = ['spin', 'betUp', 'betDown', 'buy', 'ante', 'anteArrow', 'autoplay', 'sound', 'menu', 'info'];
 
 async function makeItem(it) {
   const b = drawnBounds(it);
@@ -603,6 +607,13 @@ let grid = null, lastGrid = null;
 const listeners = {};
 export function on(name, fn) { listeners[name] = fn; }
 
+// The part of the portrait layout the player needs: the princess and logo down to the credit line, with the
+// bottom bar's buttons that the original anchored to the screen's edges (measured from layout/portrait.json).
+const PORTRAIT_CONTENT = { x: -10, y: 150, w: 770, h: 1325 };
+const ACCOUNT_LINE = 44; // room the page keeps over the portrait game for the account line
+// the empty tumble-history panel by the bet controls, where the page puts its bonus panel
+const SIDE_PANEL = /TumbleHistory\/RA\/Content\/Back\/S$/;
+
 async function layout(onProgress = () => {}) {
   const sw = app.screen.width, sh = app.screen.height;
   const name = sh > sw ? 'portrait' : 'landscape';
@@ -622,15 +633,62 @@ async function layout(onProgress = () => {}) {
     if (lastGrid) await show(lastGrid, { instant: true });
     listeners.rebuilt?.();
   }
-  const k = Math.min(sw / cw, sh / ch);
+  let k;
+  if (name === 'landscape') {
+    k = Math.min(sw / cw, sh / ch);
+    world.position.set((sw - cw * k) / 2, (sh - ch * k) / 2);
+  } else {
+    // every control on screen, the buttons at the bar's ends included
+    const c = PORTRAIT_CONTENT, room = sh - ACCOUNT_LINE;
+    k = Math.min(sw / c.w, room / c.h);
+    world.position.set((sw - c.w * k) / 2 - c.x * k, ACCOUNT_LINE + (room - c.h * k) / 2 - c.y * k);
+  }
   world.scale.set(k);
-  world.position.set((sw - cw * k) / 2, (sh - ch * k) / 2);
   placeOverlays();
+  touchTargets();
   ambience.resize(sw, sh);
+  let panel = world.children.find(o => SIDE_PANEL.test(o.item?.path || ''))?.bounds;
+  // in portrait the bet + button overlaps the panel's left edge: keep clear of it
+  const plus = ui.betUp?.bounds, clear = plus && plus.x + plus.w + 4 - panel?.x;
+  if (panel && name === 'portrait' && clear > 0) panel = { ...panel, x: panel.x + clear, w: panel.w - clear };
+  listeners.layout?.({ name, k, world: { x: world.x, y: world.y }, panel: panel && { x: world.x + panel.x * k, y: world.y + panel.y * k, w: panel.w * k, h: panel.h * k } });
+}
+
+// Small buttons get a fingertip-sized hit area, trimmed where it would reach into a neighbour's.
+// The landscape bar's settings and sound icons are drawn very small; on a phone they also grow, about their centres.
+const TOUCH = 44, SMALLEST = 20;
+function touchTargets() {
+  for (const key of ['menu', 'sound']) {
+    const o = ui[key];
+    if (!o) continue;
+    o.home ||= { x: o.x, y: o.y, sx: o.scale.x, sy: o.scale.y };
+    const h = o.home, lb = o.getLocalBounds(), cx = lb.x + lb.width / 2, cy = lb.y + lb.height / 2;
+    o.pivot.set(0, 0); o.position.set(h.x, h.y); o.scale.set(h.sx, h.sy);
+    const b = o.getBounds(), grow = Math.min(1.8, Math.max(1, SMALLEST / Math.min(b.width, b.height)));
+    o.pivot.set(cx, cy); o.position.set(h.x + cx * h.sx, h.y + cy * h.sy); o.scale.set(h.sx * grow, h.sy * grow);
+  }
+  const hits = BUTTONS.filter(key => ui[key] && key !== 'anteArrow').map(key => {
+    const o = ui[key]; o.hitArea = null;
+    const b = o.getBounds(), px = Math.max(0, (TOUCH - b.width) / 2), py = Math.max(0, (TOUCH - b.height) / 2);
+    return { o, b, r: { x0: b.left - px, y0: b.top - py, x1: b.right + px, y1: b.bottom + py } };
+  });
+  for (const [i, p] of hits.entries()) for (const q of hits.slice(i + 1)) {
+    const ox = Math.min(p.r.x1, q.r.x1) - Math.max(p.r.x0, q.r.x0), oy = Math.min(p.r.y1, q.r.y1) - Math.max(p.r.y0, q.r.y0);
+    if (ox <= 0 || oy <= 0) continue;
+    const [a, b, lo, hi] = ox < oy ? ['x0', 'x1', 'left', 'right'] : ['y0', 'y1', 'top', 'bottom'];
+    const [first, second] = p.b[lo] + p.b[hi] < q.b[lo] + q.b[hi] ? [p, q] : [q, p];
+    const mid = (first.b[hi] + second.b[lo]) / 2;
+    first.r[b] = Math.max(first.b[hi], Math.min(first.r[b], mid));
+    second.r[a] = Math.min(second.b[lo], Math.max(second.r[a], mid));
+  }
+  for (const { o, r } of hits) {
+    const p0 = o.toLocal(new PIXI.Point(r.x0, r.y0)), p1 = o.toLocal(new PIXI.Point(r.x1, r.y1));
+    o.hitArea = new PIXI.Rectangle(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y));
+  }
 }
 
 function hookButtons() {
-  for (const key of ['spin', 'betUp', 'betDown', 'buy', 'ante', 'anteArrow', 'autoplay', 'sound']) {
+  for (const key of BUTTONS) {
     const o = ui[key];
     if (!o) continue;
     o.eventMode = 'static';

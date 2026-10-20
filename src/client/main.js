@@ -171,7 +171,31 @@ scene.on('columnLanded', ({ col, first }) => first ? sound.play(sound.CLIPS.reel
 scene.on('scatterLanded', () => sound.playNth(sound.CLIPS.scatter, scattersThisSpin++));
 scene.on('anticipation', () => sound.anticipate());
 scene.on('vanish', () => { sound.playNth(sound.CLIPS.vanish, tumbleNo++); scene.wait(350).then(() => sound.play(sound.CLIPS.tumble)); });
-function renderSound() { const st = sound.getSettings(); scene.renderVolume({ volume: st.volume, muted: st.muted }); scene.setSoundIcon(!st.muted && st.volume > 0); }
+function renderSound() {
+  const st = sound.getSettings();
+  scene.renderVolume({ volume: st.volume, muted: st.muted }); scene.setSoundIcon(!st.muted && st.volume > 0);
+  $('#setting-sound').checked = !st.muted; $('#setting-volume').value = Math.round(st.volume * 100);
+}
+// the menu button opens the settings; the info button and the settings' rules button open the bonus rules
+const rules = () => $('#bonus-hud button').click();
+scene.on('menu', () => { sound.play(sound.CLIPS.click); scene.hideOverlay('volume'); renderSound(); $('#settings').showModal(); });
+scene.on('info', () => { sound.play(sound.CLIPS.click); rules(); });
+$('#setting-sound').onchange = e => { sound.setSettings({ muted: !e.target.checked }); renderSound(); };
+$('#setting-volume').oninput = e => { sound.setSettings({ volume: e.target.value / 100, muted: false }); renderSound(); };
+$('#settings .settings-close').onclick = () => $('#settings').close();
+$('#settings .setting-rules').onclick = () => { $('#settings').close(); rules(); };
+// The bonus panel sits in the empty panel by the bet controls, its lettering sized to it; when the panel is
+// small it keeps to the jackpots and the rules button. The account line keeps clear of the game's left column.
+scene.on('layout', ({ name, k, world, panel }) => {
+  const hud = $('#bonus-hud');
+  if (panel) {
+    const font = Math.max(9, Math.min(16, panel.h / 10, panel.w / 9.5));
+    Object.assign(hud.style, { left: `${panel.x}px`, top: `${panel.y}px`, width: `${panel.w}px`, height: `${panel.h}px`, fontSize: `${font}px` });
+    hud.classList.toggle('is-compact', panel.h / font < 14);
+  }
+  // (the column ends at x 276 of the 1920 layout; the buy panel starts 125 down)
+  $('.who').classList.toggle('is-tight', name === 'landscape' && world.x + 276 * k < 190 && world.y + 125 * k < 60);
+});
 scene.on('betDown', () => bet({ bet: state.bet - 1 }));
 scene.on('betUp', () => bet({ bet: state.bet + 1 }));
 scene.on('ante', () => bet({ ante: !state.ante }));

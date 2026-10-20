@@ -37,6 +37,13 @@
     <button class="jackpot-close" type="button">Continue</button>
   </dialog>
 
+  <dialog id="settings" aria-labelledby="settings-title">
+    <h2 id="settings-title">Settings</h2>
+    <label class="setting"><span>Sound</span><input id="setting-sound" type="checkbox" role="switch"></label>
+    <label class="setting"><span>Volume</span><input id="setting-volume" type="range" min="0" max="100" step="1"></label>
+    <div class="actions"><button class="setting-rules" type="button">Game rules</button><button class="settings-close" type="button">Close</button></div>
+  </dialog>
+
   <div class="who">
     <span id="sync" role="status">Playing as guest</span>
     <button id="account" type="button">Sign in</button>
