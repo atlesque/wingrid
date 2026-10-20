@@ -5,7 +5,7 @@
     "centre": 515,
     "halfWidth": 13,
     "lift": 0.25,
-    "jaw": [24, 95],
+    "hinge": [1.5, 26],
     "roundHalfWidth": 10,
     "roundOpen": 15,
     "corner": 5

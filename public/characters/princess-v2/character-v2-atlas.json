@@ -91,6 +91,14 @@
       "width": 1024,
       "height": 1536,
       "rotate": false
+    },
+    "jaw": {
+      "image": "character-v2-jaw.png",
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 1536,
+      "rotate": false
     }
   },
   "eyes": [

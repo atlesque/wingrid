@@ -35,10 +35,14 @@ export async function createPrincessV2() {
     loadJson('character-v2-rig.json'), loadJson('character-v2-atlas.json'), loadJson('character-v2-face.json'),
     loadJson('character-v2-lipsync.json')
   ]);
-  const texture = await PIXI.Assets.load(`${BASE}/${atlasInfo.image}`);
+  // every piece is cut from the painting with identity UVs; a piece with its own image (her jaw) is painting-sized
+  const textures = new Map();
+  for (const path of new Set([atlasInfo.image, ...Object.values(atlasInfo.sprites).map(s => s.image).filter(Boolean)]))
+    textures.set(path, await PIXI.Assets.load(`${BASE}/${path}`));
+  const texture = textures.get(atlasInfo.image);
   const image = { naturalWidth: texture.width, naturalHeight: texture.height };
   const atlas = new TextureAtlas();
-  for (const name of Object.keys(atlasInfo.sprites)) atlas.addTexture(name, texture);
+  for (const [name, sprite] of Object.entries(atlasInfo.sprites)) atlas.addTexture(name, textures.get(sprite.image || atlasInfo.image));
   Object.assign(rig.animations, {
     v2_anticipation: reaction({ tilt: -3, lift: 10, wand: 12, wings: 7 }),
     v2_win: reaction({ tilt: 4, lift: 26, wand: 22, wings: 13, duration: 1.8 }),
@@ -64,7 +68,7 @@ export async function createPrincessV2() {
       const offsets = [];
       let cursor = 0, affected = false;
       for (let i=0; i<source.uvs.length; i+=2) {
-        const [dx, dy] = offset(source.uvs[i]*image.naturalWidth, source.uvs[i+1]*image.naturalHeight);
+        const [dx, dy] = offset(source.uvs[i]*image.naturalWidth, source.uvs[i+1]*image.naturalHeight, slot.data.name);
         const count=source.vertices[cursor++];
         for (let j=0;j<count;j++) { offsets.push(dx,-dy); cursor+=4; }
         affected=affected || Math.abs(dx)+Math.abs(dy)>1e-8;
@@ -88,10 +92,11 @@ export async function createPrincessV2() {
     }
     return [dx, dy];
   });
-  // Speaking shapes the mouth along the line between her lips. The lips part in an oval round the middle of
-  // her mouth (narrower when they round into an O) that closes well before the corners, so the smile keeps its
-  // shape: the lower lip and chin drop, the upper lip lifts a little, and a mouth drawn into the gap shows
-  // behind them. The corners draw out for an "ee" and in for an "oo". Her brows lift as she talks.
+  // Speaking shapes the mouth along the line between her lips. Her lower face is its own piece (the jaw slot,
+  // drawn over the head): below the line it drops as one, lower lip, chin and jawline together, sliding over her
+  // collar, and out past the corners of her mouth it hinges, so her cheeks stretch gently towards her ears and the
+  // corners stay closed. Rounding the lips narrows the opening. The upper lip lifts a little, a mouth drawn into the
+  // gap shows behind them, and the corners draw out for an "ee" and in for an "oo". Her brows lift as she talks.
   const { mouth, brows, visemes } = face;
   const seam = x => {
     const points = mouth.seam;
@@ -102,16 +107,22 @@ export async function createPrincessV2() {
     }
     return points.at(-1)[1];
   };
-  // how far the lips part at x for an oval of the given half width; it widens further down so the chin drops as one
-  // (in a U, so the lower lip drops as a curve, not a point)
-  const parting = (halfWidth, x, depth = 0) => {
-    const u = Math.abs(x - mouth.centre) / (halfWidth + depth * .5);
+  // how far the upper lip lifts at x, in a U round the middle of her mouth
+  const parting = (halfWidth, x) => {
+    const u = Math.abs(x - mouth.centre) / halfWidth;
     return u >= 1 ? 0 : Math.pow(1 - Math.pow(u, 3), .6);
   };
-  const jawField = (halfWidth, drop) => field((x, y) => {
+  // how far the jaw has dropped at a point this far below the line between her lips: all of it within a pixel or
+  // two under the opening, and over a longer stretch of cheek further out
+  const dropped = (halfWidth, x, depth) => {
+    const reach = mouth.hinge[0] + mouth.hinge[1] * smooth(halfWidth * .6, halfWidth * 1.8, Math.abs(x - mouth.centre));
+    return depth <= 0 ? 0 : smooth(0, reach, depth);
+  };
+  const jawField = (halfWidth, drop) => field((x, y, slot) => {
     const depth = y - seam(x);
-    if (depth >= 0) return [0, drop * parting(halfWidth, x, depth) * (1 - smooth(mouth.jaw[0], mouth.jaw[1], depth))];
-    return [0, -drop * mouth.lift * parting(halfWidth, x) * (1 - smooth(0, 9, -depth))];
+    if (slot === 'jaw') return [0, drop * dropped(halfWidth, x, depth)];
+    if (slot === 'head' && depth < 0) return [0, -drop * mouth.lift * parting(halfWidth, x) * (1 - smooth(0, 9, -depth))];
+    return [0, 0];
   });
   const jaw = jawField(mouth.halfWidth, mouth.open), roundJaw = jawField(mouth.roundHalfWidth, mouth.roundOpen);
   const corners = field((x, y) => {
@@ -162,11 +173,13 @@ export async function createPrincessV2() {
     const top = [], bottom = [], teeth = [], tongue = [];
     for (let i = 0; i <= 16; i++) {
       const x = mouth.centre + mouth.halfWidth * (i / 8 - 1), y = seam(x);
-      const wide = parting(mouth.halfWidth, x), round = parting(mouth.roundHalfWidth, x);
+      const wide = dropped(mouth.halfWidth, x, 1.5), round = dropped(mouth.roundHalfWidth, x, 1.5);
       const gap = shape.open * (mouth.open * wide * (1 - shape.round) + mouth.roundOpen * round * shape.round);
+      const lift = shape.open * mouth.lift * (mouth.open * parting(mouth.halfWidth, x) * (1 - shape.round)
+        + mouth.roundOpen * parting(mouth.roundHalfWidth, x) * shape.round);
       // the drawn lip line thins out where the lips barely part
       const edge = Math.min(1, gap / 1.5) * Math.max(wide * (1 - shape.round), round);
-      const upper = y - .4 * edge - gap * mouth.lift, lower = y + 1.2 * edge + gap;
+      const upper = y - .4 * edge - lift, lower = y + 1.2 * edge + gap;
       top.push(place(x, upper));
       teeth.push(place(x, upper + gap * .45 * shape.teeth));
       tongue.push(place(x, lower - gap * .3));
