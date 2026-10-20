@@ -45,6 +45,7 @@ function render() {
   const locked = busy || !!f || !!state.jackpot;
   scene.setEnabled('betDown', !locked && state.bet > 0);
   scene.setEnabled('betUp', !locked && state.bet < cfg.bets.length - 1);
+  scene.setEnabled('betMenu', !locked);
   scene.setEnabled('buy', !locked && !state.ante && state.credits >= betAmount() * 100);
   scene.setEnabled('ante', !locked);
   scene.setEnabled('anteArrow', !locked);
@@ -151,12 +152,12 @@ async function run(buy) {
 }
 function startAutoplay(set) {
   autoSettings = set;
-  scene.setSpeed(set.turbo ? 2.2 : set.quick ? 1.5 : 1);
+  scene.setSpeed(Math.max(SPEEDS[speedLevel], set.turbo ? 2.2 : set.quick ? 1.5 : 1));
   auto = set.spins - 1; // this press is the first
   render();
   run();
 }
-function stopAutoplay() { auto = 0; scene.setSpeed(1); render(); }
+function stopAutoplay() { auto = 0; scene.setSpeed(SPEEDS[speedLevel]); render(); }
 async function topUp() {
   try { state = await api.topUp(); render(); toast(`+${fmt(cfg.startCredits)} free credits`); } catch (e) { toast(e.message, 2000); }
 }
@@ -186,7 +187,14 @@ $('#settings .settings-close').onclick = () => $('#settings').close();
 $('#settings .setting-rules').onclick = () => { $('#settings').close(); rules(); };
 // The bonus panel sits in the empty panel by the bet controls, its lettering sized to it; when the panel is
 // small it keeps to the jackpots and the rules button. The account line keeps clear of the game's left column.
-scene.on('layout', ({ name, k, world, panel }) => {
+// On a phone the buy and double-chance panels and the jackpot panel are left off (the i button still opens the
+// rules). Double chance can't be switched off there, so it is switched off.
+let phone = false;
+const phoneAnteOff = () => { if (phone && state?.ante && !busy && !state.feature) bet({ ante: false }); };
+scene.on('layout', ({ name, k, phone: isPhone, world, panel }) => {
+  phone = isPhone;
+  document.documentElement.classList.toggle('is-phone', phone);
+  phoneAnteOff();
   const hud = $('#bonus-hud');
   if (panel) {
     const font = Math.max(9, Math.min(16, panel.h / 10, panel.w / 9.5));
@@ -196,6 +204,31 @@ scene.on('layout', ({ name, k, world, panel }) => {
   // (the column ends at x 276 of the 1920 layout; the buy panel starts 125 down)
   $('.who').classList.toggle('is-tight', name === 'landscape' && world.x + 276 * k < 190 && world.y + 125 * k < 60);
 });
+// the speed button steps through normal, quick and turbo spins; the choice is remembered on this device
+const SPEEDS = [1, 1.5, 2.2], SPEED_NAMES = ['NORMAL SPIN', 'QUICK SPIN', 'TURBO SPIN'];
+let speedLevel = 0;
+try { speedLevel = Math.min(2, Math.max(0, +localStorage.getItem('wingrid.speed') || 0)); } catch {}
+function setSpeedLevel(level) {
+  speedLevel = level;
+  try { localStorage.setItem('wingrid.speed', level); } catch {}
+  scene.showSpeed(level);
+  if (auto <= 0) scene.setSpeed(SPEEDS[level]);
+}
+scene.on('speed', () => { sound.play(sound.CLIPS.click); setSpeedLevel((speedLevel + 1) % SPEEDS.length); toast(SPEED_NAMES[speedLevel]); });
+// the coin-stack button lists every bet to pick from
+function openBets() {
+  const list = $('#bets .bet-list');
+  list.replaceChildren(...cfg.bets.map((amount, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = fmt(amount); b.setAttribute('aria-pressed', i === state.bet);
+    b.onclick = () => { $('#bets').close(); if (i !== state.bet) bet({ bet: i }); };
+    return b;
+  }));
+  $('#bets').showModal();
+  list.querySelector('[aria-pressed="true"]')?.focus();
+}
+scene.on('betMenu', () => { sound.play(sound.CLIPS.click); if (!busy && !state.feature && !state.jackpot) openBets(); });
+$('#bets .bets-close').onclick = () => $('#bets').close();
 scene.on('betDown', () => bet({ bet: state.bet - 1 }));
 scene.on('betUp', () => bet({ bet: state.bet + 1 }));
 scene.on('ante', () => bet({ ante: !state.ante }));
@@ -247,6 +280,8 @@ try {
 }
 render();
 renderSound();
+scene.showSpeed(speedLevel); scene.setSpeed(SPEEDS[speedLevel]);
+phoneAnteOff();
 scene.setText('banner', BANNERS[0]);
 loadingProgress(100, 'Ready to play');
 await new Promise(resolve => setTimeout(resolve, 250));
