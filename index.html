@@ -44,6 +44,16 @@
     <div class="actions"><button class="setting-rules" type="button">Game rules</button><button class="settings-close" type="button">Close</button></div>
   </dialog>
 
+  <dialog id="autoplay" aria-labelledby="autoplay-title">
+    <h2 id="autoplay-title">Autoplay</h2>
+    <label class="setting"><span>Turbo spin</span><input name="turbo" type="checkbox" role="switch"></label>
+    <label class="setting"><span>Quick spin</span><input name="quick" type="checkbox" role="switch"></label>
+    <label class="setting"><span>Skip screens</span><input name="skip" type="checkbox" role="switch" checked></label>
+    <label class="setting"><span>Spins</span><output class="autoplay-count">100</output></label>
+    <input class="autoplay-spins" type="range" min="0" max="7" step="1" value="5" aria-label="Number of autospins">
+    <div class="actions"><button class="autoplay-close" type="button">Cancel</button><button class="autoplay-start is-primary" type="button">Start</button></div>
+  </dialog>
+
   <dialog id="bets" aria-labelledby="bets-title">
     <h2 id="bets-title">Bet</h2>
     <div class="bet-list"></div>
