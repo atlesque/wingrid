@@ -30,11 +30,14 @@ export function createBonuses({ pick, onState, onError, react }) {
       ? `${f.left} FREE SPINS LEFT · TOTAL ${f.totalMult}x · WON ${money(f.won)}`
       : 'MULTIPLIERS 2x–500x · 4 MBP = 15 FREE SPINS';
     meter.textContent = `${f?.totalMult ?? displayMult}×`;
-    hud.querySelector('.jackpot-pools').replaceChildren(...(state.jackpots || cfg.jackpots.tiers).map(tier => {
+    // one plate per pool, biggest on top, like a prize ladder
+    hud.querySelector('.jackpot-pools').replaceChildren(...[...(state.jackpots || cfg.jackpots.tiers)].reverse().map(tier => {
       const row = document.createElement('div'), name = document.createElement('span'), amount = document.createElement('strong');
-      name.textContent = tier.name; amount.textContent = money(tier.amount); row.append(name, amount); return row;
+      row.dataset.tier = tier.id; name.textContent = tier.name; amount.textContent = money(tier.amount); row.append(name, amount); return row;
     }));
-    hud.querySelector('button').textContent = state.jackpot ? 'Reveal your jackpot' : 'Jackpots & bonus rules';
+    const button = hud.querySelector('button');
+    button.textContent = state.jackpot ? 'Reveal your jackpot' : 'Rules';
+    button.classList.toggle('is-pending', !!state.jackpot);
     if (dialog.open && state.jackpot && !settling) updateCards(state.jackpot.picks);
   }
   function updateCards(picks) {
