@@ -18,6 +18,11 @@ In free spins, winning orbs add to a persistent multiplier, used whenever new or
 land with a symbol win. Scatter pays remain separate. The triggering spin and the
 entire free-spin feature share a 5,000x base-bet cap. Buying is disabled during ante.
 
+`npm run rtp` simulates the math (`node scripts/rtp.mjs 4000000` for tighter figures). Over 4 million
+spins: about 96.5% RTP with a 27.8% hit rate, free spins once in about 255 spins (about 150 with double
+chance, also 96.5%), an average feature of about 88x, and about 96% for a bought feature. The original
+lists 96.5% RTP and a 28.6% hit rate.
+
 The client switches to the night-festival backdrop and purple board, shows spins left, feature winnings
 and the multiplier total, announces retriggers and celebrates 20x/35x/50x/100x wins.
 `spin.win` is the actual credited amount; `tumbleWin` and `scatterWin` are in base bets.

@@ -31,11 +31,13 @@ export const SYMBOL = Object.fromEntries(SYMBOLS.map(s => [s.id, s]));
 export const SCATTER_PAYS = { 4: 3, 5: 5, 6: 100 };
 
 // How often each symbol lands in a cell. Free spins use their own weights with more orbs.
-const BASE_WEIGHTS = { crown: 4, chalice: 6, hourglass: 7, ring: 8, amethyst: 10, topaz: 11, emerald: 12, sapphire: 13, ruby: 14 };
+const BASE_WEIGHTS = { crown: 4, chalice: 6, hourglass: 7, ring: 8, amethyst: 10, topaz: 11, emerald: 12, sapphire: 13, ruby: 15 };
 const FREE_WEIGHTS = { crown: 5, chalice: 6, hourglass: 7, ring: 8, amethyst: 10, topaz: 11, emerald: 12, sapphire: 13, ruby: 14 };
-// chance per cell, on top of the weights above
-const SCATTER_CHANCE = { base: 0.0175, ante: 0.0215, free: 0.0125 };
-const MULT_CHANCE = { base: 0.0039, free: 0.04 };
+// chance per cell, on top of the weights above. Tuned with scripts/rtp.mjs to about 96.5% RTP in the base
+// game, with double chance and for a bought feature, and free spins about once in 255 spins (150 with
+// double chance). Base-game orbs are rarer so that more of the return comes from free spins.
+const SCATTER_CHANCE = { base: 0.0195, ante: 0.0228, free: 0.0125 };
+const MULT_CHANCE = { base: 0.002, free: 0.04 };
 export const MULTIPLIERS = [
   [2, 300], [3, 220], [4, 160], [5, 130], [6, 90], [8, 70], [10, 50], [12, 30], [15, 22],
   [20, 14], [25, 9], [50, 4], [100, 2], [250, 0.6], [500, 0.25],
