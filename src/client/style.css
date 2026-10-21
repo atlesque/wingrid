@@ -19,6 +19,7 @@
   background: var(--gold-fill); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: var(--outline);
 }
 * { box-sizing: border-box; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #10183f; color: var(--ink);
   font: 700 14px/1.2 var(--text); }
 /* The backdrop: one painting that covers the whole screen behind the game's transparent canvas, whatever the
